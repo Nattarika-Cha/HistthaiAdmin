@@ -1,25 +1,58 @@
-import logo from './logo.svg';
+import React, { Component } from 'react';
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'antd/dist/antd.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import { BrowserRouter as Router } from "react-router-dom";
+// import { RightSquareFilled } from '@ant-design/icons';
+import Menu from "./template/Menu";
+import Routing from "./routes";
+// import { Layout } from 'antd';
+import { Layout } from 'antd';
+
+const { Content, Sider } = Layout;
+
+export default class App extends Component {
+  state = {
+    collapsed: false,
+  };
+
+  toggle = () => {
+    this.setState({
+      collapsed: !this.state.collapsed,
+    });
+  };
+
+  render() {
+    return (
+      <Router>
+        <Layout>
+          <Sider
+            breakpoint="lg"
+            collapsedWidth="0"
+            onBreakpoint={broken => {
+              console.log(broken);
+            }}
+            onCollapse={(collapsed, type) => {
+              console.log(collapsed, type);
+            }}
+          >
+            <div className="logo" />
+            <Menu theme="dark" mode="inline" defaultSelectedKeys={['4']}>
+              <Menu />
+            </Menu>
+          </Sider>
+          <Layout>
+            <Content style={{ margin: '24px 16px 0' }}>
+              <div className="site-layout-background" style={{ padding: 24, minHeight: 360, height: "97%" }}>
+                <Routing />
+              </div>
+            </Content>
+            {/* <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer> */}
+          </Layout>
+        </Layout>
+      </Router>
+    );
+  }
 }
 
-export default App;
