@@ -1,0 +1,43 @@
+#product{
+    margin: 1%;
+    padding: 0% 0% 0% 2%;
+}
+
+#icon{
+    display: flex;
+    justify-content: flex-start;
+    margin-right: 2%;
+}
+
+#page-product{
+    font-size: x-large;
+    color: #DA213D;
+    border-left: 2px solid #DA213D;
+    display: flex;
+    padding-top: 1.9%;
+    padding-left: 3%;
+}
+
+#input-search{
+    margin: 3%;
+}
+
+.anticon svg {
+    display: flex;
+}
+
+#col{
+    margin-left: 1.5%;
+}
+
+#button-print{
+    background-color: #FFFFFF;
+    border: none;
+    color: #AEAEAE;
+}
+
+#button-addproduct{
+    background-color: #DA213D;
+    border: none;
+    color: #FFFFFF;
+}
