@@ -3,6 +3,7 @@ import { BsFillGrid1X2Fill} from 'react-icons/bs';
 import { Col, Row, Table, Tag, Popconfirm, Statistic,} from 'antd';
 import { Container } from 'react-bootstrap';
 import '../css/Home.css';
+import ReactApexChart from "react-apexcharts";
 
 const columns = [
     {
@@ -174,6 +175,28 @@ export default class Home extends Component {
         this.state = {
             token: "",
             user: [],
+
+            series: [{
+              data: [400, 430, 448, 470, 540]
+            }],
+            options: {
+              chart: {
+                type: 'bar',
+                height: 350
+              },
+              plotOptions: {
+                bar: {
+                  horizontal: true,
+                }
+              },
+              dataLabels: {
+                enabled: false
+              },
+              xaxis: {
+                categories: ['South Korea', 'Canada', 'United Kingdom', 'Netherlands', 'Italy'],
+              }
+            },
+          
         };
     }
   
@@ -193,7 +216,7 @@ export default class Home extends Component {
                     <Col xs={24} md={24} xl={15} id="chart">
                         <Col xs={24} md={24} xl={24}>สินค้าที่ผู้คนสนใจ
                             <Col>
-                                
+                                <ReactApexChart options={this.state.options} series={this.state.series} type="bar" height={350} />
                             </Col>
                         </Col>
                     </Col>
@@ -245,11 +268,11 @@ export default class Home extends Component {
                   </Col>
                 </Row>
 
-                <Row id="row3">
-                    <Col>ข้อความจากผู้ติดต่อ</Col>
-                </Row>
-                <Row id="interest-product">
-                    <Table columns={columns} dataSource={data} />
+                <Row>
+                  <Col  id="row3">ข้อความจากผู้ติดต่อ</Col>
+                  <Row id="interest-product1">
+                  <Table columns={columns} dataSource={data} />
+                  </Row>
                 </Row>
             </Container>
         )
