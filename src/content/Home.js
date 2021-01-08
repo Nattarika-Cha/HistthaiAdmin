@@ -9,84 +9,6 @@ import swal from 'sweetalert';
 
 var ip = "http://localhost:5000";
 // var ip_img_profile = "http://128.199.198.10/API/profile/";
-
-const columns = [
-  {
-    title: 'ชื่อ - นามสกุล',
-    dataIndex: 'name',
-    key: 'name',
-    render: text => <div>{text}</div>,
-  },
-  {
-    title: 'เบอร์โทรศัพท์',
-    dataIndex: 'phone',
-    key: 'phone',
-  },
-  {
-    title: 'E - mail',
-    dataIndex: 'email',
-    key: 'email',
-    ellipsis: true,
-  },
-  {
-    title: 'เรื่อง',
-    key: 'type',
-    dataIndex: 'type',
-    render: tags => (
-      <>
-        {
-          (tags === "สมัครตัวแทนจำหน่าย") ?
-            <Tag color="green" key="1">
-              {tags.toUpperCase()}
-            </Tag>
-            : (tags === "สอบถามข้อมูลเพิ่มเติม") ?
-              <Tag color="geekblue" key="2">
-                {tags.toUpperCase()}
-              </Tag>
-              : (tags === "สั่งซื้อสินค้า") ?
-                <Tag color="red" key="3">
-                  {tags.toUpperCase()}
-                </Tag>
-                :
-                <></>
-        }
-      </>
-    ),
-  },
-  {
-    title: 'ข้อความ',
-    dataIndex: 'msg',
-    key: 'msg',
-    ellipsis: true,
-  },
-  {
-    title: '',
-    dataIndex: 'acceptStatus',
-    key: 'acceptStatus',
-    render: accept => (
-      <>
-        {
-          (accept === "A") ?
-            <Tag color="green" key="1">{"อนุมัติ"}</Tag>
-            : (accept === "N") ?
-              <Tag color="geekblue" key="2">{"รอดำเนินการ"}</Tag>
-              :
-              <></>
-        }
-      </>
-    ),
-  },
-  {
-    title: '',
-    dataIndex: '',
-    key: 'x',
-    render: () =>
-      <Popconfirm title="คุณแน่ใจว่าจะลบรายการ？" okText="ลบ" cancelText="ยกเลิก">
-        <div id="delete" href="#">ลบรายการ</div>
-      </Popconfirm>,
-  },
-];
-
 export default class Home extends Component {
   constructor(props) {
     super(props);
@@ -106,6 +28,8 @@ export default class Home extends Component {
       optionshit: [],
       optionshitselect: null,
       searchhitstatus: false,
+
+      contactstatus: true,
 
       series: [{
         data: [400, 430, 448, 470, 540]
@@ -193,6 +117,83 @@ export default class Home extends Component {
       },
     ];
 
+    this.columnscontact = [
+      {
+        title: 'ชื่อ - นามสกุล',
+        dataIndex: 'name',
+        key: 'name',
+        render: text => <div>{text}</div>,
+      },
+      {
+        title: 'เบอร์โทรศัพท์',
+        dataIndex: 'phone',
+        key: 'phone',
+      },
+      {
+        title: 'E - mail',
+        dataIndex: 'email',
+        key: 'email',
+        ellipsis: true,
+      },
+      {
+        title: 'เรื่อง',
+        key: 'type',
+        dataIndex: 'type',
+        render: tags => (
+          <>
+            {
+              (tags === "สมัครตัวแทนจำหน่าย") ?
+                <Tag color="green" key="1">
+                  {tags.toUpperCase()}
+                </Tag>
+                : (tags === "สอบถามข้อมูลเพิ่มเติม") ?
+                  <Tag color="geekblue" key="2">
+                    {tags.toUpperCase()}
+                  </Tag>
+                  : (tags === "สั่งซื้อสินค้า") ?
+                    <Tag color="red" key="3">
+                      {tags.toUpperCase()}
+                    </Tag>
+                    :
+                    <></>
+            }
+          </>
+        ),
+      },
+      {
+        title: 'ข้อความ',
+        dataIndex: 'msg',
+        key: 'msg',
+        ellipsis: true,
+      },
+      {
+        title: '',
+        dataIndex: 'acceptStatus',
+        key: 'acceptStatus',
+        render: accept => (
+          <>
+            {
+              (accept === "A") ?
+                <Tag color="green" key="1">{"อนุมัติ"}</Tag>
+                : (accept === "N") ?
+                  <Tag color="geekblue" key="2">{"รอดำเนินการ"}</Tag>
+                  :
+                  <></>
+            }
+          </>
+        ),
+      },
+      {
+        title: '',
+        dataIndex: '',
+        key: 'x',
+        render: (record) =>
+          <Popconfirm title="คุณแน่ใจว่าจะลบรายการ？" okText="ลบ" cancelText="ยกเลิก" onConfirm={() => this.handleDeleteContact(record.contactId)}>
+            <div id="delete" href="#">ลบรายการ</div>
+          </Popconfirm>,
+      },
+    ];
+
 
     this.onSearchFildNew = this.onSearchFildNew.bind(this);
     this.onSelectNew = this.onSelectNew.bind(this);
@@ -205,13 +206,16 @@ export default class Home extends Component {
     this.onChangeHit = this.onChangeHit.bind(this);
     this.onSaveHit = this.onSaveHit.bind(this);
     this.handleDeleteHit = this.handleDeleteHit.bind(this);
+
+    this.handleDeleteContact = this.handleDeleteContact.bind(this);
   }
 
   async componentDidMount() {
     var url_contact = ip + "/Contact/find/all";
     const contact = await (await axios.get(url_contact)).data;
     this.setState({
-      contact: contact
+      contact: contact,
+      contactstatus: false
     });
 
     var url_product_hit = ip + "/ProductShow/find/hit";
@@ -224,7 +228,6 @@ export default class Home extends Component {
 
     var url_product_new = ip + "/ProductShow/find/new";
     const productnew = await (await axios.get(url_product_new)).data;
-    console.log(productnew.length, " length")
     this.setState({
       productnew: productnew,
       productnewstatus: false,
@@ -236,7 +239,6 @@ export default class Home extends Component {
     if (value !== "") {
       var url_wordsearch_new = ip + "/Product/find/wordsearchproductshow/" + value;
       const wordsearchnew = await (await axios.get(url_wordsearch_new)).data;
-      // console.log(wordsearchnew, " wordsearchnew")
       this.setState({
         optionsnew: wordsearchnew
       });
@@ -251,7 +253,6 @@ export default class Home extends Component {
     if (value !== "") {
       var url_wordsearch_hit = ip + "/Product/find/wordsearchproductshow/" + value;
       const wordsearchhit = await (await axios.get(url_wordsearch_hit)).data;
-      // console.log(wordsearchnew, " wordsearchnew")
       this.setState({
         optionshit: wordsearchhit
       });
@@ -380,6 +381,26 @@ export default class Home extends Component {
     }
   }
 
+  async handleDeleteContact(contactId) {
+    const data = {
+      contactStatus: "N"
+    };
+
+    var url_update_product_Contact = ip + "/Contact/updateStatus/" + contactId;
+    const updateproductcontact = await (await axios.put(url_update_product_Contact, data)).data;
+    if (updateproductcontact[0] > 0) {
+      const contact = [...this.state.contact];
+      this.setState({
+        contact: contact.filter((item) => item.contactId !== contactId),
+        contactstatus: false
+      });
+
+      console.log(this.state.contact, " contact");
+    } else {
+
+    }
+  }
+
   render() {
     return (
       <Container fluid>
@@ -470,7 +491,7 @@ export default class Home extends Component {
         <Row>
           <Col id="row3">ข้อความจากผู้ติดต่อ</Col>
           <Row id="interest-product1">
-            <Table columns={columns} dataSource={this.state.contact} />
+            <Table columns={this.columnscontact} dataSource={this.state.contact} loading={this.state.contactstatus}/>
           </Row>
         </Row>
       </Container>
