@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { FaProductHunt } from "react-icons/fa";
 import { Row, Col, Input, Select, Button, Table, Switch, Modal, Popconfirm, Upload } from 'antd';
 import { Container } from 'react-bootstrap';
-import { PrinterTwoTone, AppstoreAddOutlined, CloseOutlined, CheckOutlined, PlusOutlined, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
+import { PrinterTwoTone, CloseOutlined, CheckOutlined, PlusOutlined, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
 import '../css/Product.css';
 import Form from "antd/lib/form/Form";
 
@@ -14,6 +14,18 @@ function handleChange(value) {
 }
 
 function handleChange1(value) {
+    console.log(`selected ${value}`);
+}
+
+function handleChange2(value) {
+    console.log(`selected ${value}`);
+}
+
+function handleChange3(value) {
+    console.log(`selected ${value}`);
+}
+
+function handleChange4(value) {
     console.log(`selected ${value}`);
 }
 
@@ -31,7 +43,51 @@ const data = [
     },
 ];
 
+const prices = [
+    {
+        level: 'Silver',
+        level1: '0',
+        level2: '0',
+        level3: '0',
+        level4: '0',
+        level5: '0',
+    },
+    {
+        level: 'Gold',
+        level1: '0',
+        level2: '0',
+        level3: '0',
+        level4: '0',
+        level5: '0',
+    },
+    {
+        level: 'Platinum',
+        level1: '0',
+        level2: '0',
+        level3: '0',
+        level4: '0',
+        level5: '0',
+    },
+    {
+        level: 'End User',
+        level1: '0',
+        level2: '0',
+        level3: '0',
+        level4: '0',
+        level5: '0',
+    },
+];
+
 function getBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
+  }
+
+  function getBase641(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
@@ -46,8 +102,11 @@ export default class Product extends Component {
             token: "",
             user: [],
             isModalVisible: false,
+            isModal1Visible: false,
             previewImage: '',
             previewTitle: '', 
+            previewImage1: '',
+            previewTitle1: '', 
             fileList : [
                 {
                     uid: '-1',
@@ -73,7 +132,33 @@ export default class Product extends Component {
                     status: 'done',
                     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
                 },
-            ]  
+            ],
+            fileList1 : [
+                {
+                    uid: '-1',
+                    name: 'image.png',
+                    status: 'done',
+                    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+                },
+                {
+                    uid: '-2',
+                    name: 'image.png',
+                    status: 'done',
+                    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+                },
+                {
+                    uid: '-3',
+                    name: 'image.png',
+                    status: 'done',
+                    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+                },
+                {
+                    uid: '-4',
+                    name: 'image.png',
+                    status: 'done',
+                    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+                },
+            ]    
         };
 
         this.product = [
@@ -156,7 +241,7 @@ export default class Product extends Component {
                 width: 45,
                 render: () =>
                     <>
-                        <div type="primary" onClick={this.showModal}><EditTwoTone twoToneColor="#63549B"/></div>
+                        <div type="primary" onClick={this.showModal}><EditTwoTone style={{ fontSize: '20px' }} twoToneColor="#63549B"/></div>
                     </>,
             },
             {
@@ -166,12 +251,56 @@ export default class Product extends Component {
                 width: 45,
                 render: () =>
                     <Popconfirm title="คุณแน่ใจว่าจะลบรายการ？" okText="ลบ" cancelText="ยกเลิก">
-                        <div><DeleteTwoTone  twoToneColor="#DA213D"/></div>
+                        <div><DeleteTwoTone  style={{ fontSize: '20px' }} twoToneColor="#DA213D"/></div>
                     </Popconfirm>,
             },
         ]
 
+        this.price = [
+            {
+                title: 'ระดับ',
+                dataIndex: 'level',
+                width: 'fit-content',
+            },
+            {
+                title: 'Level1',
+                dataIndex: 'level1',
+                editable: true,
+                render: () =>
+                    <Input id="input"/>,
+            },
+            {
+                title: 'Level2',
+                dataIndex: 'level2',
+                editable: true,
+                render: () =>
+                    <Input id="input"/>,
+            },
+            {
+                title: 'Level3',
+                dataIndex: 'level3',
+                editable: true,
+                render: () =>
+                    <Input id="input"/>,
+            },
+            {
+                title: 'Level4',
+                dataIndex: 'level4',
+                editable: true,
+                render: () =>
+                    <Input id="input"/>,
+            },
+            {
+                title: 'Level5',
+                dataIndex: 'level5',
+                editable: true,
+                render: () =>
+                    <Input id="input"/>,
+            },
+        ]
+
         this.showModal = this.showModal.bind(this);
+        this.showModal1 = this.showModal1.bind(this);
         this.handleOk = this.handleOk.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
 
@@ -179,17 +308,33 @@ export default class Product extends Component {
         this.handlePreview = this.handlePreview.bind(this);
         this.handleChangeimage = this.handleChangeimage.bind(this);
 
+        this.handleCancelimage1 = this.handleCancelimage1.bind(this);
+        this.handlePreview1 = this.handlePreview1.bind(this);
+        this.handleChangeimage1 = this.handleChangeimage1.bind(this);
+
     }
     
     showModal() {
         this.setState({ isModalVisible: true});
     };
 
+    showModal1() {
+        this.setState({ isModal1Visible: true});
+    };
+
     handleOk() {
         this.setState({ isModalVisible: false });
     };
 
+    handleOk1() {
+        this.setState({ isModal1Visible: false });
+    };
+
     handleCancel() {
+        this.setState({ isModalVisible: false });
+    };
+
+    handleCancel1() {
         this.setState({ isModalVisible: false });
     };
 
@@ -210,6 +355,24 @@ export default class Product extends Component {
     handleChangeimage(fileList){
         this.setState({ ...fileList });
     };
+
+    handleCancelimage1() {
+        this.setState({ preview1Visible: false });
+    };
+    handlePreview1 = async file => {
+        if (!file.url && !file.preview) {
+          file.preview = await getBase641(file.originFileObj);
+        }
+    
+        this.setState({
+          previewImage1: file.url || file.preview,
+          previewVisible: true,
+          previewTitle1: file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
+        });
+      };
+    handleChangeimage1(fileList){
+        this.setState({ ...fileList });
+    };
     
     render() {
         const uploadButton = (
@@ -217,7 +380,13 @@ export default class Product extends Component {
             <PlusOutlined style={{fontSize: "20px", color: '#DA213D'}}/>
             <div style={{ marginTop: 8, color: '#DA213D' }}>เพิ่มรูปภาพ</div>
         </div>
-    );
+        );
+        const uploadButton1 = (
+        <div>
+            <PlusOutlined style={{fontSize: "20px", color: '#DA213D'}}/>
+            <div style={{ marginTop: 8, color: '#DA213D' }}>เพิ่มรูปภาพ</div>
+        </div>
+        );
         return (
             <Container fluid>
                 <Row id="product">
@@ -234,18 +403,22 @@ export default class Product extends Component {
                     </Input.Group>
                 </Row>
                 <Row id="input-search">
-                    <Col md={3} xl={3}><div>เรียงลำดับตาม</div></Col>
+                    <Col md={2} xl={2}><div>เรียงลำดับตาม</div></Col>
                     <Col md={3} xl={3} id="col">
-                        <Select defaultValue="วันที่" style={{ width: 80 }} onChange={handleChange}>
-                            <Option value="jack">วันที่</Option>
-                            <Option value="lucy">ชื่อ</Option>
+                        <Select defaultValue="เรียงลำดับตาม" style={{ width: 130 }} onChange={handleChange}>
+                            <Option value="วันที่">วันที่</Option>
+                            <Option value="ชื่อ">ชื่อ</Option>
                         </Select>
                     </Col>
                     <Col md={5} xl={4} id="col">
                         <Button id="button-print" icon={<PrinterTwoTone twoToneColor="#DA213D"/>}>ปริ้นรายการสินค้า</Button>
                     </Col>
+                    <Col md={4} xl={3} id="col">
+                        {/* <Button id="button-addproduct" icon={<FileAddTwoTone twoToneColor="#DA213D"/>}>เพิ่มรายการสินค้า</Button> */}
+                        <Button id="button-addproduct" onClick={this.showModal1}>เพิ่มรายการสินค้า</Button>
+                    </Col>
                     <Col md={5} xl={4} id="col">
-                        <Button id="button-addproduct" icon={<AppstoreAddOutlined />}>เพิ่มรายการสินค้า</Button>
+                        <Button id="button-addproduct">เพิ่มไฟล์รายการสินค้า</Button>
                     </Col>
                 </Row>
                 <Row id="input-search">
@@ -267,17 +440,23 @@ export default class Product extends Component {
                                     <Col md={12} xl={12}><Input id="input"/></Col>
                                 </Row>
                             </Col>
-                        </Row>
-                        <Row id="add-product">
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>รหัสสินค้า :</Col>
                                     <Col md={12} xl={12}><Input id="input"/></Col>
                                 </Row>
                             </Col>
+                        </Row>
+                        <Row id="add-product">
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>หน่วย :</Col>
+                                    <Col md={12} xl={12}><Input id="input"/></Col>
+                                </Row>
+                            </Col>
+                            <Col md={12} xl={12}>
+                                <Row>
+                                    <Col md={6} xl={6}>ชื่อสินค้า :</Col>
                                     <Col md={12} xl={12}><Input id="input"/></Col>
                                 </Row>
                             </Col>
@@ -285,14 +464,20 @@ export default class Product extends Component {
                         <Row id="add-product">
                             <Col md={12} xl={12}>
                                 <Row>
-                                    <Col md={6} xl={6}>ชื่อสินค้า :</Col>
+                                    <Col md={6} xl={6}>ขนาด :</Col>
                                     <Col md={12} xl={12}><Input id="input"/></Col>
                                 </Row>
                             </Col>
                             <Col md={12} xl={12}>
                                 <Row>
-                                    <Col md={6} xl={6}>ขนาด :</Col>
-                                    <Col md={12} xl={12}><Input id="input"/></Col>
+                                    <Col md={6} xl={6}>สถานะ :</Col>
+                                    <Col md={12} xl={12}>
+                                        <Select defaultValue="สถานะ"  onChange={handleChange2} id="input">
+                                            <Option value="มีจำหน่าย">มีจำหน่าย</Option>
+                                            <Option value="รอเพิ่มเติมสินค้า">รอเพิ่มเติมสินค้า</Option>
+                                            <Option value="สั่งสินค้าล่วงหน้า">สั่งสินค้าล่วงหน้า</Option>
+                                        </Select>
+                                    </Col>
                                 </Row>
                             </Col>
                         </Row>
@@ -308,8 +493,8 @@ export default class Product extends Component {
                                     <Col md={6} xl={6}>หมวดหมู่ :</Col>
                                     <Col md={12} xl={12}>
                                         <Select defaultValue="หมวดหมู่"  onChange={handleChange1} id="input">
-                                            <Option value="jack">อุปกรณ์เครืองมือช่าง</Option>
-                                            <Option value="lucy">แผ่นแสตนเลส</Option>
+                                            <Option value="อุปกรณ์เครืองมือช่าง">อุปกรณ์เครืองมือช่าง</Option>
+                                            <Option value="แผ่นแสตนเลส">แผ่นแสตนเลส</Option>
                                         </Select>
                                     </Col>
                                 </Row>
@@ -343,6 +528,11 @@ export default class Product extends Component {
                                 </Row>
                             </Col>
                         </Row>
+                        <Row>    
+                        </Row>
+                        <Row id="row-price">
+                            <Table columns={this.price} dataSource={prices} />
+                        </Row>
                         <Row id="add-img">
                         <Upload
                             action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
@@ -360,6 +550,135 @@ export default class Product extends Component {
                                 onCancel={this.handleCancelimage}
                             >
                             <img alt="example" style={{ width: '100%' }} src={this.state.previewImage} />
+                            </Modal>
+                        </Row>
+                    </Form>
+                </Modal>
+                <Modal 
+                    title="แก้ไขรายการสินค้า" 
+                    visible={this.state.isModal1Visible} 
+                    onOk={this.handleOk1} 
+                    onCancel={this.handleCancel1}
+                    width={800}>
+                    <Form id="form">
+                        <Col md={24} xl={24} id="product-detail">รายละเอียดสินค้า</Col>
+                        <Row id="add-product">
+                            <Col md={12} xl={12}>
+                                <Row>
+                                    <Col md={6} xl={6}>รหัสบาร์โค้ด :</Col>
+                                    <Col md={12} xl={12}><Input id="input"/></Col>
+                                </Row>
+                            </Col>
+                            <Col md={12} xl={12}>
+                                <Row>
+                                    <Col md={6} xl={6}>รหัสสินค้า :</Col>
+                                    <Col md={12} xl={12}><Input id="input"/></Col>
+                                </Row>
+                            </Col>
+                        </Row>
+                        <Row id="add-product">
+                            <Col md={12} xl={12}>
+                                <Row>
+                                    <Col md={6} xl={6}>หน่วย :</Col>
+                                    <Col md={12} xl={12}><Input id="input"/></Col>
+                                </Row>
+                            </Col>
+                            <Col md={12} xl={12}>
+                                <Row>
+                                    <Col md={6} xl={6}>ชื่อสินค้า :</Col>
+                                    <Col md={12} xl={12}><Input id="input"/></Col>
+                                </Row>
+                            </Col>
+                        </Row>
+                        <Row id="add-product">
+                            <Col md={12} xl={12}>
+                                <Row>
+                                    <Col md={6} xl={6}>ขนาด :</Col>
+                                    <Col md={12} xl={12}><Input id="input"/></Col>
+                                </Row>
+                            </Col>
+                            <Col md={12} xl={12}>
+                                <Row>
+                                    <Col md={6} xl={6}>สถานะ :</Col>
+                                    <Col md={12} xl={12}>
+                                        <Select defaultValue="สถานะ"  onChange={handleChange3} id="input">
+                                            <Option value="มีจำหน่าย">มีจำหน่าย</Option>
+                                            <Option value="รอเพิ่มเติมสินค้า">รอเพิ่มเติมสินค้า</Option>
+                                            <Option value="สั่งสินค้าล่วงหน้า">สั่งสินค้าล่วงหน้า</Option>
+                                        </Select>
+                                    </Col>
+                                </Row>
+                            </Col>
+                        </Row>
+                        <Row id="add-product">
+                            <Col md={12} xl={12}>
+                                <Row>
+                                    <Col md={6} xl={6}>สี :</Col>
+                                    <Col md={12} xl={12}><Input id="input"/></Col>
+                                </Row>
+                            </Col>
+                            <Col md={12} xl={12}>
+                                <Row>
+                                    <Col md={6} xl={6}>หมวดหมู่ :</Col>
+                                    <Col md={12} xl={12}>
+                                        <Select defaultValue="หมวดหมู่"  onChange={handleChange4} id="input">
+                                            <Option value="อุปกรณ์เครืองมือช่าง">อุปกรณ์เครืองมือช่าง</Option>
+                                            <Option value="แผ่นแสตนเลส">แผ่นแสตนเลส</Option>
+                                        </Select>
+                                    </Col>
+                                </Row>
+                            </Col>
+                        </Row>
+                        <Row id="add-product">
+                            <Col md={12} xl={12}>
+                                <Row>
+                                    <Col md={6} xl={6}>วิธีการใช้งาน :</Col>
+                                    <Col md={12} xl={12}><TextArea rows={2} id="input"/></Col>
+                                </Row>
+                            </Col>
+                            <Col md={12} xl={12}>
+                                <Row>
+                                    <Col md={6} xl={6}>ข้อควรระวัง :</Col>
+                                    <Col md={12} xl={12}><TextArea rows={2} id="input"/></Col>
+                                </Row>
+                            </Col>
+                        </Row>
+                        <Row id="add-product">
+                            <Col md={12} xl={12}>
+                                <Row>
+                                    <Col md={6} xl={6}>วิธีเก็บรักษา :</Col>
+                                    <Col md={12} xl={12}><TextArea rows={2} id="input"/></Col>
+                                </Row>
+                            </Col>
+                            <Col md={12} xl={12}>
+                                <Row>
+                                    <Col md={6} xl={6}>ขั้นตอนการปฐมพยาบาล :</Col>
+                                    <Col md={12} xl={12}><TextArea rows={2} id="input"/></Col>
+                                </Row>
+                            </Col>
+                        </Row>
+                        <Row>    
+                        </Row>
+                        <Row id="row-price">
+                            <Table columns={this.price} dataSource={prices} />
+                        </Row>
+                        <Row id="add-img">
+                        <Upload
+                            action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                            listType="picture-card"
+                            fileList={this.state.fileList1}
+                            onPreview={this.handlePreview1}
+                            onChange={this.handleChangeimage1}
+                            >
+                            {this.state.fileList1.length >= 5 ? null : uploadButton1}
+                            </Upload>
+                            <Modal
+                                visible={this.state.previewVisible}
+                                title={this.state.previewTitle1}
+                                footer={null}
+                                onCancel={this.handleCancelimage1}
+                            >
+                            <img alt="example" style={{ width: '100%' }} src={this.state.previewImage1} />
                             </Modal>
                         </Row>
                     </Form>

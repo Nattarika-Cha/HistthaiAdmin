@@ -204,7 +204,7 @@ export default class Home extends Component {
         return (
             <Container fluid>
                 <Row id="home">
-                    <Col xs={1} md={1} xl={1} id="icon">
+                    <Col id="icon">
                         <BsFillGrid1X2Fill style={{fontSize: '200%', color: '#DA213D' }}/>
                     </Col>
                     <Col xs={5} md={5} xl={5} id="page-home">
