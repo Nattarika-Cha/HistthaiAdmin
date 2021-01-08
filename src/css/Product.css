@@ -12,14 +12,14 @@
 #page-product{
     font-size: x-large;
     color: #DA213D;
-    border-left: 2px solid #DA213D;
+    /* border-left: 2px solid #DA213D; */
     display: flex;
-    padding-top: 1.9%;
-    padding-left: 3%;
+    padding-top: 2%;
+    /* padding-left: 3%; */
 }
 
 #input-search{
-    margin: 3%;
+    margin: 2%;
 }
 
 .anticon svg {
@@ -55,6 +55,7 @@
     position: relative;
     padding: 14px 8px;
     overflow-wrap: break-word;
+    padding-left: 25px;
 }
 
 #add-product{
@@ -116,7 +117,7 @@
 
 .anticon svg {
     display: flex;
-    color: #ffffff;
+    color: #DA213D;
 }
 
 .ant-btn-primary {
@@ -126,4 +127,8 @@
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.12);
     -webkit-box-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
     box-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
+}
+
+#row-price{
+    margin-top: 2%;
 }
