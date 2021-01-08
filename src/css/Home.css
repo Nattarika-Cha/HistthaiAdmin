@@ -26,10 +26,10 @@
 #page-home {
     font-size: x-large;
     color: #DA213D;
-    border-left: 2px solid #DA213D;
+    /* border-left: 2px solid #DA213D; */
     display: flex;
     padding-top: 0.5%;
-    padding-left: 3%;
+    /* padding-left: 3%; */
 }
 
 #row2{
