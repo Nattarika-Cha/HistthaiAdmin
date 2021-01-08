@@ -10,6 +10,7 @@
     "@testing-library/user-event": "^12.1.10",
     "antd": "^4.9.4",
     "apexcharts": "^3.23.1",
+    "axios": "^0.21.1",
     "bootstrap": "^4.5.3",
     "bootstrap-icons": "^1.2.2",
     "highcharts": "^8.0.0",
@@ -24,6 +25,7 @@
     "react-jsx-highcharts": "^4.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.1",
+    "sweetalert": "^2.1.2",
     "web-vitals": "^0.2.4"
   },
   "scripts": {
