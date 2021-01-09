@@ -160,10 +160,10 @@
     cursor: pointer;
 }
 
-.ant-table-pagination.ant-pagination {
+/* .ant-table-pagination.ant-pagination {
     margin: 16px 0;
     display: none;
-}
+} */
 
 .ant-table-wrapper {
     clear: both;

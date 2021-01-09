@@ -1,17 +1,22 @@
 import React, { Component } from "react";
 import { FaProductHunt } from "react-icons/fa";
-import { Row, Col, Input, Select, Button, Table, Switch, Modal, Popconfirm, Upload } from 'antd';
+import { Row, Col, Input, Select, Button, Table, Switch, Modal, Popconfirm, Upload, Form } from 'antd';
 import { Container } from 'react-bootstrap';
-import { PrinterTwoTone, CloseOutlined, CheckOutlined, PlusOutlined, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
+import { CloseOutlined, CheckOutlined, PlusOutlined, EditTwoTone, DeleteTwoTone } from '@ant-design/icons'; //PrinterTwoTone
 import '../css/Product.css';
-import Form from "antd/lib/form/Form";
+// import Form from "antd/lib/form/Form";
+import moment from 'moment';
+import axios from 'axios';
+// import swal from 'sweetalert';
+
+var ip = "http://localhost:5000";
 
 const { Option } = Select;
 const { TextArea } = Input;
 
-function handleChange(value) {
-    console.log(`selected ${value}`);
-}
+// function handleChange(value) {
+//     console.log(`selected ${value}`);
+// }
 
 function handleChange1(value) {
     console.log(`selected ${value}`);
@@ -29,19 +34,19 @@ function handleChange4(value) {
     console.log(`selected ${value}`);
 }
 
-const data = [
-    {
-        key: '1',
-        barcode: '8859653400017',
-        codeId: 'MRWG30440810',
-        name: 'แผ่นสเตนเลสสี / ผิวเงามิลเลอร์',
-        unit: 'กล่อง',
-        catalog: 'ใบตัดเหล็ก',
-        size: '1220 x 2440 x 1.0 มม.',
-        color: 'น้ำตาล',
-        date: '40-40-4400',
-    },
-];
+// const data = [
+//     {
+//         key: '1',
+//         barcode: '8859653400017',
+//         codeId: 'MRWG30440810',
+//         name: 'แผ่นสเตนเลสสี / ผิวเงามิลเลอร์',
+//         unit: 'กล่อง',
+//         catalog: 'ใบตัดเหล็ก',
+//         size: '1220 x 2440 x 1.0 มม.',
+//         color: 'น้ำตาล',
+//         date: '40-40-4400',
+//     },
+// ];
 
 const prices = [
     {
@@ -80,34 +85,37 @@ const prices = [
 
 function getBase64(file) {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = error => reject(error);
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
     });
-  }
+}
 
-  function getBase641(file) {
+function getBase641(file) {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = error => reject(error);
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
     });
-  }
+}
 export default class Product extends Component {
     constructor(props) {
         super(props);
         this.state = {
             token: "",
             user: [],
+            product: [],
+            productEdit: [],
+            productstatus: true,
             isModalVisible: false,
             isModal1Visible: false,
             previewImage: '',
-            previewTitle: '', 
+            previewTitle: '',
             previewImage1: '',
-            previewTitle1: '', 
-            fileList : [
+            previewTitle1: '',
+            fileList: [
                 {
                     uid: '-1',
                     name: 'image.png',
@@ -133,7 +141,7 @@ export default class Product extends Component {
                     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
                 },
             ],
-            fileList1 : [
+            fileList1: [
                 {
                     uid: '-1',
                     name: 'image.png',
@@ -158,7 +166,7 @@ export default class Product extends Component {
                     status: 'done',
                     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
                 },
-            ]    
+            ]
         };
 
         this.product = [
@@ -170,49 +178,56 @@ export default class Product extends Component {
             },
             {
                 title: 'แสดง',
-                dataIndex: 'switcher',
-                key: 'switcher',
-                render: () =>
+                dataIndex: '',
+                key: 'x',
+                render: (record) =>
                     <Switch
                         checkedChildren={<CheckOutlined />}
                         unCheckedChildren={<CloseOutlined />}
                         size="small"
-                        defaultChecked
+                        checked={(record.productStatus === "A") ? true : false}
+                        onChange={() => this.onChangeProduct(record)}
+                    //defaultChecked
                     />,
             },
             {
-                title: 'บาร์โค้ด',
-                dataIndex: 'barcode',
-                key: 'barcode',
-                ellipsis: true,
-                
-            },
-            {
-                title: 'รหัสสินค้า',
+                title: 'รหัสโค้ด',
                 dataIndex: 'codeId',
                 key: 'codeId',
                 ellipsis: true,
-                
+
+            },
+            {
+                title: 'รหัสสินค้า',
+                dataIndex: 'productCode',
+                key: 'productCode',
+                ellipsis: true,
+
             },
             {
                 title: 'ชื่อสินค้า',
                 dataIndex: 'name',
                 key: 'name',
                 ellipsis: true,
+                // onFilter: (value, record) => record.name.indexOf(value) === 0,
+                // sorter: (a, b) => a.name.length - b.name.length,
+                // sortDirections: ['descend'],
             },
             {
                 title: 'หน่วย',
                 dataIndex: 'unit',
                 key: 'unit',
                 ellipsis: true,
-                
+
             },
             {
                 title: 'หมวดหมู่',
-                dataIndex: 'catalog',
-                key: 'catalog',
+                dataIndex: 'catName',
+                key: 'catName',
                 ellipsis: true,
-                
+                // onFilter: (value, record) => record.catName.indexOf(value) === 0,
+                // sorter: (a, b) => a.catName.length - b.catName.length,
+                // sortDirections: ['descend'],
             },
             {
                 title: 'ขนาด',
@@ -225,23 +240,27 @@ export default class Product extends Component {
                 dataIndex: 'color',
                 key: 'color',
                 ellipsis: true,
-                
+
             },
             {
                 title: 'วันที่',
-                dataIndex: 'date',
-                key: 'date',
+                dataIndex: 'createDate',
+                key: 'createDate',
                 ellipsis: true,
-                
+                render: render =>
+                    <>
+                        <div>{moment(render).format('L')}</div>
+                    </>
+
             },
             {
                 title: '',
-                dataIndex: 'edit',
-                key: 'edit',
+                dataIndex: '',
+                key: 'x',
                 width: 45,
-                render: () =>
+                render: (record) =>
                     <>
-                        <div type="primary" onClick={this.showModal}><EditTwoTone style={{ fontSize: '20px' }} twoToneColor="#63549B"/></div>
+                        <div type="primary" onClick={() => this.showModal(record)}><EditTwoTone style={{ fontSize: '20px', cursor: 'pointer' }} twoToneColor="#63549B" /></div>
                     </>,
             },
             {
@@ -251,7 +270,7 @@ export default class Product extends Component {
                 width: 45,
                 render: () =>
                     <Popconfirm title="คุณแน่ใจว่าจะลบรายการ？" okText="ลบ" cancelText="ยกเลิก">
-                        <div><DeleteTwoTone  style={{ fontSize: '20px' }} twoToneColor="#DA213D"/></div>
+                        <div><DeleteTwoTone style={{ fontSize: '20px', cursor: 'pointer' }} twoToneColor="#DA213D" /></div>
                     </Popconfirm>,
             },
         ]
@@ -267,35 +286,35 @@ export default class Product extends Component {
                 dataIndex: 'level1',
                 editable: true,
                 render: () =>
-                    <Input id="input"/>,
+                    <Input id="input" />,
             },
             {
                 title: 'Level2',
                 dataIndex: 'level2',
                 editable: true,
                 render: () =>
-                    <Input id="input"/>,
+                    <Input id="input" />,
             },
             {
                 title: 'Level3',
                 dataIndex: 'level3',
                 editable: true,
                 render: () =>
-                    <Input id="input"/>,
+                    <Input id="input" />,
             },
             {
                 title: 'Level4',
                 dataIndex: 'level4',
                 editable: true,
                 render: () =>
-                    <Input id="input"/>,
+                    <Input id="input" />,
             },
             {
                 title: 'Level5',
                 dataIndex: 'level5',
                 editable: true,
                 render: () =>
-                    <Input id="input"/>,
+                    <Input id="input" />,
             },
         ]
 
@@ -312,17 +331,31 @@ export default class Product extends Component {
         this.handlePreview1 = this.handlePreview1.bind(this);
         this.handleChangeimage1 = this.handleChangeimage1.bind(this);
 
+        this.onChangeProduct = this.onChangeProduct.bind(this);
+        this.onClickProduct = this.onClickProduct.bind(this);
+        this.onChangeFildProduct = this.onChangeFildProduct.bind(this);
     }
-    
-    showModal() {
-        this.setState({ isModalVisible: true});
+
+    onChangeFildProduct(e) {
+        this.setState({
+            productEdit : { [e.target.name]: e.target.value }
+        })
+    }
+
+    showModal(record) {
+        console.log(record, " record")
+        this.setState({
+            isModalVisible: true,
+            productEdit: record
+        });
     };
 
     showModal1() {
-        this.setState({ isModal1Visible: true});
+        this.setState({ isModal1Visible: true });
     };
 
-    handleOk() {
+    handleOk(values) {
+        console.log(values, " values");
         this.setState({ isModalVisible: false });
     };
 
@@ -343,16 +376,16 @@ export default class Product extends Component {
     };
     handlePreview = async file => {
         if (!file.url && !file.preview) {
-          file.preview = await getBase64(file.originFileObj);
+            file.preview = await getBase64(file.originFileObj);
         }
-    
+
         this.setState({
-          previewImage: file.url || file.preview,
-          previewVisible: true,
-          previewTitle: file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
+            previewImage: file.url || file.preview,
+            previewVisible: true,
+            previewTitle: file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
         });
-      };
-    handleChangeimage(fileList){
+    };
+    handleChangeimage(fileList) {
         this.setState({ ...fileList });
     };
 
@@ -361,31 +394,73 @@ export default class Product extends Component {
     };
     handlePreview1 = async file => {
         if (!file.url && !file.preview) {
-          file.preview = await getBase641(file.originFileObj);
+            file.preview = await getBase641(file.originFileObj);
         }
-    
+
         this.setState({
-          previewImage1: file.url || file.preview,
-          previewVisible: true,
-          previewTitle1: file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
+            previewImage1: file.url || file.preview,
+            previewVisible: true,
+            previewTitle1: file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
         });
-      };
-    handleChangeimage1(fileList){
+    };
+    handleChangeimage1(fileList) {
         this.setState({ ...fileList });
     };
-    
+
+    async onChangeProduct(record) {
+        var productStatus = "";
+        if (record?.productStatus === "A") {
+            productStatus = "N";
+        } else {
+            productStatus = "A";
+        }
+        const data = {
+            productStatus: productStatus
+        };
+
+        var url_update_product_status = ip + "/Product/update/productstatus/" + record?.productId;
+        const updateproductstatus = await (await axios.put(url_update_product_status, data)).data;
+        if (updateproductstatus[0] > 0) {
+            const product = [...this.state.product];
+            product.forEach((product, index) => {
+                if (product.productId === record?.productId) {
+                    product.productStatus = productStatus;
+                }
+            });
+            this.setState({
+                product: product,
+                productstatus: false
+            });
+        } else {
+
+        }
+    }
+
+    onClickProduct() {
+        console.log("Switch click");
+    }
+
+    async componentDidMount() {
+        var url_product = ip + "/Product/find/all/admin";
+        const product = await (await axios.get(url_product)).data;
+        this.setState({
+            product: product,
+            productstatus: false
+        });
+    }
+
     render() {
         const uploadButton = (
-        <div>
-            <PlusOutlined style={{fontSize: "20px", color: '#DA213D'}}/>
-            <div style={{ marginTop: 8, color: '#DA213D' }}>เพิ่มรูปภาพ</div>
-        </div>
+            <div>
+                <PlusOutlined style={{ fontSize: "20px", color: '#DA213D' }} />
+                <div style={{ marginTop: 8, color: '#DA213D' }}>เพิ่มรูปภาพ</div>
+            </div>
         );
         const uploadButton1 = (
-        <div>
-            <PlusOutlined style={{fontSize: "20px", color: '#DA213D'}}/>
-            <div style={{ marginTop: 8, color: '#DA213D' }}>เพิ่มรูปภาพ</div>
-        </div>
+            <div>
+                <PlusOutlined style={{ fontSize: "20px", color: '#DA213D' }} />
+                <div style={{ marginTop: 8, color: '#DA213D' }}>เพิ่มรูปภาพ</div>
+            </div>
         );
         return (
             <Container fluid>
@@ -403,7 +478,7 @@ export default class Product extends Component {
                     </Input.Group>
                 </Row>
                 <Row id="input-search">
-                    <Col md={2} xl={2}><div>เรียงลำดับตาม</div></Col>
+                    {/* <Col md={2} xl={2}><div>เรียงลำดับตาม</div></Col>
                     <Col md={3} xl={3} id="col">
                         <Select defaultValue="เรียงลำดับตาม" style={{ width: 130 }} onChange={handleChange}>
                             <Option value="วันที่">วันที่</Option>
@@ -412,7 +487,7 @@ export default class Product extends Component {
                     </Col>
                     <Col md={5} xl={4} id="col">
                         <Button id="button-print" icon={<PrinterTwoTone twoToneColor="#DA213D"/>}>ปริ้นรายการสินค้า</Button>
-                    </Col>
+                    </Col> */}
                     <Col md={4} xl={3} id="col">
                         {/* <Button id="button-addproduct" icon={<FileAddTwoTone twoToneColor="#DA213D"/>}>เพิ่มรายการสินค้า</Button> */}
                         <Button id="button-addproduct" onClick={this.showModal1}>เพิ่มรายการสินค้า</Button>
@@ -422,13 +497,18 @@ export default class Product extends Component {
                     </Col>
                 </Row>
                 <Row id="input-search">
-                    <Table columns={this.product} dataSource={data} />
+                    <Table
+                        columns={this.product}
+                        dataSource={this.state.product}
+                        loading={this.state.productstatus}
+                        pagination={{ pageSizeOptions: ['30', '40'], showSizeChanger: true }}
+                    />
                 </Row>
-
-                <Modal 
-                    title="แก้ไขรายการสินค้า" 
-                    visible={this.state.isModalVisible} 
-                    onOk={this.handleOk} 
+                {console.log(this.state.productEdit, " this.state.productEdit")}
+                <Modal
+                    title="แก้ไขรายการสินค้า"
+                    visible={this.state.isModalVisible}
+                    onOk={this.handleOk}
                     onCancel={this.handleCancel}
                     width={800}>
                     <Form id="form">
@@ -437,13 +517,13 @@ export default class Product extends Component {
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>รหัสบาร์โค้ด :</Col>
-                                    <Col md={12} xl={12}><Input id="input"/></Col>
+                                    <Col md={12} xl={12}><Input id="input" name="codeId" value={this.state.productEdit?.codeId} onChange={this.onChangeFildProduct}/></Col>
                                 </Row>
                             </Col>
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>รหัสสินค้า :</Col>
-                                    <Col md={12} xl={12}><Input id="input"/></Col>
+                                    <Col md={12} xl={12}><Input id="input" name="productCode" value={this.state.productEdit?.productCode} onChange={this.onChangeFildProduct}/></Col>
                                 </Row>
                             </Col>
                         </Row>
@@ -451,13 +531,13 @@ export default class Product extends Component {
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>หน่วย :</Col>
-                                    <Col md={12} xl={12}><Input id="input"/></Col>
+                                    <Col md={12} xl={12}><Input id="input" name="unit" value={this.state.productEdit?.unit} onChange={this.onChangeFildProduct}/></Col>
                                 </Row>
                             </Col>
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>ชื่อสินค้า :</Col>
-                                    <Col md={12} xl={12}><Input id="input"/></Col>
+                                    <Col md={12} xl={12}><Input id="input" name="name" value={this.state.productEdit?.name} onChange={this.onChangeFildProduct}/></Col>
                                 </Row>
                             </Col>
                         </Row>
@@ -465,14 +545,14 @@ export default class Product extends Component {
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>ขนาด :</Col>
-                                    <Col md={12} xl={12}><Input id="input"/></Col>
+                                    <Col md={12} xl={12}><Input id="input" name="size" value={this.state.productEdit?.size} onChange={this.onChangeFildProduct}/></Col>
                                 </Row>
                             </Col>
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>สถานะ :</Col>
                                     <Col md={12} xl={12}>
-                                        <Select defaultValue="สถานะ"  onChange={handleChange2} id="input">
+                                        <Select defaultValue="สถานะ" onChange={handleChange2} id="input">
                                             <Option value="มีจำหน่าย">มีจำหน่าย</Option>
                                             <Option value="รอเพิ่มเติมสินค้า">รอเพิ่มเติมสินค้า</Option>
                                             <Option value="สั่งสินค้าล่วงหน้า">สั่งสินค้าล่วงหน้า</Option>
@@ -485,14 +565,14 @@ export default class Product extends Component {
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>สี :</Col>
-                                    <Col md={12} xl={12}><Input id="input"/></Col>
+                                    <Col md={12} xl={12}><Input id="input" name="color" value={this.state.productEdit?.color} onChange={this.onChangeFildProduct}/></Col>
                                 </Row>
                             </Col>
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>หมวดหมู่ :</Col>
                                     <Col md={12} xl={12}>
-                                        <Select defaultValue="หมวดหมู่"  onChange={handleChange1} id="input">
+                                        <Select defaultValue="หมวดหมู่" onChange={handleChange1} id="input">
                                             <Option value="อุปกรณ์เครืองมือช่าง">อุปกรณ์เครืองมือช่าง</Option>
                                             <Option value="แผ่นแสตนเลส">แผ่นแสตนเลส</Option>
                                         </Select>
@@ -504,13 +584,13 @@ export default class Product extends Component {
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>วิธีการใช้งาน :</Col>
-                                    <Col md={12} xl={12}><TextArea rows={2} id="input"/></Col>
+                                    <Col md={12} xl={12}><TextArea id="input" name="direction" value={this.state.productEdit?.direction} onChange={this.onChangeFildProduct}/></Col>
                                 </Row>
                             </Col>
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>ข้อควรระวัง :</Col>
-                                    <Col md={12} xl={12}><TextArea rows={2} id="input"/></Col>
+                                    <Col md={12} xl={12}><TextArea id="input" name="caution" value={this.state.productEdit?.caution} onChange={this.onChangeFildProduct}/></Col>
                                 </Row>
                             </Col>
                         </Row>
@@ -518,30 +598,30 @@ export default class Product extends Component {
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>วิธีเก็บรักษา :</Col>
-                                    <Col md={12} xl={12}><TextArea rows={2} id="input"/></Col>
+                                    <Col md={12} xl={12}><TextArea id="input" name="keepespreserve" value={this.state.productEdit?.keepespreserve} onChange={this.onChangeFildProduct}/></Col>
                                 </Row>
                             </Col>
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>ขั้นตอนการปฐมพยาบาล :</Col>
-                                    <Col md={12} xl={12}><TextArea rows={2} id="input"/></Col>
+                                    <Col md={12} xl={12}><TextArea id="input" name="firstaidprocedure" value={this.state.productEdit?.firstaidprocedure} onChange={this.onChangeFildProduct}/></Col>
                                 </Row>
                             </Col>
                         </Row>
-                        <Row>    
+                        <Row>
                         </Row>
                         <Row id="row-price">
                             <Table columns={this.price} dataSource={prices} />
                         </Row>
                         <Row id="add-img">
-                        <Upload
-                            action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                            listType="picture-card"
-                            fileList={this.state.fileList}
-                            onPreview={this.handlePreview}
-                            onChange={this.handleChangeimage}
+                            <Upload
+                                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                                listType="picture-card"
+                                fileList={this.state.fileList}
+                                onPreview={this.handlePreview}
+                                onChange={this.handleChangeimage}
                             >
-                            {this.state.fileList.length >= 5 ? null : uploadButton}
+                                {this.state.fileList.length >= 5 ? null : uploadButton}
                             </Upload>
                             <Modal
                                 visible={this.state.previewVisible}
@@ -549,15 +629,18 @@ export default class Product extends Component {
                                 footer={null}
                                 onCancel={this.handleCancelimage}
                             >
-                            <img alt="example" style={{ width: '100%' }} src={this.state.previewImage} />
+                                <img alt="example" style={{ width: '100%' }} src={this.state.previewImage} />
                             </Modal>
                         </Row>
+                        <Button type="primary" htmlType="submit" id="Button-submit">
+                            ยืนยัน
+                            </Button>
                     </Form>
                 </Modal>
-                <Modal 
-                    title="แก้ไขรายการสินค้า" 
-                    visible={this.state.isModal1Visible} 
-                    onOk={this.handleOk1} 
+                <Modal
+                    title="แก้ไขรายการสินค้า"
+                    visible={this.state.isModal1Visible}
+                    onOk={this.handleOk1}
                     onCancel={this.handleCancel1}
                     width={800}>
                     <Form id="form">
@@ -566,13 +649,13 @@ export default class Product extends Component {
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>รหัสบาร์โค้ด :</Col>
-                                    <Col md={12} xl={12}><Input id="input"/></Col>
+                                    <Col md={12} xl={12}><Input id="input" /></Col>
                                 </Row>
                             </Col>
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>รหัสสินค้า :</Col>
-                                    <Col md={12} xl={12}><Input id="input"/></Col>
+                                    <Col md={12} xl={12}><Input id="input" /></Col>
                                 </Row>
                             </Col>
                         </Row>
@@ -580,13 +663,13 @@ export default class Product extends Component {
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>หน่วย :</Col>
-                                    <Col md={12} xl={12}><Input id="input"/></Col>
+                                    <Col md={12} xl={12}><Input id="input" /></Col>
                                 </Row>
                             </Col>
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>ชื่อสินค้า :</Col>
-                                    <Col md={12} xl={12}><Input id="input"/></Col>
+                                    <Col md={12} xl={12}><Input id="input" /></Col>
                                 </Row>
                             </Col>
                         </Row>
@@ -594,14 +677,14 @@ export default class Product extends Component {
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>ขนาด :</Col>
-                                    <Col md={12} xl={12}><Input id="input"/></Col>
+                                    <Col md={12} xl={12}><Input id="input" /></Col>
                                 </Row>
                             </Col>
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>สถานะ :</Col>
                                     <Col md={12} xl={12}>
-                                        <Select defaultValue="สถานะ"  onChange={handleChange3} id="input">
+                                        <Select defaultValue="สถานะ" onChange={handleChange3} id="input">
                                             <Option value="มีจำหน่าย">มีจำหน่าย</Option>
                                             <Option value="รอเพิ่มเติมสินค้า">รอเพิ่มเติมสินค้า</Option>
                                             <Option value="สั่งสินค้าล่วงหน้า">สั่งสินค้าล่วงหน้า</Option>
@@ -614,14 +697,14 @@ export default class Product extends Component {
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>สี :</Col>
-                                    <Col md={12} xl={12}><Input id="input"/></Col>
+                                    <Col md={12} xl={12}><Input id="input" /></Col>
                                 </Row>
                             </Col>
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>หมวดหมู่ :</Col>
                                     <Col md={12} xl={12}>
-                                        <Select defaultValue="หมวดหมู่"  onChange={handleChange4} id="input">
+                                        <Select defaultValue="หมวดหมู่" onChange={handleChange4} id="input">
                                             <Option value="อุปกรณ์เครืองมือช่าง">อุปกรณ์เครืองมือช่าง</Option>
                                             <Option value="แผ่นแสตนเลส">แผ่นแสตนเลส</Option>
                                         </Select>
@@ -633,13 +716,13 @@ export default class Product extends Component {
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>วิธีการใช้งาน :</Col>
-                                    <Col md={12} xl={12}><TextArea rows={2} id="input"/></Col>
+                                    <Col md={12} xl={12}><TextArea rows={2} id="input" /></Col>
                                 </Row>
                             </Col>
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>ข้อควรระวัง :</Col>
-                                    <Col md={12} xl={12}><TextArea rows={2} id="input"/></Col>
+                                    <Col md={12} xl={12}><TextArea rows={2} id="input" /></Col>
                                 </Row>
                             </Col>
                         </Row>
@@ -647,30 +730,30 @@ export default class Product extends Component {
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>วิธีเก็บรักษา :</Col>
-                                    <Col md={12} xl={12}><TextArea rows={2} id="input"/></Col>
+                                    <Col md={12} xl={12}><TextArea rows={2} id="input" /></Col>
                                 </Row>
                             </Col>
                             <Col md={12} xl={12}>
                                 <Row>
                                     <Col md={6} xl={6}>ขั้นตอนการปฐมพยาบาล :</Col>
-                                    <Col md={12} xl={12}><TextArea rows={2} id="input"/></Col>
+                                    <Col md={12} xl={12}><TextArea rows={2} id="input" /></Col>
                                 </Row>
                             </Col>
                         </Row>
-                        <Row>    
+                        <Row>
                         </Row>
                         <Row id="row-price">
                             <Table columns={this.price} dataSource={prices} />
                         </Row>
                         <Row id="add-img">
-                        <Upload
-                            action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                            listType="picture-card"
-                            fileList={this.state.fileList1}
-                            onPreview={this.handlePreview1}
-                            onChange={this.handleChangeimage1}
+                            <Upload
+                                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                                listType="picture-card"
+                                fileList={this.state.fileList1}
+                                onPreview={this.handlePreview1}
+                                onChange={this.handleChangeimage1}
                             >
-                            {this.state.fileList1.length >= 5 ? null : uploadButton1}
+                                {this.state.fileList1.length >= 5 ? null : uploadButton1}
                             </Upload>
                             <Modal
                                 visible={this.state.previewVisible}
@@ -678,7 +761,7 @@ export default class Product extends Component {
                                 footer={null}
                                 onCancel={this.handleCancelimage1}
                             >
-                            <img alt="example" style={{ width: '100%' }} src={this.state.previewImage1} />
+                                <img alt="example" style={{ width: '100%' }} src={this.state.previewImage1} />
                             </Modal>
                         </Row>
                     </Form>

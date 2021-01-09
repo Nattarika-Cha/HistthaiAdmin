@@ -395,7 +395,6 @@ export default class Home extends Component {
         contactstatus: false
       });
 
-      console.log(this.state.contact, " contact");
     } else {
 
     }
