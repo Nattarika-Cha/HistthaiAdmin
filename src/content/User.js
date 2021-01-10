@@ -3,22 +3,25 @@ import { Container } from 'react-bootstrap';
 import {Row, Col, Input, Select, Button, Popconfirm, Table, Modal, Form, Avatar } from 'antd'
 import { BsFillPersonLinesFill } from "react-icons/bs";
 import { PrinterTwoTone, DeleteTwoTone, EyeTwoTone, AntDesignOutlined } from '@ant-design/icons';
+import axios from 'axios';
 import '../css/User.css';
 
 const { Option } = Select;
 
-const data = [
-    {
-        key: '1',
-        member:'Platinum',
-        memberId: '4040404040',
-        name: 'sompot sathongngak',
-        email: 's5902041620113@email.kmutnb.ac.th',
-        telephonenumber: '0989973910',
-        address: '48/2 หมู่ 6 ตำบลสิ อำเภอขุนหาญ จังหวักศรีสะเกษ 33150',
-        date: '40-40-4400',
-    },
-];
+var ip = "http://localhost:5000";
+
+// const data = [
+//     {
+//         key: '1',
+//         member:'Platinum',
+//         memberId: '4040404040',
+//         name: 'sompot sathongngak',
+//         email: 's5902041620113@email.kmutnb.ac.th',
+//         telephonenumber: '0989973910',
+//         address: '48/2 หมู่ 6 ตำบลสิ อำเภอขุนหาญ จังหวักศรีสะเกษ 33150',
+//         date: '40-40-4400',
+//     },
+// ];
 
 function handleChange(value) {
     console.log(`selected ${value}`);
@@ -30,8 +33,8 @@ export default class User extends Component {
             token: "",
             user: [],
             isModalVisible: false,
+            userstatus: false,
         };
-
         this.product = [
             {
                 title: 'ประเภทสมาชิก',
@@ -41,8 +44,8 @@ export default class User extends Component {
             },
             {
                 title: 'รหัสสมาชิก',
-                dataIndex: 'memberId',
-                key: 'memberId',
+                dataIndex: 'userCode',
+                key: 'userCode',
                 width: 120,
             },
             {
@@ -55,31 +58,33 @@ export default class User extends Component {
                 title: 'อีเมลล์',
                 dataIndex: 'email',
                 key: 'email',
-                ellipsis: true, 
+                width: 150,
             },
             {
                 title: 'เบอร์โทร',
-                dataIndex: 'telephonenumber',
-                key: 'telephonenumber',
+                dataIndex: 'phone',
+                key: 'phone',
                 width: 120,
             },
             {
                 title: 'ที่อยู่',
                 dataIndex: 'address',
                 key: 'address',
-                ellipsis: true, 
+                ellipsis: true,
+                width: 200,
             },
             {
                 title: 'วันที่',
-                dataIndex: 'date',
-                key: 'date',
+                dataIndex: 'createDate',
+                key: 'createDate',
+                ellipsis: true,
                 width: 120,
             },
             {
                 title: '',
                 dataIndex: 'edit',
                 key: 'edit',
-                width: 40,
+                width: 60,
                 render: () =>
                     <>
                         <div type="primary" onClick={this.showModal}><EyeTwoTone style={{ fontSize: '20px' }} twoToneColor="#63549B"/></div>
@@ -89,9 +94,9 @@ export default class User extends Component {
                 title: '',
                 dataIndex: '',
                 key: 'x',
-                width: 60,
-                render: () =>
-                    <Popconfirm title="คุณแน่ใจว่าจะลบรายการ？" okText="ลบ" cancelText="ยกเลิก">
+                width: 50,
+                render: (record) =>
+                    <Popconfirm title="คุณแน่ใจว่าจะลบรายการ？" okText="ลบ" cancelText="ยกเลิก" >
                         <div><DeleteTwoTone  style={{ fontSize: '20px' }} twoToneColor="#DA213D"/></div>
                     </Popconfirm>,
             },
@@ -100,6 +105,7 @@ export default class User extends Component {
         this.showModal = this.showModal.bind(this);
         this.handleOk = this.handleOk.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
+        // this.handleDeleteUser = this.handleDeleteUser.bind(this);
     }
 
     showModal() {
@@ -114,11 +120,39 @@ export default class User extends Component {
         this.setState({ isModalVisible: false})
     }
 
+    async componentDidMount() {
+        var url_user = ip + "/UserProfile/find/all/admin";
+        const user = await (await axios.get(url_user)).data;
+        this.setState({
+            user: user,
+            userstatus: false
+        });
+      }
+
+    // async handleDeleteUser(userProfileId) {
+    //     const data = {
+    //       userStatus: "N"
+    //     };
+    
+    //     var url_update_user = ip + "/UserProfile/find/all/admin" + userProfileId;
+    //     const updateuser = await (await axios.put(url_update_User, data)).data;
+    //     if (updateuser[0] > 0) {
+    //       const user = [...this.state.user];
+    //       this.setState({
+    //         user: user.filter((item) => item.userProfileId !== userProfileId),
+    //         userstatus: false
+    //       });
+    
+    //     } else {
+    
+    //     }
+    //   }
+
     render() {
         return (
             <Container fluid>
                 <Row id="product">
-                    <Col xs={1} md={1} xl={1} id="icon">
+                    <Col xs={1} md={1} xl={1} id="icon-user">
                         <BsFillPersonLinesFill style={{ fontSize: '400%', color: '#DA213D' }} />
                     </Col>
                     <Col xs={5} md={5} xl={5} id="page-user">
@@ -144,7 +178,7 @@ export default class User extends Component {
                     </Col>
                 </Row>
                 <Row id="input-search1">
-                    <Table columns={this.product} dataSource={data} />
+                    <Table columns={this.product} dataSource={this.state.user} scroll={{ x: 1500 }}/>
                 </Row>
                 <Modal
                     // title="รายละเอียดสมาชิก" 
