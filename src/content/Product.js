@@ -4,10 +4,8 @@ import { Row, Col, Input, Select, Button, Table, Switch, Modal, Popconfirm, Uplo
 import { Container } from 'react-bootstrap';
 import { CloseOutlined, CheckOutlined, PlusOutlined, EditTwoTone, DeleteTwoTone } from '@ant-design/icons'; //PrinterTwoTone
 import '../css/Product.css';
-// import Form from "antd/lib/form/Form";
 import moment from 'moment';
 import axios from 'axios';
-// import swal from 'sweetalert';
 
 var ip = "http://localhost:5000";
 
@@ -174,7 +172,6 @@ export default class Product extends Component {
                 title: 'รูปภาพ',
                 dataIndex: 'image',
                 key: 'image',
-                ellipsis: true,
             },
             {
                 title: 'แสดง',
@@ -194,21 +191,16 @@ export default class Product extends Component {
                 title: 'รหัสโค้ด',
                 dataIndex: 'codeId',
                 key: 'codeId',
-                ellipsis: true,
-
             },
             {
                 title: 'รหัสสินค้า',
                 dataIndex: 'productCode',
                 key: 'productCode',
-                ellipsis: true,
-
             },
             {
                 title: 'ชื่อสินค้า',
                 dataIndex: 'name',
                 key: 'name',
-                ellipsis: true,
                 // onFilter: (value, record) => record.name.indexOf(value) === 0,
                 // sorter: (a, b) => a.name.length - b.name.length,
                 // sortDirections: ['descend'],
@@ -217,14 +209,11 @@ export default class Product extends Component {
                 title: 'หน่วย',
                 dataIndex: 'unit',
                 key: 'unit',
-                ellipsis: true,
-
             },
             {
                 title: 'หมวดหมู่',
                 dataIndex: 'catName',
                 key: 'catName',
-                ellipsis: true,
                 // onFilter: (value, record) => record.catName.indexOf(value) === 0,
                 // sorter: (a, b) => a.catName.length - b.catName.length,
                 // sortDirections: ['descend'],
@@ -233,20 +222,16 @@ export default class Product extends Component {
                 title: 'ขนาด',
                 dataIndex: 'size',
                 key: 'size',
-                ellipsis: true,
             },
             {
                 title: 'สี',
                 dataIndex: 'color',
                 key: 'color',
-                ellipsis: true,
-
             },
             {
                 title: 'วันที่',
                 dataIndex: 'createDate',
                 key: 'createDate',
-                ellipsis: true,
                 render: render =>
                     <>
                         <div>{moment(render).format('L')}</div>
@@ -465,7 +450,7 @@ export default class Product extends Component {
         return (
             <Container fluid>
                 <Row id="product">
-                    <Col xs={1} md={1} xl={1} id="icon">
+                    <Col xs={1} md={1} xl={1} id="icon-product">
                         <FaProductHunt style={{ fontSize: '400%', color: '#DA213D' }} />
                     </Col>
                     <Col xs={5} md={5} xl={5} id="page-product">
@@ -501,6 +486,8 @@ export default class Product extends Component {
                         columns={this.product}
                         dataSource={this.state.product}
                         loading={this.state.productstatus}
+                        scroll={{ x: 1500 }}
+                        // align={{center}}
                         pagination={{ pageSizeOptions: ['30', '40'], showSizeChanger: true }}
                     />
                 </Row>

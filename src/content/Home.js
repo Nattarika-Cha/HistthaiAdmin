@@ -122,23 +122,27 @@ export default class Home extends Component {
         title: 'ชื่อ - นามสกุล',
         dataIndex: 'name',
         key: 'name',
+        width: 160,
         render: text => <div>{text}</div>,
       },
       {
         title: 'เบอร์โทรศัพท์',
         dataIndex: 'phone',
         key: 'phone',
+        width: 120,
       },
       {
         title: 'E - mail',
         dataIndex: 'email',
         key: 'email',
         ellipsis: true,
+        width: 180,
       },
       {
         title: 'เรื่อง',
         key: 'type',
         dataIndex: 'type',
+        width: 150,
         render: tags => (
           <>
             {
@@ -165,11 +169,13 @@ export default class Home extends Component {
         dataIndex: 'msg',
         key: 'msg',
         ellipsis: true,
+        width: 200,
       },
       {
         title: '',
         dataIndex: 'acceptStatus',
         key: 'acceptStatus',
+        width: 120,
         render: accept => (
           <>
             {
@@ -187,6 +193,7 @@ export default class Home extends Component {
         title: '',
         dataIndex: '',
         key: 'x',
+        width: 120,
         render: (record) =>
           <Popconfirm title="คุณแน่ใจว่าจะลบรายการ？" okText="ลบ" cancelText="ยกเลิก" onConfirm={() => this.handleDeleteContact(record.contactId)}>
             <div id="delete" href="#">ลบรายการ</div>
@@ -383,7 +390,7 @@ export default class Home extends Component {
 
   async handleDeleteContact(contactId) {
     const data = {
-      contactStatus: "N"
+      userStatus: "N"
     };
 
     var url_update_product_Contact = ip + "/Contact/updateStatus/" + contactId;
@@ -405,37 +412,30 @@ export default class Home extends Component {
       <Container fluid>
         <Row id="home">
           <Col xs={1} md={1} xl={1} id="icon">
-            <BsFillGrid1X2Fill style={{ fontSize: '300%', color: '#DA213D' }} />
+            <BsFillGrid1X2Fill style={{ fontSize: '280%', color: '#DA213D' }} />
           </Col>
           <Col xs={5} md={5} xl={5} id="page-home">หน้าหลัก</Col>
         </Row>
 
         <Row id="row2">
-          <Col xs={24} md={24} xl={15} id="chart">
-            <Col xs={24} md={24} xl={24}>สินค้าที่ผู้คนสนใจ<Col>
-              <ReactApexChart options={this.state.options} series={this.state.series} type="bar" height={350} />
-            </Col>
+          <Col xs={24} md={24} xl={24} id="visit-head">สินค้าที่ผู้คนสนใจ</Col>
+          <Col xs={24} md={24} xl={24} id="chart">
+            <Col>
+              <ReactApexChart options={this.state.options} series={this.state.series} type="bar" height={300}/>
             </Col>
           </Col>
-
-          <Col xs={24} md={24} xl={8} id="visit">
-            <Col xs={24} md={24} xl={24} id="visit-head">จำนวนการเข้าชม</Col>
-            <Row id="row-visit1">
-              <Col xs={1} md={1} xl={1} id="visit-border"></Col>
-              <Col xs={22} md={22} xl={22} id="visit-member">
-                <Col>
-                  <Statistic id="visit-nummember" title="สมาชิก" value={112893} />
-                </Col>
-              </Col>
-            </Row>
-            <Row>
-              <Col xs={1} md={1} xl={1} id="visit-border1"></Col>
-              <Col xs={22} md={22} xl={22} id="visit-member1">
-                <Col>
-                  <Statistic title="บุคคลทั่วไป" value={112893} />
-                </Col>
-              </Col>
-            </Row>
+        </Row>
+        <Row id="statistic">
+          <Col md={24} xl={24} id="visit-head">จำนวนการเข้าชม</Col>
+          <Col md={11} xl={11}id="visit">
+            <Col md={24} xl={24} id="visit-member">
+              <Statistic id="visit-nummember1" title="สมาชิก" value={112893} />
+            </Col>
+          </Col>
+          <Col md={11} xl={11}id="visit1">
+            <Col md={24} xl={24} id="visit-user">
+              <Statistic id="visit-user1" title="ผู้ใช้ทั่วไป" value={112893} />
+            </Col>
           </Col>
         </Row>
 
@@ -458,7 +458,7 @@ export default class Home extends Component {
               <Button id="btnadd-popularproduct" onClick={this.onSaveNew} disabled={this.state.searchnewstatus}>เพิ่มรายการ</Button>
             </Col>
             <Col xs={24} md={24} xl={24}>
-              <Table columns={this.interestproduct} dataSource={this.state.productnew} loading={this.state.productnewstatus} />
+              <Table columns={this.interestproduct} dataSource={this.state.productnew} loading={this.state.productnewstatus} pagination={false}/>
             </Col>
           </Col>
         </Row>
@@ -482,16 +482,16 @@ export default class Home extends Component {
               <Button id="btnadd-popularproduct" onClick={this.onSaveHit} disabled={this.state.searchhitstatus}>เพิ่มรายการ</Button>
             </Col>
             <Col xs={24} md={24} xl={24}>
-              <Table columns={this.bestseller} dataSource={this.state.producthit} loading={this.state.producthitstatus} />
+              <Table columns={this.bestseller} dataSource={this.state.producthit} loading={this.state.producthitstatus} pagination={false}/>
             </Col>
           </Col>
         </Row>
 
-        <Row>
+        <Row id="row3">
           <Col id="row3">ข้อความจากผู้ติดต่อ</Col>
-          <Row id="interest-product1">
-            <Table columns={this.columnscontact} dataSource={this.state.contact} loading={this.state.contactstatus}/>
-          </Row>
+          <Col  xs={24} md={24} xl={24}>
+            <Table columns={this.columnscontact} dataSource={this.state.contact} scroll={{ x: 1500 }} loading={this.state.contactstatus}/>
+          </Col>
         </Row>
       </Container>
     )
