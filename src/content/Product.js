@@ -337,8 +337,10 @@ export default class Product extends Component {
     }
 
     onChangeFildProduct(e) {
+        const product = this.state.productEdit;
+        product[e.target.name] = e.target.value;
         this.setState({
-            productEdit : { [e.target.name]: e.target.value }
+            productEdit : product
         })
     }
 
@@ -552,10 +554,10 @@ export default class Product extends Component {
                                 <Row>
                                     <Col md={6} xl={6}>สถานะ :</Col>
                                     <Col md={12} xl={12}>
-                                        <Select defaultValue="สถานะ" onChange={handleChange2} id="input">
-                                            <Option value="มีจำหน่าย">มีจำหน่าย</Option>
-                                            <Option value="รอเพิ่มเติมสินค้า">รอเพิ่มเติมสินค้า</Option>
-                                            <Option value="สั่งสินค้าล่วงหน้า">สั่งสินค้าล่วงหน้า</Option>
+                                        <Select labelInValue defaultValue={{ value: ('' + this.state.productEdit?.flagProduct)}} onChange={handleChange2} id="input">
+                                            <Option value="1">มีจำหน่าย</Option>
+                                            <Option value="2">รอเพิ่มเติมสินค้า</Option>
+                                            <Option value="3">สั่งสินค้าล่วงหน้า</Option>
                                         </Select>
                                     </Col>
                                 </Row>
@@ -632,9 +634,6 @@ export default class Product extends Component {
                                 <img alt="example" style={{ width: '100%' }} src={this.state.previewImage} />
                             </Modal>
                         </Row>
-                        <Button type="primary" htmlType="submit" id="Button-submit">
-                            ยืนยัน
-                            </Button>
                     </Form>
                 </Modal>
                 <Modal
