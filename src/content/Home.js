@@ -6,6 +6,7 @@ import '../css/Home.css';
 import ReactApexChart from "react-apexcharts";
 import axios from 'axios';
 import swal from 'sweetalert';
+import moment from 'moment';
 import { DeleteTwoTone, EditTwoTone } from '@ant-design/icons';
 
 const { Option } = Select;
@@ -198,6 +199,16 @@ export default class Home extends Component {
         key: 'numCall',
         ellipsis: true,
       },
+      {
+        title: 'วันที่',
+        dataIndex: 'createDate',
+        key: 'createDate',
+        render: render =>
+            <>
+                <div>{moment(render).format('L')}</div>
+            </>
+
+    },
       {
         title: '',
         dataIndex: 'acceptStatus',
