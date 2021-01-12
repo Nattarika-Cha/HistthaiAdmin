@@ -13,74 +13,6 @@ var ip = "http://localhost:5000";
 const { Option } = Select;
 const { TextArea } = Input;
 
-// function handleChange(value) {
-//     console.log(`selected ${value}`);
-// }
-
-// function handleChange1(value) {
-//     console.log(`selected ${value}`);
-// }
-
-// function handleChange2(value) {
-//     console.log(`selected ${value}`);
-// }
-
-function handleChange3(value) {
-    console.log(`selected ${value}`);
-}
-
-function handleChange4(value) {
-    console.log(`selected ${value}`);
-}
-
-// const data = [
-//     {
-//         key: '1',
-//         barcode: '8859653400017',
-//         codeId: 'MRWG30440810',
-//         name: 'แผ่นสเตนเลสสี / ผิวเงามิลเลอร์',
-//         unit: 'กล่อง',
-//         catalog: 'ใบตัดเหล็ก',
-//         size: '1220 x 2440 x 1.0 มม.',
-//         color: 'น้ำตาล',
-//         date: '40-40-4400',
-//     },
-// ];
-
-const prices = [
-    {
-        level: 'Silver',
-        level1: '0',
-        level2: '0',
-        level3: '0',
-        level4: '0',
-        level5: '0',
-    },
-    {
-        level: 'Gold',
-        level1: '0',
-        level2: '0',
-        level3: '0',
-        level4: '0',
-        level5: '0',
-    },
-    {
-        level: 'Platinum',
-        level1: '0',
-        level2: '0',
-        level3: '0',
-        level4: '0',
-        level5: '0',
-    },
-    {
-        level: 'End User',
-        level1: '0',
-        level2: '0',
-        level3: '0',
-        level4: '0',
-        level5: '0',
-    },
-];
 
 function getBase64(file) {
     return new Promise((resolve, reject) => {
@@ -124,6 +56,7 @@ export default class Product extends Component {
             barCode: '',
             productCode: '',
             unit: '',
+            brand: '',
             name: '',
             size: '',
             flagProduct: 0,
@@ -157,6 +90,7 @@ export default class Product extends Component {
             barCodeSave: '',
             productCodeSave: '',
             unitSave: '',
+            brandSave: '',
             nameSave: '',
             sizeSave: '',
             flagProductSave: 0,
@@ -400,6 +334,9 @@ export default class Product extends Component {
 
         this.handleSaveProduct = this.handleSaveProduct.bind(this);
         this.handleCancelSaveProduct = this.handleCancelSaveProduct.bind(this);
+
+        this.handleChangeFlagProductSave = this.handleChangeFlagProductSave.bind(this);
+        this.handleChangeCatIdSave = this.handleChangeCatIdSave.bind(this);
     }
 
     onChangeFildProduct(e) {
@@ -420,6 +357,7 @@ export default class Product extends Component {
             barCode: record.barCode,
             productCode: record.productCode,
             unit: record.unit,
+            brand: record.brand,
             name: record.name,
             size: record.size,
             flagProduct: record.flagProduct,
@@ -455,9 +393,21 @@ export default class Product extends Component {
         });
     }
 
+    handleChangeFlagProductSave(value) {
+        this.setState({
+            flagProductSave: value.value
+        });
+    }
+
     handleChangeCatIdEdit(value) {
         this.setState({
             catId: value.value
+        });
+    }
+
+    handleChangeCatIdSave(value) {
+        this.setState({
+            catIdSave: value.value
         });
     }
 
@@ -475,6 +425,7 @@ export default class Product extends Component {
             barCode: this.state.barCode,
             productCode: this.state.productCode,
             unit: this.state.unit,
+            brand: this.state.brand,
             name: this.state.name,
             size: this.state.size,
             flagProduct: this.state.flagProduct,
@@ -509,13 +460,14 @@ export default class Product extends Component {
             this.setState({ statusButtonEdit: false, productstatus: true });
             swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
                 this.setState({
-                    isModalVisible: false,
+                    isModalVisibleSave: false,
                     productId: 0,
                     codeId: '',
                     priceProductId: 0,
                     barCode: '',
                     productCode: '',
                     unit: '',
+                    brand: '',
                     name: '',
                     size: '',
                     flagProduct: 0,
@@ -558,8 +510,96 @@ export default class Product extends Component {
         }
     };
 
-    handleSaveProduct() {
-        this.setState({ isModalVisibleSave: false });
+    async handleSaveProduct() {
+        this.setState({ statusButtonEdit: true });
+        var dataSave = {
+            barCode: this.state.barCodeSave,
+            productCode: this.state.productCodeSave,
+            unit: this.state.unitSave,
+            brand: this.state.brandSave,
+            name: this.state.nameSave,
+            size: this.state.sizeSave,
+            flagProduct: this.state.flagProductSave,
+            color: this.state.colorSave,
+            catId: this.state.catIdSave,
+            direction: this.state.directionSave,
+            caution: this.state.cautionSave,
+            keepespreserve: this.state.keepespreserveSave,
+            firstaidprocedure: this.state.firstaidprocedureSave,
+            productStatus: "A",
+            detail: this.state.detailSave,
+            level1: this.state.level1Save,
+            level2: this.state.level2Save,
+            level3: this.state.level3Save,
+            level4: this.state.level4Save,
+            level5: this.state.level5Save,
+            level6: this.state.level6Save,
+            level7: this.state.level7Save,
+            level8: this.state.level8Save,
+            level9: this.state.level9Save,
+            level10: this.state.level10Save,
+            level11: this.state.level11Save,
+            level12: this.state.level12Save,
+            level13: this.state.level13Save,
+            level14: this.state.level14Save,
+            level15: this.state.level15Save,
+            enduser: this.state.enduserSave,
+            priceProduceStatus: "A"
+        }
+
+        var url_create_product_price = ip + "/Product/create/admin/";
+        const createproductprice = await (await axios.post(url_create_product_price, dataSave)).data;
+        if (createproductprice) {
+            this.setState({ statusButtonEdit: false, productstatus: true });
+            swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
+                this.setState({
+                    isModalVisibleSave: false,
+                    productIdSave: 0,
+                    codeIdSave: '',
+                    priceProductIdSave: 0,
+                    barCodeSave: '',
+                    productCodeSave: '',
+                    unitSave: '',
+                    brandSave: '',
+                    nameSave: '',
+                    sizeSave: '',
+                    flagProductSave: 0,
+                    colorSave: '',
+                    catIdSave: 0,
+                    directionSave: '',
+                    cautionSave: '',
+                    keepespreserveSave: '',
+                    firstaidprocedureSave: '',
+                    detailSave: '',
+                    level1Save: '',
+                    level2Save: '',
+                    level3Save: '',
+                    level4Save: '',
+                    level5Save: '',
+                    level6Save: '',
+                    level7Save: '',
+                    level8Save: '',
+                    level9Save: '',
+                    level10Save: '',
+                    level11Save: '',
+                    level12Save: '',
+                    level13Save: '',
+                    level14Save: '',
+                    level15Save: '',
+                    enduserSave: ''
+                });
+            });
+            var url_product = ip + "/Product/find/all/admin";
+            const product = await (await axios.get(url_product)).data;
+            this.setState({
+                product: product,
+                productstatus: false
+            });
+        } else {
+            this.setState({ statusButtonEdit: false });
+            swal("Warning!", "บันทึกข้อมูลไม่สำเร็จ", "warning").then((value) => {
+            });
+        }
     };
 
     handleCancelEditProduct() {
@@ -571,6 +611,7 @@ export default class Product extends Component {
             barCode: '',
             productCode: '',
             unit: '',
+            brand: '',
             name: '',
             size: '',
             flagProduct: 0,
@@ -602,7 +643,42 @@ export default class Product extends Component {
     };
 
     handleCancelSaveProduct() {
-        this.setState({ isModalVisibleSave: false });
+        this.setState({
+            isModalVisibleSave: false,
+            productIdSave: 0,
+            codeIdSave: '',
+            priceProductIdSave: 0,
+            barCodeSave: '',
+            productCodeSave: '',
+            unitSave: '',
+            brandSave: '',
+            nameSave: '',
+            sizeSave: '',
+            flagProductSave: 0,
+            colorSave: '',
+            catIdSave: 0,
+            directionSave: '',
+            cautionSave: '',
+            keepespreserveSave: '',
+            firstaidprocedureSave: '',
+            detailSave: '',
+            level1Save: '',
+            level2Save: '',
+            level3Save: '',
+            level4Save: '',
+            level5Save: '',
+            level6Save: '',
+            level7Save: '',
+            level8Save: '',
+            level9Save: '',
+            level10Save: '',
+            level11Save: '',
+            level12Save: '',
+            level13Save: '',
+            level14Save: '',
+            level15Save: '',
+            enduserSave: ''
+        });
     };
 
     handleCancelimage() {
@@ -739,26 +815,15 @@ export default class Product extends Component {
                         </Col>
                         <Col xs={5} md={5} xl={5} id="page-product">
                             สินค้า
-                    </Col>
+                        </Col>
                     </Row>
-                    <Row id="input-search">
+                    {/* <Row id="input-search">
                         <Input.Group compact>
                             <Input.Search style={{ width: '30%' }} placeholder="ค้นหาสินค้า (รหัสสินค้า หรือ ชื่อสินค้า)" />
                         </Input.Group>
-                    </Row>
+                    </Row> */}
                     <Row id="input-search">
-                        {/* <Col md={2} xl={2}><div>เรียงลำดับตาม</div></Col>
-                    <Col md={3} xl={3} id="col">
-                        <Select defaultValue="เรียงลำดับตาม" style={{ width: 130 }} onChange={handleChange}>
-                            <Option value="วันที่">วันที่</Option>
-                            <Option value="ชื่อ">ชื่อ</Option>
-                        </Select>
-                    </Col>
-                    <Col md={5} xl={4} id="col">
-                        <Button id="button-print" icon={<PrinterTwoTone twoToneColor="#DA213D"/>}>ปริ้นรายการสินค้า</Button>
-                    </Col> */}
                         <Col md={4} xl={3} id="col">
-                            {/* <Button id="button-addproduct" icon={<FileAddTwoTone twoToneColor="#DA213D"/>}>เพิ่มรายการสินค้า</Button> */}
                             <Button id="button-addproduct" onClick={this.showModalSaveProduct}>เพิ่มรายการสินค้า</Button>
                         </Col>
                         <Col md={5} xl={4} id="col">
@@ -806,8 +871,16 @@ export default class Product extends Component {
                                 </Col>
                                 <Col md={12} xl={12}>
                                     <Row>
-                                        <Col md={6} xl={6}>ชื่อสินค้า :</Col>
-                                        <Col md={12} xl={12}><Input id="input" name="name" value={this.state.name} onChange={this.onChangeFildProduct} /></Col>
+                                        <Col md={6} xl={6}>ยี้ห้อ :</Col>
+                                        <Col md={12} xl={12}><Input id="input" name="brand" value={this.state.brand} onChange={this.onChangeFildProduct} /></Col>
+                                    </Row>
+                                </Col>
+                            </Row>
+                            <Row id="add-product">
+                                <Col md={24} xl={24}>
+                                    <Row>
+                                        <Col md={3} xl={3}>ชื่อสินค้า :</Col>
+                                        <Col md={18} xl={18}><Input id="input" name="name" value={this.state.name} onChange={this.onChangeFildProduct} /></Col>
                                     </Row>
                                 </Col>
                             </Row>
@@ -822,7 +895,7 @@ export default class Product extends Component {
                                     <Row>
                                         <Col md={6} xl={6}>สถานะ :</Col>
                                         <Col md={12} xl={12}>
-                                            <Select labelInValue value={{ value: ('' + this.state.flagProduct) }} onChange={this.handleChangeFlagProductEdit} id="input">
+                                            <Select labelInValue value={{ value: ('' + this.state.flagProduct) }} onChange={this.handleChangeFlagProductEdit} id="input" style={{width: "100%"}}>
                                                 <Option value="1">มีจำหน่าย</Option>
                                                 <Option value="2">รอเพิ่มเติมสินค้า</Option>
                                                 <Option value="3">สั่งสินค้าล่วงหน้า</Option>
@@ -842,7 +915,7 @@ export default class Product extends Component {
                                     <Row>
                                         <Col md={6} xl={6}>หมวดหมู่ :</Col>
                                         <Col md={12} xl={12}>
-                                            <Select labelInValue value={{ value: this.state.catId }} onChange={this.handleChangeCatIdEdit} id="input" name="catId">
+                                            <Select labelInValue value={{ value: this.state.catId }} onChange={this.handleChangeCatIdEdit} id="input" name="catId" style={{width: "100%"}}>
                                                 {
                                                     this.state.catalog?.map((catalog) => {
                                                         return <Option value={catalog.catId}>{catalog.catName}</Option>
@@ -949,7 +1022,7 @@ export default class Product extends Component {
                                     <img alt="example" style={{ width: '100%' }} src={this.state.previewImage} />
                                 </Modal>
                             </Row>
-                        </Form> 
+                        </Form>
                     </Modal>
                     <Modal
                         title="เพิ่มรายการสินค้า"
@@ -963,13 +1036,13 @@ export default class Product extends Component {
                                 <Col md={12} xl={12}>
                                     <Row>
                                         <Col md={6} xl={6}>รหัสบาร์โค้ด :</Col>
-                                        <Col md={12} xl={12}><Input id="input" /></Col>
+                                        <Col md={12} xl={12}><Input id="input" name="barCodeSave" value={this.state.barCodeSave} onChange={this.onChangeFildProduct} /></Col>
                                     </Row>
                                 </Col>
                                 <Col md={12} xl={12}>
                                     <Row>
                                         <Col md={6} xl={6}>รหัสสินค้า :</Col>
-                                        <Col md={12} xl={12}><Input id="input" /></Col>
+                                        <Col md={12} xl={12}><Input id="input" name="productCodeSave" value={this.state.productCodeSave} onChange={this.onChangeFildProduct} /></Col>
                                     </Row>
                                 </Col>
                             </Row>
@@ -977,13 +1050,21 @@ export default class Product extends Component {
                                 <Col md={12} xl={12}>
                                     <Row>
                                         <Col md={6} xl={6}>หน่วย :</Col>
-                                        <Col md={12} xl={12}><Input id="input" /></Col>
+                                        <Col md={12} xl={12}><Input id="input" name="unitSave" value={this.state.unitSave} onChange={this.onChangeFildProduct} /></Col>
                                     </Row>
                                 </Col>
                                 <Col md={12} xl={12}>
                                     <Row>
-                                        <Col md={6} xl={6}>ชื่อสินค้า :</Col>
-                                        <Col md={12} xl={12}><Input id="input" /></Col>
+                                        <Col md={6} xl={6}>ยี้ห้อ :</Col>
+                                        <Col md={12} xl={12}><Input id="input" name="brandSave" value={this.state.brandSave} onChange={this.onChangeFildProduct} /></Col>
+                                    </Row>
+                                </Col>
+                            </Row>
+                            <Row id="add-product">
+                                <Col md={24} xl={24}>
+                                    <Row>
+                                        <Col md={3} xl={3}>ชื่อสินค้า :</Col>
+                                        <Col md={18} xl={18}><Input id="input" name="nameSave" value={this.state.nameSave} onChange={this.onChangeFildProduct} /></Col>
                                     </Row>
                                 </Col>
                             </Row>
@@ -991,17 +1072,17 @@ export default class Product extends Component {
                                 <Col md={12} xl={12}>
                                     <Row>
                                         <Col md={6} xl={6}>ขนาด :</Col>
-                                        <Col md={12} xl={12}><Input id="input" /></Col>
+                                        <Col md={12} xl={12}><Input id="input" name="sizeSave" value={this.state.sizeSave} onChange={this.onChangeFildProduct} /></Col>
                                     </Row>
                                 </Col>
                                 <Col md={12} xl={12}>
                                     <Row>
                                         <Col md={6} xl={6}>สถานะ :</Col>
                                         <Col md={12} xl={12}>
-                                            <Select defaultValue="สถานะ" onChange={handleChange3} id="input">
-                                                <Option value="มีจำหน่าย">มีจำหน่าย</Option>
-                                                <Option value="รอเพิ่มเติมสินค้า">รอเพิ่มเติมสินค้า</Option>
-                                                <Option value="สั่งสินค้าล่วงหน้า">สั่งสินค้าล่วงหน้า</Option>
+                                            <Select labelInValue value={{ value: ('' + this.state.flagProductSave) }} onChange={this.handleChangeFlagProductSave} id="input" style={{width: "100%"}}>
+                                                <Option value="1">มีจำหน่าย</Option>
+                                                <Option value="2">รอเพิ่มเติมสินค้า</Option>
+                                                <Option value="3">สั่งสินค้าล่วงหน้า</Option>
                                             </Select>
                                         </Col>
                                     </Row>
@@ -1011,16 +1092,19 @@ export default class Product extends Component {
                                 <Col md={12} xl={12}>
                                     <Row>
                                         <Col md={6} xl={6}>สี :</Col>
-                                        <Col md={12} xl={12}><Input id="input" /></Col>
+                                        <Col md={12} xl={12}><Input id="input" name="colorSave" value={this.state.colorSave} onChange={this.onChangeFildProduct} /></Col>
                                     </Row>
                                 </Col>
                                 <Col md={12} xl={12}>
                                     <Row>
                                         <Col md={6} xl={6}>หมวดหมู่ :</Col>
                                         <Col md={12} xl={12}>
-                                            <Select defaultValue="หมวดหมู่" onChange={handleChange4} id="input">
-                                                <Option value="อุปกรณ์เครืองมือช่าง">อุปกรณ์เครืองมือช่าง</Option>
-                                                <Option value="แผ่นแสตนเลส">แผ่นแสตนเลส</Option>
+                                            <Select labelInValue value={{ value: this.state.catIdSave }} onChange={this.handleChangeCatIdSave} id="input" name="catIdSave" style={{width: "100%"}}>
+                                                {
+                                                    this.state.catalog?.map((catalog) => {
+                                                        return <Option value={catalog.catId}>{catalog.catName}</Option>
+                                                    })
+                                                }
                                             </Select>
                                         </Col>
                                     </Row>
@@ -1030,13 +1114,13 @@ export default class Product extends Component {
                                 <Col md={12} xl={12}>
                                     <Row>
                                         <Col md={6} xl={6}>วิธีการใช้งาน :</Col>
-                                        <Col md={12} xl={12}><TextArea rows={2} id="input" /></Col>
+                                        <Col md={12} xl={12}><TextArea rows={2} id="input" name="directionSave" value={this.state.directionSave} onChange={this.onChangeFildProduct} /></Col>
                                     </Row>
                                 </Col>
                                 <Col md={12} xl={12}>
                                     <Row>
                                         <Col md={6} xl={6}>ข้อควรระวัง :</Col>
-                                        <Col md={12} xl={12}><TextArea rows={2} id="input" /></Col>
+                                        <Col md={12} xl={12}><TextArea rows={2} id="input" name="cautionSave" value={this.state.cautionSave} onChange={this.onChangeFildProduct} /></Col>
                                     </Row>
                                 </Col>
                             </Row>
@@ -1044,21 +1128,65 @@ export default class Product extends Component {
                                 <Col md={12} xl={12}>
                                     <Row>
                                         <Col md={6} xl={6}>วิธีเก็บรักษา :</Col>
-                                        <Col md={12} xl={12}><TextArea rows={2} id="input" /></Col>
+                                        <Col md={12} xl={12}><TextArea rows={2} id="input" name="keepespreserveSave" value={this.state.keepespreserveSave} onChange={this.onChangeFildProduct} /></Col>
                                     </Row>
                                 </Col>
                                 <Col md={12} xl={12}>
                                     <Row>
                                         <Col md={6} xl={6}>ขั้นตอนการปฐมพยาบาล :</Col>
-                                        <Col md={12} xl={12}><TextArea rows={2} id="input" /></Col>
+                                        <Col md={12} xl={12}><TextArea rows={2} id="input" name="firstaidprocedureSave" value={this.state.firstaidprocedureSave} onChange={this.onChangeFildProduct} /></Col>
+                                    </Row>
+                                </Col>
+                            </Row>
+                            <Row id="add-product">
+                                <Col md={24} xl={24}>
+                                    <Row>
+                                        <Col md={3} xl={3}>รายละเอียดสินค้า :</Col>
+                                        <Col md={18} xl={18}><TextArea id="input" name="detailSave" value={this.state.detailSave} onChange={this.onChangeFildProduct} /></Col>
                                     </Row>
                                 </Col>
                             </Row>
                             <Row>
                             </Row>
-                            <Row id="row-price">
-                                <Table columns={this.price} dataSource={prices} />
+                            <Row id="add-product">
+                                <Col md={4} xl={4} id="col-center-header">ระดับ</Col>
+                                <Col md={4} xl={4} id="col-center-header">Level 1</Col>
+                                <Col md={4} xl={4} id="col-center-header">Level 2</Col>
+                                <Col md={4} xl={4} id="col-center-header">Level 3</Col>
+                                <Col md={4} xl={4} id="col-center-header">Level 4</Col>
+                                <Col md={4} xl={4} id="col-center-header">Level 5</Col>
                             </Row>
+                            <Row id="add-product">
+                                <Col md={4} xl={4} id="col-center-header">{this.state.member1}</Col>
+                                <Col md={4} xl={4} id="col-price"><Input id="input-price" name="level1Save" value={this.state.level1Save} onChange={this.onChangeFildProduct} /></Col>
+                                <Col md={4} xl={4} id="col-price"><Input id="input-price" name="level2Save" value={this.state.level2Save} onChange={this.onChangeFildProduct} /></Col>
+                                <Col md={4} xl={4} id="col-price"><Input id="input-price" name="level3Save" value={this.state.level3Save} onChange={this.onChangeFildProduct} /></Col>
+                                <Col md={4} xl={4} id="col-price"><Input id="input-price" name="level4Save" value={this.state.level4Save} onChange={this.onChangeFildProduct} /></Col>
+                                <Col md={4} xl={4} id="col-price"><Input id="input-price" name="level5Save" value={this.state.level5Save} onChange={this.onChangeFildProduct} /></Col>
+                            </Row>
+                            <Row id="add-product">
+                                <Col md={4} xl={4} id="col-center-header">{this.state.member2}</Col>
+                                <Col md={4} xl={4} id="col-price"><Input id="input-price" name="level6Save" value={this.state.level6Save} onChange={this.onChangeFildProduct} /></Col>
+                                <Col md={4} xl={4} id="col-price"><Input id="input-price" name="level7Save" value={this.state.level7Save} onChange={this.onChangeFildProduct} /></Col>
+                                <Col md={4} xl={4} id="col-price"><Input id="input-price" name="level8Save" value={this.state.level8Save} onChange={this.onChangeFildProduct} /></Col>
+                                <Col md={4} xl={4} id="col-price"><Input id="input-price" name="level9Save" value={this.state.level9Save} onChange={this.onChangeFildProduct} /></Col>
+                                <Col md={4} xl={4} id="col-price"><Input id="input-price" name="level10Save" value={this.state.level10Save} onChange={this.onChangeFildProduct} /></Col>
+                            </Row>
+                            <Row id="add-product">
+                                <Col md={4} xl={4} id="col-center-header">{this.state.member3}</Col>
+                                <Col md={4} xl={4} id="col-price"><Input id="input-price" name="level11Save" value={this.state.level11Save} onChange={this.onChangeFildProduct} /></Col>
+                                <Col md={4} xl={4} id="col-price"><Input id="input-price" name="level12Save" value={this.state.level12Save} onChange={this.onChangeFildProduct} /></Col>
+                                <Col md={4} xl={4} id="col-price"><Input id="input-price" name="level13Save" value={this.state.level13Save} onChange={this.onChangeFildProduct} /></Col>
+                                <Col md={4} xl={4} id="col-price"><Input id="input-price" name="level14Save" value={this.state.level14Save} onChange={this.onChangeFildProduct} /></Col>
+                                <Col md={4} xl={4} id="col-price"><Input id="input-price" name="level15Save" value={this.state.level15Save} onChange={this.onChangeFildProduct} /></Col>
+                            </Row>
+                            <Row id="add-product">
+                                <Col md={4} xl={4} id="col-center-header">{this.state.EndUser}</Col>
+                                <Col md={4} xl={4} id="col-price"><Input id="input-price" name="enduserSave" value={this.state.enduserSave} onChange={this.onChangeFildProduct} /></Col>
+                            </Row>
+                            {/* <Row id="row-price">
+                                <Table columns={this.price} dataSource={prices} />
+                            </Row> */}
                             <Row id="add-img">
                                 <Upload
                                     action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
