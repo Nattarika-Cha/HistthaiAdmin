@@ -9,6 +9,7 @@ import axios from 'axios';
 import swal from 'sweetalert';
 
 var ip = "http://localhost:5000";
+var uuid = "";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -122,58 +123,12 @@ export default class Product extends Component {
             previewTitle: '',
             previewImage1: '',
             previewTitle1: '',
-            fileList: [
-                {
-                    uid: '-1',
-                    name: 'image.png',
-                    status: 'done',
-                    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-                },
-                {
-                    uid: '-2',
-                    name: 'image.png',
-                    status: 'done',
-                    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-                },
-                {
-                    uid: '-3',
-                    name: 'image.png',
-                    status: 'done',
-                    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-                },
-                {
-                    uid: '-4',
-                    name: 'image.png',
-                    status: 'done',
-                    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-                },
-            ],
-            fileList1: [
-                {
-                    uid: '-1',
-                    name: 'image.png',
-                    status: 'done',
-                    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-                },
-                {
-                    uid: '-2',
-                    name: 'image.png',
-                    status: 'done',
-                    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-                },
-                {
-                    uid: '-3',
-                    name: 'image.png',
-                    status: 'done',
-                    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-                },
-                {
-                    uid: '-4',
-                    name: 'image.png',
-                    status: 'done',
-                    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-                },
-            ]
+
+            fileListMainEdit: [],
+            ImgMainEdit: [],
+
+            fileListDetailEdit: [],
+            ImgDetailEdit: []
         };
 
         this.product = [
@@ -245,7 +200,6 @@ export default class Product extends Component {
                     <>
                         <div>{moment(render).format('L')}</div>
                     </>
-
             },
             {
                 title: '',
@@ -317,16 +271,13 @@ export default class Product extends Component {
         this.handEditProduct = this.handEditProduct.bind(this);
         this.handleCancelEditProduct = this.handleCancelEditProduct.bind(this);
 
+        this.handleChangeListMainEdit = this.handleChangeListMainEdit.bind(this);
+        this.handleChangeListDetailEdit = this.handleChangeListDetailEdit.bind(this);
+
         this.handleCancelimage = this.handleCancelimage.bind(this);
         this.handlePreview = this.handlePreview.bind(this);
-        this.handleChangeimage = this.handleChangeimage.bind(this);
-
-        this.handleCancelimage1 = this.handleCancelimage1.bind(this);
-        this.handlePreview1 = this.handlePreview1.bind(this);
-        this.handleChangeimage1 = this.handleChangeimage1.bind(this);
 
         this.onChangeProduct = this.onChangeProduct.bind(this);
-        this.onClickProduct = this.onClickProduct.bind(this);
         this.onChangeFildProduct = this.onChangeFildProduct.bind(this);
 
         this.handleChangeFlagProductEdit = this.handleChangeFlagProductEdit.bind(this);
@@ -340,8 +291,6 @@ export default class Product extends Component {
     }
 
     onChangeFildProduct(e) {
-        // const product = this.state.productEdit;
-        // product[e.target.name] = e.target.value;
         this.setState({
             [e.target.name]: e.target.value
         })
@@ -681,10 +630,6 @@ export default class Product extends Component {
         });
     };
 
-    handleCancelimage() {
-        this.setState({ previewVisible: false });
-    };
-
     handlePreview = async file => {
         if (!file.url && !file.preview) {
             file.preview = await getBase64(file.originFileObj);
@@ -696,26 +641,73 @@ export default class Product extends Component {
             previewTitle: file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
         });
     };
-    handleChangeimage(fileList) {
-        this.setState({ ...fileList });
+
+    handleCancelimage() {
+        this.setState({ previewVisible: false });
     };
 
-    handleCancelimage1() {
-        this.setState({ preview1Visible: false });
-    };
-    handlePreview1 = async file => {
-        if (!file.url && !file.preview) {
-            file.preview = await getBase641(file.originFileObj);
+    async handleChangeListMainEdit(fileList) {
+        console.log(fileList.file, " file");
+        const imgMainEdit = this.state.ImgMainEdit;
+        if (fileList.file.status === "uploading") {
+            imgMainEdit[0].img = await getBase64(fileList.file.originFileObj);
+            imgMainEdit[0].flag = "Edit";
+        } else if (fileList.file.status === "removed") {
+            imgMainEdit[0].img = "";
+            imgMainEdit[0].flag = "Removed";
         }
 
-        this.setState({
-            previewImage1: file.url || file.preview,
-            previewVisible: true,
-            previewTitle1: file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
-        });
+        console.log(imgMainEdit, " imgMainEdit");
+
+        this.setState({ fileListMainEdit: fileList.fileList });
     };
-    handleChangeimage1(fileList) {
-        this.setState({ ...fileList });
+
+    async handleChangeListDetailEdit(fileList) {
+        const imgDetailEdit = this.state.ImgDetailEdit;
+        var state = 0;
+        if (fileList.file.status === "uploading") {
+            const remove = await imgDetailEdit.filter((item) => item.flag === "Removed");
+            if (remove.length > 0) {
+                imgDetailEdit.forEach(async (imgDetail, index) => {
+                    if (imgDetail.flag === "Removed" && uuid !== fileList.file.uid && state === 0) {
+                        uuid = fileList.file.uid;
+                        state += 1;
+                        imgDetail.uid = fileList.file.uid;
+                        imgDetail.img = await getBase64(fileList.file.originFileObj);
+                        imgDetail.flag = "Edit";
+                        return;
+                    } else {
+                        return;
+                    }
+                });
+            } else if (remove.length === 0 && uuid !== fileList.file.uid) {
+                uuid = fileList.file.uid;
+                const addData = {
+                    uid: fileList.file.uid,
+                    imgId: 0,
+                    name: this.state.codeId,
+                    status: 'done',
+                    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+                    flag: "Insert",
+                    img: await getBase64(fileList.file.originFileObj)
+                }
+
+                imgDetailEdit.push(addData);
+            }
+        } else if (fileList.file.status === "removed") {
+            imgDetailEdit.forEach((imgDetail, index) => {
+                if (imgDetail.uid === fileList.file.uid) {
+                    if (imgDetail.flag === "Insert") {
+                        imgDetailEdit.splice(index, 1);
+                    } else {
+                        imgDetail.img = "";
+                        imgDetail.flag = "Removed";
+                    }
+                }
+            });
+        }
+
+        this.setState({ fileListDetailEdit: fileList.fileList });
     };
 
     async onChangeProduct(record) {
@@ -747,16 +739,89 @@ export default class Product extends Component {
         }
     }
 
-    onClickProduct() {
-        console.log("Switch click");
-    }
-
     async componentDidMount() {
         var url_product = ip + "/Product/find/all/admin";
         const product = await (await axios.get(url_product)).data;
         this.setState({
             product: product,
             productstatus: false
+        });
+
+        this.setState({
+            fileListMainEdit: [{
+                uid: '1',
+                name: 'P100001_1.png',
+                status: 'done',
+                url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+                flag: "Default",
+                img: ""
+            }],
+            ImgMainEdit: [{
+                uid: '1',
+                name: 'P100001_1.png',
+                status: 'done',
+                url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+                flag: "Default",
+                img: ""
+            }],
+            fileListDetailEdit: [
+                // {
+                //     uid: '2',
+                //     imgId: 1,
+                //     name: 'P100001_2.png',
+                //     status: 'done',
+                //     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+                //     flag: "Default",
+                //     img: ""
+                // },
+                // {
+                //     uid: '3',
+                //     imgId: 2,
+                //     name: 'P100001_3.png',
+                //     status: 'done',
+                //     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+                //     flag: "Default",
+                //     img: ""
+                // },
+                // {
+                //     uid: '4',
+                //     imgId: 3,
+                //     name: 'P100001_4.png',
+                //     status: 'done',
+                //     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+                //     flag: "Default",
+                //     img: ""
+                // }
+            ],
+            ImgDetailEdit: [
+                // {
+                //     uid: '2',
+                //     imgId: 1,
+                //     name: 'P100001_2.png',
+                //     status: 'done',
+                //     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+                //     flag: "Default",
+                //     img: ""
+                // },
+                // {
+                //     uid: '3',
+                //     imgId: 2,
+                //     name: 'P100001_3.png',
+                //     status: 'done',
+                //     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+                //     flag: "Default",
+                //     img: ""
+                // },
+                // {
+                //     uid: '4',
+                //     imgId: 3,
+                //     name: 'P100001_4.png',
+                //     status: 'done',
+                //     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+                //     flag: "Default",
+                //     img: ""
+                // }
+            ]
         });
 
         var url_catalog = ip + "/Catalog/find/all";
@@ -895,7 +960,7 @@ export default class Product extends Component {
                                     <Row>
                                         <Col md={6} xl={6}>สถานะ :</Col>
                                         <Col md={12} xl={12}>
-                                            <Select labelInValue value={{ value: ('' + this.state.flagProduct) }} onChange={this.handleChangeFlagProductEdit} id="input" style={{width: "100%"}}>
+                                            <Select labelInValue value={{ value: ('' + this.state.flagProduct) }} onChange={this.handleChangeFlagProductEdit} id="input" style={{ width: "100%" }}>
                                                 <Option value="1">มีจำหน่าย</Option>
                                                 <Option value="2">รอเพิ่มเติมสินค้า</Option>
                                                 <Option value="3">สั่งสินค้าล่วงหน้า</Option>
@@ -915,7 +980,7 @@ export default class Product extends Component {
                                     <Row>
                                         <Col md={6} xl={6}>หมวดหมู่ :</Col>
                                         <Col md={12} xl={12}>
-                                            <Select labelInValue value={{ value: this.state.catId }} onChange={this.handleChangeCatIdEdit} id="input" name="catId" style={{width: "100%"}}>
+                                            <Select labelInValue value={{ value: this.state.catId }} onChange={this.handleChangeCatIdEdit} id="input" name="catId" style={{ width: "100%" }}>
                                                 {
                                                     this.state.catalog?.map((catalog) => {
                                                         return <Option value={catalog.catId}>{catalog.catName}</Option>
@@ -1000,18 +1065,36 @@ export default class Product extends Component {
                                 <Col md={4} xl={4} id="col-price"><Input id="input-price" name="enduser" value={this.state.enduser} onChange={this.onChangeFildProduct} /></Col>
                             </Row>
 
-                            {/* <Row id="row-price">
-                            <Table columns={this.price} dataSource={prices} />
-                        </Row> */}
+                            <Row id="header-img">รูปภาพหลัก</Row>
                             <Row id="add-img">
                                 <Upload
-                                    action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                                    action={ip + "/UserProfile/UploadImg"}
                                     listType="picture-card"
-                                    fileList={this.state.fileList}
+                                    fileList={this.state.fileListMainEdit}
                                     onPreview={this.handlePreview}
-                                    onChange={this.handleChangeimage}
+                                    onChange={this.handleChangeListMainEdit}
                                 >
-                                    {this.state.fileList.length >= 5 ? null : uploadButton}
+                                    {this.state.fileListMainEdit.length >= 1 ? null : uploadButton}
+                                </Upload>
+                                <Modal
+                                    visible={this.state.previewVisible}
+                                    title={this.state.previewTitle}
+                                    footer={null}
+                                    onCancel={this.handleCancelimage}
+                                >
+                                    <img alt="example" style={{ width: '100%' }} src={this.state.previewImage} />
+                                </Modal>
+                            </Row>
+                            <Row id="header-img">รูปภาพรอง</Row>
+                            <Row id="add-img">
+                                <Upload
+                                    action={ip + "/UserProfile/UploadImg"}
+                                    listType="picture-card"
+                                    fileList={this.state.fileListDetailEdit}
+                                    onPreview={this.handlePreview}
+                                    onChange={this.handleChangeListDetailEdit}
+                                >
+                                    {this.state.fileListDetailEdit.length >= 4 ? null : uploadButton}
                                 </Upload>
                                 <Modal
                                     visible={this.state.previewVisible}
@@ -1079,7 +1162,7 @@ export default class Product extends Component {
                                     <Row>
                                         <Col md={6} xl={6}>สถานะ :</Col>
                                         <Col md={12} xl={12}>
-                                            <Select labelInValue value={{ value: ('' + this.state.flagProductSave) }} onChange={this.handleChangeFlagProductSave} id="input" style={{width: "100%"}}>
+                                            <Select labelInValue value={{ value: ('' + this.state.flagProductSave) }} onChange={this.handleChangeFlagProductSave} id="input" style={{ width: "100%" }}>
                                                 <Option value="1">มีจำหน่าย</Option>
                                                 <Option value="2">รอเพิ่มเติมสินค้า</Option>
                                                 <Option value="3">สั่งสินค้าล่วงหน้า</Option>
@@ -1099,7 +1182,7 @@ export default class Product extends Component {
                                     <Row>
                                         <Col md={6} xl={6}>หมวดหมู่ :</Col>
                                         <Col md={12} xl={12}>
-                                            <Select labelInValue value={{ value: this.state.catIdSave }} onChange={this.handleChangeCatIdSave} id="input" name="catIdSave" style={{width: "100%"}}>
+                                            <Select labelInValue value={{ value: this.state.catIdSave }} onChange={this.handleChangeCatIdSave} id="input" name="catIdSave" style={{ width: "100%" }}>
                                                 {
                                                     this.state.catalog?.map((catalog) => {
                                                         return <Option value={catalog.catId}>{catalog.catName}</Option>
@@ -1187,7 +1270,7 @@ export default class Product extends Component {
                             {/* <Row id="row-price">
                                 <Table columns={this.price} dataSource={prices} />
                             </Row> */}
-                            <Row id="add-img">
+                            {/* <Row id="add-img">
                                 <Upload
                                     action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
                                     listType="picture-card"
@@ -1205,7 +1288,7 @@ export default class Product extends Component {
                                 >
                                     <img alt="example" style={{ width: '100%' }} src={this.state.previewImage1} />
                                 </Modal>
-                            </Row>
+                            </Row> */}
                         </Form>
                     </Modal>
                 </Spin>
