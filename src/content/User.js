@@ -1,8 +1,10 @@
 import React, { Component } from "react";
 import { Container } from 'react-bootstrap';
-import {Row, Col, Input, Select, Button, Popconfirm, Table, Modal, Form, Avatar } from 'antd'
+import {Row, Col, Input, Select, Popconfirm, Table, Modal, Form, Avatar, Button, Space  } from 'antd'
 import { BsFillPersonLinesFill } from "react-icons/bs";
-import { PrinterTwoTone, DeleteTwoTone, EyeTwoTone, AntDesignOutlined } from '@ant-design/icons';
+import { DeleteTwoTone, EyeTwoTone, AntDesignOutlined } from '@ant-design/icons';
+import Highlighter from 'react-highlight-words';
+import { SearchOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import '../css/User.css';
 
@@ -34,6 +36,9 @@ export default class User extends Component {
             user: [],
             isModalVisible: false,
             userstatus: false,
+
+            searchText: '',
+            searchedColumn: '',
         };
         this.product = [
             {
@@ -41,18 +46,27 @@ export default class User extends Component {
                 dataIndex: 'member',
                 key: 'member',
                 width: 120,
+                filters: [
+                    { text: 'Buyer', value: 'Buyer' },
+                    { text: 'Dealer', value: 'Dealer' },
+                    { text: 'Adviser', value: 'Adviser' },
+                    { text: 'Price Tag', value: 'Price Tag' },
+                    { text: 'Admin', value: 'Admin' },
+                  ],
             },
             {
                 title: 'รหัสสมาชิก',
                 dataIndex: 'userCode',
                 key: 'userCode',
                 width: 120,
+                ...this.getColumnSearchProps('userCode'),
             },
             {
                 title: 'ชื่อสมาชิก',
                 dataIndex: 'name',
                 key: 'name',
                 width: 120,
+                ...this.getColumnSearchProps('name'),
             },
             {
                 title: 'อีเมลล์',
@@ -65,6 +79,7 @@ export default class User extends Component {
                 dataIndex: 'phone',
                 key: 'phone',
                 width: 120,
+                ...this.getColumnSearchProps('phone'),
             },
             {
                 title: 'ที่อยู่',
@@ -107,6 +122,72 @@ export default class User extends Component {
         this.handleCancel = this.handleCancel.bind(this);
         // this.handleDeleteUser = this.handleDeleteUser.bind(this);
     }
+
+    getColumnSearchProps = dataIndex => ({
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+          <div style={{ padding: 8 }}>
+            <Input
+              ref={node => {
+                this.searchInput = node;
+              }}
+              placeholder={`Search ${dataIndex}`}
+              value={selectedKeys[0]}
+              onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+              onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+              style={{ width: 188, marginBottom: 8, display: 'block' }}
+            />
+            <Space>
+              <Button
+                type="primary"
+                onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+                // icon={<SearchOutlined style={{ color: '#FFFFFF' }}/>}
+                size="small"
+                style={{ width: 90 }}
+              >
+                Search
+              </Button>
+              <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+                Reset
+              </Button>
+            </Space>
+          </div>
+        ),
+        filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+        onFilter: (value, record) =>
+          record[dataIndex]
+            ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
+            : '',
+        onFilterDropdownVisibleChange: visible => {
+          if (visible) {
+            setTimeout(() => this.searchInput.select(), 100);
+          }
+        },
+        render: text =>
+          this.state.searchedColumn === dataIndex ? (
+            <Highlighter
+              highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+              searchWords={[this.state.searchText]}
+              autoEscape
+              textToHighlight={text ? text.toString() : ''}
+            />
+          ) : (
+            text
+          ),
+      });
+    
+      handleSearch = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        this.setState({
+          searchText: selectedKeys[0],
+          searchedColumn: dataIndex,
+        });
+      };
+    
+      handleReset = clearFilters => {
+        clearFilters();
+        this.setState({ searchText: '' });
+      };
+
 
     showModal() {
         this.setState({ isModalVisible: true});
@@ -164,7 +245,7 @@ export default class User extends Component {
                         <Input.Search style={{ width: '30%' }} placeholder="ค้นหาสมาชิก (ประเภทสมาชิก รหัสสมาชิก ชื่อสมาชิก)" />
                     </Input.Group>
                 </Row>
-                <Row id="input-search1">
+                {/* <Row id="input-search1">
                     <Col md={2} xl={2}><div>เรียงลำดับตาม</div></Col>
                     <Col md={3} xl={3} id="col">
                         <Select defaultValue="เรียงลำดับตาม" style={{ width: 130 }} onChange={handleChange}>
@@ -176,7 +257,7 @@ export default class User extends Component {
                     <Col md={5} xl={4} id="col">
                         <Button id="button-print" icon={<PrinterTwoTone twoToneColor="#DA213D"/>}>ปริ้นรายการสินค้า</Button>
                     </Col>
-                </Row>
+                </Row> */}
                 <Row id="input-search1">
                     <Table columns={this.product} dataSource={this.state.user} scroll={{ x: 1500 }}/>
                 </Row>

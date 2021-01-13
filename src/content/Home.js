@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { BsFillGrid1X2Fill } from 'react-icons/bs';
-import { Col, Row, Table, Tag, Popconfirm, Statistic, AutoComplete, Button, Modal, Form, Input, Select, InputNumber } from 'antd';
+import { Col, Row, Table, Tag, Popconfirm, Statistic, AutoComplete, Button, Modal, Form, Input, Select, InputNumber, Space  } from 'antd';
 import { Container } from 'react-bootstrap';
 import '../css/Home.css';
 import ReactApexChart from "react-apexcharts";
@@ -8,12 +8,19 @@ import axios from 'axios';
 import swal from 'sweetalert';
 import moment from 'moment';
 import { DeleteTwoTone, EditTwoTone } from '@ant-design/icons';
+import Highlighter from 'react-highlight-words';
+import { SearchOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 const { TextArea } = Input;
 
 var ip = "http://localhost:5000";
 // var ip_img_profile = "http://128.199.198.10/API/profile/";
+
+function onChange(pagination, filters, sorter, extra) {
+  console.log('params', pagination, filters, sorter, extra);
+}
+
 export default class Home extends Component {
   constructor(props) {
     super(props);
@@ -43,6 +50,9 @@ export default class Home extends Component {
       acceptStatus: "",
       numCall: 0,
       remark: "",
+
+      searchText: '',
+      searchedColumn: '',
 
       series: [{
         data: [400, 430, 448, 470, 540]
@@ -140,6 +150,7 @@ export default class Home extends Component {
         key: 'name',
         width: 160,
         render: text => <div>{text}</div>,
+        ...this.getColumnSearchProps('name'),
       },
       {
         title: 'เบอร์โทรศัพท์',
@@ -151,6 +162,8 @@ export default class Home extends Component {
         title: 'Line Id',
         dataIndex: 'line',
         key: 'line',
+        ellipsis: true,
+        width: 120,
       },
       {
         title: 'E - mail',
@@ -163,7 +176,26 @@ export default class Home extends Component {
         title: 'เรื่อง',
         key: 'type',
         dataIndex: 'type',
-        width: 150,
+        width: 160,
+        filters: [
+          {
+            text: 'สมัครตัวแทนจำหน่าย',
+            value: 'สมัครตัวแทนจำหน่าย',
+          },
+          {
+            text: 'สอบถามข้อมูลเพิ่มเติม',
+            value: 'สอบถามข้อมูลเพิ่มเติม',
+          },
+          {
+            text: 'สั่งซื้อสินค้า',
+            value: 'สั่งซื้อสินค้า',
+          },
+          {
+            text: 'อื่น ๆ',
+            value: 'อื่น ๆ',
+          },
+        ],
+        onFilter: (value, record) => record.type.indexOf(value) === 0,
         render: tags => (
           <>
             {
@@ -200,12 +232,17 @@ export default class Home extends Component {
         title: 'จำนวนครั้งที่โทร',
         dataIndex: 'numCall',
         key: 'numCall',
-        ellipsis: true,
+        width: 160,
+        defaultSortOrder: 'descend',
+        sorter: {
+          compare: (a, b) => a.numCall - b.numCall,
+        },
       },
       {
         title: 'วันที่',
         dataIndex: 'createDate',
         key: 'createDate',
+        width: 160,
         render: render =>
             <>
                 <div>{moment(render).format('L')}</div>
@@ -213,10 +250,21 @@ export default class Home extends Component {
 
     },
       {
-        title: '',
+        title: 'สถานะ',
         dataIndex: 'acceptStatus',
         key: 'acceptStatus',
         width: 120,
+        filters: [
+          {
+            text: 'อนุมัติ',
+            value: 'A',
+          },
+          {
+            text: 'รอดำเนินการ',
+            value: 'N',
+          },
+        ],
+        onFilter: (value, record) => record.acceptStatus.indexOf(value) === 0,
         render: accept => (
           <>
             {
@@ -272,7 +320,74 @@ export default class Home extends Component {
     this.onChangeNumCall = this.onChangeNumCall.bind(this);
     this.onChangeFildProduct = this.onChangeFildProduct.bind(this);
     this.onChangeAcceptStatus = this.onChangeAcceptStatus.bind(this);
+
   }
+
+  getColumnSearchProps = dataIndex => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={node => {
+            this.searchInput = node;
+          }}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{ width: 188, marginBottom: 8, display: 'block' }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+            // icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Search
+          </Button>
+          <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+            Reset
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+    onFilter: (value, record) =>
+      record[dataIndex]
+        ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
+        : '',
+    onFilterDropdownVisibleChange: visible => {
+      if (visible) {
+        setTimeout(() => this.searchInput.select(), 100);
+      }
+    },
+    render: text =>
+      this.state.searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+          searchWords={[this.state.searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ''}
+        />
+      ) : (
+        text
+      ),
+  });
+
+  handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    this.setState({
+      searchText: selectedKeys[0],
+      searchedColumn: dataIndex,
+    });
+  };
+
+  handleReset = clearFilters => {
+    clearFilters();
+    this.setState({ searchText: '' });
+  };
+
 
   showModal(record) {
     this.setState({
@@ -635,7 +750,7 @@ export default class Home extends Component {
         <Row id="row3">
           <Col id="row3">ข้อความจากผู้ติดต่อ</Col>
           <Col  xs={24} md={24} xl={24}>
-            <Table columns={this.columnscontact} dataSource={this.state.contact} scroll={{ x: 1500 }} loading={this.state.contactstatus}/>
+            <Table columns={this.columnscontact} dataSource={this.state.contact} scroll={{ x: 1500 }} loading={this.state.contactstatus} onChange={onChange}/>
           </Col>
         </Row>
 
