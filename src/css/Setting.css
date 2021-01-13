@@ -27,6 +27,14 @@
     background-color: #ffffff;
     border-radius: 2mm;
     padding: 3%;
+    margin-right: 1%;
+}
+
+#col-level1{
+    background-color: #ffffff;
+    border-radius: 2mm;
+    padding: 3%;
+    /* margin-right: 1%; */
 }
 
 #header-collevel{
@@ -55,6 +63,13 @@
     border-bottom: 1px solid #f0f0f0;
 }
 
+#button-addcatalog{
+    background-color: #DA213D;
+    border: none;
+    color: #FFFFFF;
+    margin-bottom: 1%;
+}
+
 .ant-table table {
     width: 100%;
     text-align: left;
@@ -75,10 +90,24 @@
     width: fit-content;
 }
 
+#input-poinr{
+    background-color: #FBFBFB;
+    border: #AEAEAE;
+    border-radius: 1mm;
+    box-shadow: 1px 1px 1px 1px rgba(153, 151, 151, 0.2);
+}
+
 #change-imagehome{
     margin: 3%;
     background-color: #ffffff;
     border-radius: 2mm;
     padding: 3%;
     font-size: large;
+}
+#input-point{
+    position: relative;
+    background-color: #fbfbfb;
+    border: 0px solid #d9d9d9;
+    border-radius: 4px;
+    box-shadow: 0.5px 0.5px 0.5px 0.5px rgba(153, 151, 151, 0.2);
 }
