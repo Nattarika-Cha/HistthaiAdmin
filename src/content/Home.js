@@ -203,6 +203,16 @@ export default class Home extends Component {
         ellipsis: true,
       },
       {
+        title: 'วันที่',
+        dataIndex: 'createDate',
+        key: 'createDate',
+        render: render =>
+            <>
+                <div>{moment(render).format('L')}</div>
+            </>
+
+    },
+      {
         title: '',
         dataIndex: 'acceptStatus',
         key: 'acceptStatus',
