@@ -6,6 +6,7 @@ import '../css/Home.css';
 import ReactApexChart from "react-apexcharts";
 import axios from 'axios';
 import swal from 'sweetalert';
+import moment from 'moment';
 import { DeleteTwoTone, EditTwoTone } from '@ant-design/icons';
 
 const { Option } = Select;
@@ -51,6 +52,9 @@ export default class Home extends Component {
           type: 'bar',
           height: 350
         },
+        title: {
+          text: 'สถิติการเข้าชม' + moment().format('LL')
+        },
         plotOptions: {
           bar: {
             horizontal: true,
@@ -61,7 +65,7 @@ export default class Home extends Component {
         },
         xaxis: {
           categories: ['South Korea', 'Canada', 'United Kingdom', 'Netherlands', 'Italy'],
-        }
+        },
       },
     };
 
