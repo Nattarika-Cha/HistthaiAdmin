@@ -10,21 +10,15 @@ import swal from 'sweetalert';
 
 var ip = "http://localhost:5000";
 var uuid = "";
+var uuidMain = "";
+var uuidSave = "";
+var uuidMainSave = "";
 
 const { Option } = Select;
 const { TextArea } = Input;
 
 
 function getBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-    });
-}
-
-function getBase641(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
@@ -126,9 +120,13 @@ export default class Product extends Component {
 
             fileListMainEdit: [],
             ImgMainEdit: [],
-
             fileListDetailEdit: [],
-            ImgDetailEdit: []
+            ImgDetailEdit: [],
+
+            fileListMainSave: [],
+            ImgMainSave: [],
+            fileListDetailSave: [],
+            ImgDetailSave: []
         };
 
         this.product = [
@@ -274,6 +272,9 @@ export default class Product extends Component {
         this.handleChangeListMainEdit = this.handleChangeListMainEdit.bind(this);
         this.handleChangeListDetailEdit = this.handleChangeListDetailEdit.bind(this);
 
+        this.handleChangeListMainSave = this.handleChangeListMainSave.bind(this);
+        this.handleChangeListDetailSave = this.handleChangeListDetailSave.bind(this);
+
         this.handleCancelimage = this.handleCancelimage.bind(this);
         this.handlePreview = this.handlePreview.bind(this);
 
@@ -365,188 +366,212 @@ export default class Product extends Component {
     };
 
     async handEditProduct() {
-        this.setState({ statusButtonEdit: true });
-        var dataSave = {
-            productId: this.state.productId,
-            // codeId: this.state.codeId,
-            priceProductId: this.state.priceProductId,
-            //priceProductId: "",
-            barCode: this.state.barCode,
-            productCode: this.state.productCode,
-            unit: this.state.unit,
-            brand: this.state.brand,
-            name: this.state.name,
-            size: this.state.size,
-            flagProduct: this.state.flagProduct,
-            color: this.state.color,
-            catId: this.state.catId,
-            direction: this.state.direction,
-            caution: this.state.caution,
-            keepespreserve: this.state.keepespreserve,
-            firstaidprocedure: this.state.firstaidprocedure,
-            detail: this.state.detail,
-            level1: this.state.level1,
-            level2: this.state.level2,
-            level3: this.state.level3,
-            level4: this.state.level4,
-            level5: this.state.level5,
-            level6: this.state.level6,
-            level7: this.state.level7,
-            level8: this.state.level8,
-            level9: this.state.level9,
-            level10: this.state.level10,
-            level11: this.state.level11,
-            level12: this.state.level12,
-            level13: this.state.level13,
-            level14: this.state.level14,
-            level15: this.state.level15,
-            enduser: this.state.enduser,
-        }
+        // console.log(this.state.ImgMainEdit, " this.state.ImgMainEdit");
+        // console.log(this.state.ImgDetailEdit, " this.state.ImgDetailEdit");
 
-        var url_update_product_price = ip + "/Product/update/product/admin/";
-        const updateproductprice = await (await axios.put(url_update_product_price, dataSave)).data;
-        if (updateproductprice) {
-            this.setState({ statusButtonEdit: false, productstatus: true });
-            swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
-                this.setState({
-                    isModalVisibleSave: false,
-                    productId: 0,
-                    codeId: '',
-                    priceProductId: 0,
-                    barCode: '',
-                    productCode: '',
-                    unit: '',
-                    brand: '',
-                    name: '',
-                    size: '',
-                    flagProduct: 0,
-                    color: '',
-                    catId: 0,
-                    direction: '',
-                    caution: '',
-                    keepespreserve: '',
-                    firstaidprocedure: '',
-                    detail: '',
-                    level1: '',
-                    level2: '',
-                    level3: '',
-                    level4: '',
-                    level5: '',
-                    level6: '',
-                    level7: '',
-                    level8: '',
-                    level9: '',
-                    level10: '',
-                    level11: '',
-                    level12: '',
-                    level13: '',
-                    level14: '',
-                    level15: '',
-                    enduser: '',
-                    productEdit: []
+        if ((this.state.ImgMainEdit.length !== 0) && (this.state.ImgMainEdit[0]?.flag !== "Removed")) {
+            this.setState({ statusButtonEdit: true });
+            var dataSave = {
+                productId: this.state.productId,
+                // codeId: this.state.codeId,
+                priceProductId: this.state.priceProductId,
+                //priceProductId: "",
+                barCode: this.state.barCode,
+                productCode: this.state.productCode,
+                unit: this.state.unit,
+                brand: this.state.brand,
+                name: this.state.name,
+                size: this.state.size,
+                flagProduct: this.state.flagProduct,
+                color: this.state.color,
+                catId: this.state.catId,
+                direction: this.state.direction,
+                caution: this.state.caution,
+                keepespreserve: this.state.keepespreserve,
+                firstaidprocedure: this.state.firstaidprocedure,
+                detail: this.state.detail,
+                level1: this.state.level1,
+                level2: this.state.level2,
+                level3: this.state.level3,
+                level4: this.state.level4,
+                level5: this.state.level5,
+                level6: this.state.level6,
+                level7: this.state.level7,
+                level8: this.state.level8,
+                level9: this.state.level9,
+                level10: this.state.level10,
+                level11: this.state.level11,
+                level12: this.state.level12,
+                level13: this.state.level13,
+                level14: this.state.level14,
+                level15: this.state.level15,
+                enduser: this.state.enduser,
+                imgMainEdit: this.state.ImgMainEdit,
+                imgDetailEdit: this.state.ImgDetailEdit
+            }
+
+            var url_update_product_price = ip + "/Product/update/product/admin/";
+            const updateproductprice = await (await axios.put(url_update_product_price, dataSave)).data;
+            if (updateproductprice) {
+                this.setState({ statusButtonEdit: false, productstatus: true });
+                swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
+                    this.setState({
+                        isModalVisibleSave: false,
+                        productId: 0,
+                        codeId: '',
+                        priceProductId: 0,
+                        barCode: '',
+                        productCode: '',
+                        unit: '',
+                        brand: '',
+                        name: '',
+                        size: '',
+                        flagProduct: 0,
+                        color: '',
+                        catId: 0,
+                        direction: '',
+                        caution: '',
+                        keepespreserve: '',
+                        firstaidprocedure: '',
+                        detail: '',
+                        level1: '',
+                        level2: '',
+                        level3: '',
+                        level4: '',
+                        level5: '',
+                        level6: '',
+                        level7: '',
+                        level8: '',
+                        level9: '',
+                        level10: '',
+                        level11: '',
+                        level12: '',
+                        level13: '',
+                        level14: '',
+                        level15: '',
+                        enduser: '',
+                        productEdit: [],
+                        ImgMainEdit: [],
+                        ImgDetailEdit: []
+                    });
                 });
-            });
-            var url_product = ip + "/Product/find/all/admin";
-            const product = await (await axios.get(url_product)).data;
-            this.setState({
-                product: product,
-                productstatus: false
-            });
+                var url_product = ip + "/Product/find/all/admin";
+                const product = await (await axios.get(url_product)).data;
+                this.setState({
+                    product: product,
+                    productstatus: false
+                });
+            } else {
+                this.setState({ statusButtonEdit: false });
+                swal("Warning!", "บันทึกข้อมูลไม่สำเร็จ", "warning").then((value) => {
+                });
+            }
         } else {
-            this.setState({ statusButtonEdit: false });
-            swal("Warning!", "บันทึกข้อมูลไม่สำเร็จ", "warning").then((value) => {
+            swal("Warning!", "กรุณาเลือกรูปภาพหลัก", "warning").then((value) => {
             });
         }
     };
 
     async handleSaveProduct() {
-        this.setState({ statusButtonEdit: true });
-        var dataSave = {
-            barCode: this.state.barCodeSave,
-            productCode: this.state.productCodeSave,
-            unit: this.state.unitSave,
-            brand: this.state.brandSave,
-            name: this.state.nameSave,
-            size: this.state.sizeSave,
-            flagProduct: this.state.flagProductSave,
-            color: this.state.colorSave,
-            catId: this.state.catIdSave,
-            direction: this.state.directionSave,
-            caution: this.state.cautionSave,
-            keepespreserve: this.state.keepespreserveSave,
-            firstaidprocedure: this.state.firstaidprocedureSave,
-            productStatus: "A",
-            detail: this.state.detailSave,
-            level1: this.state.level1Save,
-            level2: this.state.level2Save,
-            level3: this.state.level3Save,
-            level4: this.state.level4Save,
-            level5: this.state.level5Save,
-            level6: this.state.level6Save,
-            level7: this.state.level7Save,
-            level8: this.state.level8Save,
-            level9: this.state.level9Save,
-            level10: this.state.level10Save,
-            level11: this.state.level11Save,
-            level12: this.state.level12Save,
-            level13: this.state.level13Save,
-            level14: this.state.level14Save,
-            level15: this.state.level15Save,
-            enduser: this.state.enduserSave,
-            priceProduceStatus: "A"
-        }
+        // console.log(this.state.ImgMainSave, " this.state.ImgMainEdit");
+        // console.log(this.state.ImgDetailSave, " this.state.ImgDetailEdit");
 
-        var url_create_product_price = ip + "/Product/create/admin/";
-        const createproductprice = await (await axios.post(url_create_product_price, dataSave)).data;
-        if (createproductprice) {
-            this.setState({ statusButtonEdit: false, productstatus: true });
-            swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
-                this.setState({
-                    isModalVisibleSave: false,
-                    productIdSave: 0,
-                    codeIdSave: '',
-                    priceProductIdSave: 0,
-                    barCodeSave: '',
-                    productCodeSave: '',
-                    unitSave: '',
-                    brandSave: '',
-                    nameSave: '',
-                    sizeSave: '',
-                    flagProductSave: 0,
-                    colorSave: '',
-                    catIdSave: 0,
-                    directionSave: '',
-                    cautionSave: '',
-                    keepespreserveSave: '',
-                    firstaidprocedureSave: '',
-                    detailSave: '',
-                    level1Save: '',
-                    level2Save: '',
-                    level3Save: '',
-                    level4Save: '',
-                    level5Save: '',
-                    level6Save: '',
-                    level7Save: '',
-                    level8Save: '',
-                    level9Save: '',
-                    level10Save: '',
-                    level11Save: '',
-                    level12Save: '',
-                    level13Save: '',
-                    level14Save: '',
-                    level15Save: '',
-                    enduserSave: ''
+        if ((this.state.ImgMainSave.length !== 0) && (this.state.ImgMainSave[0]?.flag !== "Removed")) {
+            this.setState({ statusButtonEdit: true });
+            var dataSave = {
+                barCode: this.state.barCodeSave,
+                productCode: this.state.productCodeSave,
+                unit: this.state.unitSave,
+                brand: this.state.brandSave,
+                name: this.state.nameSave,
+                size: this.state.sizeSave,
+                flagProduct: this.state.flagProductSave,
+                color: this.state.colorSave,
+                catId: this.state.catIdSave,
+                direction: this.state.directionSave,
+                caution: this.state.cautionSave,
+                keepespreserve: this.state.keepespreserveSave,
+                firstaidprocedure: this.state.firstaidprocedureSave,
+                productStatus: "A",
+                detail: this.state.detailSave,
+                level1: this.state.level1Save,
+                level2: this.state.level2Save,
+                level3: this.state.level3Save,
+                level4: this.state.level4Save,
+                level5: this.state.level5Save,
+                level6: this.state.level6Save,
+                level7: this.state.level7Save,
+                level8: this.state.level8Save,
+                level9: this.state.level9Save,
+                level10: this.state.level10Save,
+                level11: this.state.level11Save,
+                level12: this.state.level12Save,
+                level13: this.state.level13Save,
+                level14: this.state.level14Save,
+                level15: this.state.level15Save,
+                enduser: this.state.enduserSave,
+                priceProduceStatus: "A",
+                imgMainSave: this.state.ImgMainSave,
+                imgDetailSave: this.state.ImgDetailSave
+            }
+
+            var url_create_product_price = ip + "/Product/create/admin/";
+            const createproductprice = await (await axios.post(url_create_product_price, dataSave)).data;
+            if (createproductprice) {
+                this.setState({ statusButtonEdit: false, productstatus: true });
+                swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
+                    this.setState({
+                        isModalVisibleSave: false,
+                        productIdSave: 0,
+                        codeIdSave: '',
+                        priceProductIdSave: 0,
+                        barCodeSave: '',
+                        productCodeSave: '',
+                        unitSave: '',
+                        brandSave: '',
+                        nameSave: '',
+                        sizeSave: '',
+                        flagProductSave: 0,
+                        colorSave: '',
+                        catIdSave: 0,
+                        directionSave: '',
+                        cautionSave: '',
+                        keepespreserveSave: '',
+                        firstaidprocedureSave: '',
+                        detailSave: '',
+                        level1Save: '',
+                        level2Save: '',
+                        level3Save: '',
+                        level4Save: '',
+                        level5Save: '',
+                        level6Save: '',
+                        level7Save: '',
+                        level8Save: '',
+                        level9Save: '',
+                        level10Save: '',
+                        level11Save: '',
+                        level12Save: '',
+                        level13Save: '',
+                        level14Save: '',
+                        level15Save: '',
+                        enduserSave: '',
+                        ImgMainSave: [],
+                        ImgDetailSave: []
+                    });
                 });
-            });
-            var url_product = ip + "/Product/find/all/admin";
-            const product = await (await axios.get(url_product)).data;
-            this.setState({
-                product: product,
-                productstatus: false
-            });
+                var url_product = ip + "/Product/find/all/admin";
+                const product = await (await axios.get(url_product)).data;
+                this.setState({
+                    product: product,
+                    productstatus: false
+                });
+            } else {
+                this.setState({ statusButtonEdit: false });
+                swal("Warning!", "บันทึกข้อมูลไม่สำเร็จ", "warning").then((value) => {
+                });
+            }
         } else {
-            this.setState({ statusButtonEdit: false });
-            swal("Warning!", "บันทึกข้อมูลไม่สำเร็จ", "warning").then((value) => {
+            swal("Warning!", "กรุณาเลือกรูปภาพหลัก", "warning").then((value) => {
             });
         }
     };
@@ -587,7 +612,11 @@ export default class Product extends Component {
             level14: '',
             level15: '',
             enduser: '',
-            productEdit: []
+            productEdit: [],
+            fileListMainEdit: [],
+            ImgMainEdit: [],
+            fileListDetailEdit: [],
+            ImgDetailEdit: []
         });
     };
 
@@ -626,7 +655,11 @@ export default class Product extends Component {
             level13Save: '',
             level14Save: '',
             level15Save: '',
-            enduserSave: ''
+            enduserSave: '',
+            fileListMainSave: [],
+            ImgMainSave: [],
+            fileListDetailSave: [],
+            ImgDetailSave: []
         });
     };
 
@@ -647,17 +680,36 @@ export default class Product extends Component {
     };
 
     async handleChangeListMainEdit(fileList) {
-        console.log(fileList.file, " file");
         const imgMainEdit = this.state.ImgMainEdit;
+        var state = 0;
         if (fileList.file.status === "uploading") {
-            imgMainEdit[0].img = await getBase64(fileList.file.originFileObj);
-            imgMainEdit[0].flag = "Edit";
-        } else if (fileList.file.status === "removed") {
-            imgMainEdit[0].img = "";
-            imgMainEdit[0].flag = "Removed";
-        }
+            if (imgMainEdit.length === 0 && uuidMain !== fileList.file.uid && state === 0) {
+                uuidMain = fileList.file.uid;
+                state += 1;
+                const addData = {
+                    uid: fileList.file.uid,
+                    imgId: 0,
+                    name: this.state.codeId,
+                    status: 'done',
+                    url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+                    flag: "Insert",
+                    img: await getBase64(fileList.file.originFileObj)
+                }
 
-        console.log(imgMainEdit, " imgMainEdit");
+                imgMainEdit.push(addData);
+            } else if (uuidMain !== fileList.file.uid) {
+                uuidMain = fileList.file.uid;
+                imgMainEdit[0].img = await getBase64(fileList.file.originFileObj);
+                imgMainEdit[0].flag = "Edit";
+            }
+        } else if (fileList.file.status === "removed") {
+            if (imgMainEdit[0].flag === "Insert") {
+                imgMainEdit.splice(0, 1);
+            } else {
+                imgMainEdit[0].img = "";
+                imgMainEdit[0].flag = "Removed";
+            }
+        }
 
         this.setState({ fileListMainEdit: fileList.fileList });
     };
@@ -710,6 +762,60 @@ export default class Product extends Component {
         this.setState({ fileListDetailEdit: fileList.fileList });
     };
 
+    async handleChangeListMainSave(fileList) {
+        const imgMainSave = this.state.ImgMainSave;
+        var state = 0;
+        if (fileList.file.status === "uploading") {
+            if (imgMainSave.length === 0 && uuidMainSave !== fileList.file.uid && state === 0) {
+                uuidMainSave = fileList.file.uid;
+                state += 1;
+                const addData = {
+                    uid: fileList.file.uid,
+                    imgId: 0,
+                    name: "",
+                    status: 'done',
+                    url: "",
+                    flag: "Insert",
+                    img: await getBase64(fileList.file.originFileObj)
+                }
+
+                imgMainSave.push(addData);
+            }
+        } else if (fileList.file.status === "removed") {
+            imgMainSave.splice(0, 1);
+        }
+        //console.log(this.state.ImgMainSave, " imgDetailSave");
+        this.setState({ fileListMainSave: fileList.fileList });
+    };
+
+    async handleChangeListDetailSave(fileList) {
+        const imgDetailSave = this.state.ImgDetailSave;
+        // var state = 0;
+        if (fileList.file.status === "uploading") {
+            if (uuidSave !== fileList.file.uid) {
+                uuidSave = fileList.file.uid;
+                // state += 1;
+                const addData = {
+                    uid: fileList.file.uid,
+                    imgId: 0,
+                    name: "",
+                    status: 'done',
+                    url: "",
+                    flag: "Insert",
+                    img: await getBase64(fileList.file.originFileObj)
+                }
+                imgDetailSave.push(addData);
+            }
+        } else if (fileList.file.status === "removed") {
+            this.setState({
+                ImgDetailSave: imgDetailSave.filter((item) => item.uid !== fileList.file.uid),
+            });
+        }
+
+        //console.log(this.state.ImgDetailSave, " imgDetailSave");
+        this.setState({ fileListDetailSave: fileList.fileList });
+    };
+
     async onChangeProduct(record) {
         var productStatus = "";
         if (record?.productStatus === "A") {
@@ -748,22 +854,26 @@ export default class Product extends Component {
         });
 
         this.setState({
-            fileListMainEdit: [{
-                uid: '1',
-                name: 'P100001_1.png',
-                status: 'done',
-                url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-                flag: "Default",
-                img: ""
-            }],
-            ImgMainEdit: [{
-                uid: '1',
-                name: 'P100001_1.png',
-                status: 'done',
-                url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-                flag: "Default",
-                img: ""
-            }],
+            fileListMainEdit: [
+                {
+                    uid: '1',
+                    name: 'P100001_1.png',
+                    status: 'done',
+                    url: 'http://128.199.198.10/API/product/test.png',
+                    flag: "Default",
+                    img: ""
+                }
+            ],
+            ImgMainEdit: [
+                {
+                    uid: '1',
+                    name: 'P100001_1.png',
+                    status: 'done',
+                    url: 'http://128.199.198.10/API/product/test.png',
+                    flag: "Default",
+                    img: ""
+                }
+            ],
             fileListDetailEdit: [
                 // {
                 //     uid: '2',
@@ -865,12 +975,12 @@ export default class Product extends Component {
                 <div style={{ marginTop: 8, color: '#DA213D' }}>เพิ่มรูปภาพ</div>
             </div>
         );
-        const uploadButton1 = (
-            <div>
-                <PlusOutlined style={{ fontSize: "20px", color: '#DA213D' }} />
-                <div style={{ marginTop: 8, color: '#DA213D' }}>เพิ่มรูปภาพ</div>
-            </div>
-        );
+        // const uploadButton1 = (
+        //     <div>
+        //         <PlusOutlined style={{ fontSize: "20px", color: '#DA213D' }} />
+        //         <div style={{ marginTop: 8, color: '#DA213D' }}>เพิ่มรูปภาพ</div>
+        //     </div>
+        // );
         return (
             <Container fluid>
                 <Spin spinning={this.state.statusButtonEdit} size="large">
@@ -1267,28 +1377,47 @@ export default class Product extends Component {
                                 <Col md={4} xl={4} id="col-center-header">{this.state.EndUser}</Col>
                                 <Col md={4} xl={4} id="col-price"><Input id="input-price" name="enduserSave" value={this.state.enduserSave} onChange={this.onChangeFildProduct} /></Col>
                             </Row>
-                            {/* <Row id="row-price">
-                                <Table columns={this.price} dataSource={prices} />
-                            </Row> */}
-                            {/* <Row id="add-img">
+
+                            <Row id="header-img">รูปภาพหลัก</Row>
+                            <Row id="add-img">
                                 <Upload
-                                    action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                                    action={ip + "/UserProfile/UploadImg"}
                                     listType="picture-card"
-                                    fileList={this.state.fileList1}
-                                    onPreview={this.handlePreview1}
-                                    onChange={this.handleChangeimage1}
+                                    fileList={this.state.fileListMainSave}
+                                    onPreview={this.handlePreview}
+                                    onChange={this.handleChangeListMainSave}
                                 >
-                                    {this.state.fileList1.length >= 5 ? null : uploadButton1}
+                                    {this.state.fileListMainSave.length >= 1 ? null : uploadButton}
                                 </Upload>
                                 <Modal
                                     visible={this.state.previewVisible}
-                                    title={this.state.previewTitle1}
+                                    title={this.state.previewTitle}
                                     footer={null}
-                                    onCancel={this.handleCancelimage1}
+                                    onCancel={this.handleCancelimage}
                                 >
-                                    <img alt="example" style={{ width: '100%' }} src={this.state.previewImage1} />
+                                    <img alt="example" style={{ width: '100%' }} src={this.state.previewImage} />
                                 </Modal>
-                            </Row> */}
+                            </Row>
+                            <Row id="header-img">รูปภาพรอง</Row>
+                            <Row id="add-img">
+                                <Upload
+                                    action={ip + "/UserProfile/UploadImg"}
+                                    listType="picture-card"
+                                    fileList={this.state.fileListDetailSave}
+                                    onPreview={this.handlePreview}
+                                    onChange={this.handleChangeListDetailSave}
+                                >
+                                    {this.state.fileListDetailSave.length >= 4 ? null : uploadButton}
+                                </Upload>
+                                <Modal
+                                    visible={this.state.previewVisible}
+                                    title={this.state.previewTitle}
+                                    footer={null}
+                                    onCancel={this.handleCancelimage}
+                                >
+                                    <img alt="example" style={{ width: '100%' }} src={this.state.previewImage} />
+                                </Modal>
+                            </Row>
                         </Form>
                     </Modal>
                 </Spin>
