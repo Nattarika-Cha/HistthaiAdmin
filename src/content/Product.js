@@ -253,8 +253,8 @@ export default class Product extends Component {
                 dataIndex: '',
                 key: 'x',
                 width: 45,
-                render: () =>
-                    <Popconfirm title="คุณแน่ใจว่าจะลบรายการ？" okText="ลบ" cancelText="ยกเลิก">
+                render: (record) =>
+                    <Popconfirm title="คุณแน่ใจว่าจะลบรายการ？" okText="ลบ" cancelText="ยกเลิก" onConfirm={() => this.handleDeleteProduct(record)}>
                         <div><DeleteTwoTone style={{ fontSize: '20px', cursor: 'pointer' }} twoToneColor="#DA213D" /></div>
                     </Popconfirm>,
             },
@@ -328,6 +328,7 @@ export default class Product extends Component {
 
         this.handleChangeFlagProductSave = this.handleChangeFlagProductSave.bind(this);
         this.handleChangeCatIdSave = this.handleChangeCatIdSave.bind(this);
+        this.handleDeleteProduct = this.handleDeleteProduct.bind(this);
     }
 
     onChangeFildProduct(e) {
@@ -674,6 +675,28 @@ export default class Product extends Component {
             });
         }
     };
+
+    async handleDeleteProduct(record) {
+        // this.setState({ statusButtonEdit: true });
+        const productId = record.productId;
+        const priceProductId = record.priceProductId;
+        const codeId = record.codeId;
+        // console.log(productId, " productId");
+        // console.log(priceProductId, " priceProductId");
+        var url_delete_product = ip + "/Product/delete/" + productId + "/" + priceProductId + "/" + codeId;
+        const deleteproduct = await (await axios.delete(url_delete_product)).data;
+        if (deleteproduct !== null) {
+            this.setState({ statusButtonEdit: false, productstatus: true });
+            var url_product = ip + "/Product/find/all/admin";
+            const product = await (await axios.get(url_product)).data;
+            this.setState({
+                product: product,
+                productstatus: false
+            });
+        } else {
+    
+        }
+      }
 
     handleCancelEditProduct() {
         this.setState({
