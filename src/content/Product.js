@@ -297,8 +297,19 @@ export default class Product extends Component {
         })
     }
 
-    showModal(record) {
+    async showModal(record) {
+        var url_img_main = ip + "/ProductImg/ImgProduct/main/" + record.codeId;
+        const img_main = await(await axios.get(url_img_main)).data;
         this.setState({
+            fileListMainEdit: img_main,
+            ImgMainEdit: img_main,
+        });
+
+        var url_img_detail = ip + "/ProductImg/ImgProduct/detail/" + record.codeId;
+        const img_detail = await(await axios.get(url_img_detail)).data;
+        this.setState({
+            fileListDetailEdit: img_detail,
+            ImgDetailEdit: img_detail,
             isModalVisible: true,
             productEdit: record,
             productId: record.productId,
@@ -335,6 +346,49 @@ export default class Product extends Component {
             level15: record.level15,
             enduser: record.enduser,
         });
+
+        console.log(this.state.fileListMainEdit, " fileListMainEdit");
+        console.log(this.state.ImgMainEdit, " ImgMainEdit");
+
+        
+            
+        // this.setState({
+        //     isModalVisible: true,
+        //     productEdit: record,
+        //     productId: record.productId,
+        //     codeId: record.codeId,
+        //     priceProductId: record.priceProductId,
+        //     barCode: record.barCode,
+        //     productCode: record.productCode,
+        //     unit: record.unit,
+        //     brand: record.brand,
+        //     name: record.name,
+        //     size: record.size,
+        //     flagProduct: record.flagProduct,
+        //     color: record.color,
+        //     catId: record.catId,
+        //     direction: record.direction,
+        //     caution: record.caution,
+        //     keepespreserve: record.keepespreserve,
+        //     firstaidprocedure: record.firstaidprocedure,
+        //     detail: record.detail,
+        //     level1: record.level1,
+        //     level2: record.level2,
+        //     level3: record.level3,
+        //     level4: record.level4,
+        //     level5: record.level5,
+        //     level6: record.level6,
+        //     level7: record.level7,
+        //     level8: record.level8,
+        //     level9: record.level9,
+        //     level10: record.level10,
+        //     level11: record.level11,
+        //     level12: record.level12,
+        //     level13: record.level13,
+        //     level14: record.level14,
+        //     level15: record.level15,
+        //     enduser: record.enduser,
+        // });
     };
 
     handleChangeFlagProductEdit(value) {
@@ -366,8 +420,8 @@ export default class Product extends Component {
     };
 
     async handEditProduct() {
-        // console.log(this.state.ImgMainEdit, " this.state.ImgMainEdit");
-        // console.log(this.state.ImgDetailEdit, " this.state.ImgDetailEdit");
+        console.log(this.state.ImgMainEdit, " this.state.ImgMainEdit");
+        console.log(this.state.ImgDetailEdit, " this.state.ImgDetailEdit");
 
         if ((this.state.ImgMainEdit.length !== 0) && (this.state.ImgMainEdit[0]?.flag !== "Removed")) {
             this.setState({ statusButtonEdit: true });
@@ -410,13 +464,14 @@ export default class Product extends Component {
                 imgDetailEdit: this.state.ImgDetailEdit
             }
 
-            var url_update_product_price = ip + "/Product/update/product/admin/";
+            var url_update_product_price = ip + "/Product/update/product/admin/" + this.state.codeId;
             const updateproductprice = await (await axios.put(url_update_product_price, dataSave)).data;
+
             if (updateproductprice) {
                 this.setState({ statusButtonEdit: false, productstatus: true });
                 swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
                     this.setState({
-                        isModalVisibleSave: false,
+                        isModalVisible: false,
                         productId: 0,
                         codeId: '',
                         priceProductId: 0,
@@ -452,7 +507,9 @@ export default class Product extends Component {
                         enduser: '',
                         productEdit: [],
                         ImgMainEdit: [],
-                        ImgDetailEdit: []
+                        ImgDetailEdit: [],
+                        fileListMainEdit: [],
+                        fileListDetailEdit: []
                     });
                 });
                 var url_product = ip + "/Product/find/all/admin";
@@ -473,8 +530,8 @@ export default class Product extends Component {
     };
 
     async handleSaveProduct() {
-        // console.log(this.state.ImgMainSave, " this.state.ImgMainEdit");
-        // console.log(this.state.ImgDetailSave, " this.state.ImgDetailEdit");
+        console.log(this.state.ImgMainSave, " this.state.ImgMainEdit");
+        console.log(this.state.ImgDetailSave, " this.state.ImgDetailEdit");
 
         if ((this.state.ImgMainSave.length !== 0) && (this.state.ImgMainSave[0]?.flag !== "Removed")) {
             this.setState({ statusButtonEdit: true });
@@ -517,6 +574,7 @@ export default class Product extends Component {
 
             var url_create_product_price = ip + "/Product/create/admin/";
             const createproductprice = await (await axios.post(url_create_product_price, dataSave)).data;
+            console.log(createproductprice, " createproductprice");
             if (createproductprice) {
                 this.setState({ statusButtonEdit: false, productstatus: true });
                 swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
@@ -556,7 +614,9 @@ export default class Product extends Component {
                         level15Save: '',
                         enduserSave: '',
                         ImgMainSave: [],
-                        ImgDetailSave: []
+                        ImgDetailSave: [],
+                        fileListMainSave: [],
+                        fileListDetailSave: []
                     });
                 });
                 var url_product = ip + "/Product/find/all/admin";
@@ -689,6 +749,7 @@ export default class Product extends Component {
                 const addData = {
                     uid: fileList.file.uid,
                     imgId: 0,
+                    seq: 0,
                     name: this.state.codeId,
                     status: 'done',
                     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
@@ -737,6 +798,7 @@ export default class Product extends Component {
                 const addData = {
                     uid: fileList.file.uid,
                     imgId: 0,
+                    seq: 0,
                     name: this.state.codeId,
                     status: 'done',
                     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
@@ -772,6 +834,7 @@ export default class Product extends Component {
                 const addData = {
                     uid: fileList.file.uid,
                     imgId: 0,
+                    seq: 0,
                     name: "",
                     status: 'done',
                     url: "",
@@ -798,6 +861,7 @@ export default class Product extends Component {
                 const addData = {
                     uid: fileList.file.uid,
                     imgId: 0,
+                    seq: 0,
                     name: "",
                     status: 'done',
                     url: "",
@@ -851,87 +915,6 @@ export default class Product extends Component {
         this.setState({
             product: product,
             productstatus: false
-        });
-
-        this.setState({
-            fileListMainEdit: [
-                {
-                    uid: '1',
-                    name: 'P100001_1.png',
-                    status: 'done',
-                    url: 'http://128.199.198.10/API/product/test.png',
-                    flag: "Default",
-                    img: ""
-                }
-            ],
-            ImgMainEdit: [
-                {
-                    uid: '1',
-                    name: 'P100001_1.png',
-                    status: 'done',
-                    url: 'http://128.199.198.10/API/product/test.png',
-                    flag: "Default",
-                    img: ""
-                }
-            ],
-            fileListDetailEdit: [
-                // {
-                //     uid: '2',
-                //     imgId: 1,
-                //     name: 'P100001_2.png',
-                //     status: 'done',
-                //     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-                //     flag: "Default",
-                //     img: ""
-                // },
-                // {
-                //     uid: '3',
-                //     imgId: 2,
-                //     name: 'P100001_3.png',
-                //     status: 'done',
-                //     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-                //     flag: "Default",
-                //     img: ""
-                // },
-                // {
-                //     uid: '4',
-                //     imgId: 3,
-                //     name: 'P100001_4.png',
-                //     status: 'done',
-                //     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-                //     flag: "Default",
-                //     img: ""
-                // }
-            ],
-            ImgDetailEdit: [
-                // {
-                //     uid: '2',
-                //     imgId: 1,
-                //     name: 'P100001_2.png',
-                //     status: 'done',
-                //     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-                //     flag: "Default",
-                //     img: ""
-                // },
-                // {
-                //     uid: '3',
-                //     imgId: 2,
-                //     name: 'P100001_3.png',
-                //     status: 'done',
-                //     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-                //     flag: "Default",
-                //     img: ""
-                // },
-                // {
-                //     uid: '4',
-                //     imgId: 3,
-                //     name: 'P100001_4.png',
-                //     status: 'done',
-                //     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-                //     flag: "Default",
-                //     img: ""
-                // }
-            ]
         });
 
         var url_catalog = ip + "/Catalog/find/all";
