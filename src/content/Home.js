@@ -42,6 +42,9 @@ export default class Home extends Component {
       optionshitselect: null,
       searchhitstatus: false,
 
+      Statisticstatus: false,
+      memberUser:0,
+      endUser:0,
       contactstatus: true,
 
       isModalVisible: false,
@@ -484,6 +487,15 @@ export default class Home extends Component {
       productnewstatus: false,
       searchnewstatus: (productnew.length >= 6) ? true : false
     });
+
+    var url_Statistic_User = ip + "/StatisticsUser/find/all";
+    const memberUser = await (await axios.get(url_Statistic_User)).data;
+    console.log(memberUser, " memberUser")
+    this.setState({
+      memberUser: memberUser?.memberUser,
+      endUser: memberUser?.endUser,
+      StatisticUserstatus: false,
+    });
   }
 
   async onSearchFildNew(value) {
@@ -689,12 +701,12 @@ export default class Home extends Component {
           <Col md={24} xl={24} id="visit-head">จำนวนการเข้าชม</Col>
           <Col md={11} xl={11}id="visit">
             <Col md={24} xl={24} id="visit-member">
-              <Statistic id="visit-nummember1" title="สมาชิก" value={112893} />
+              <Statistic id="visit-nummember1" title="สมาชิก" value={this.state.memberUser} loading={this.state.contactstatus}/>
             </Col>
           </Col>
           <Col md={11} xl={11}id="visit1">
             <Col md={24} xl={24} id="visit-user">
-              <Statistic id="visit-user1" title="ผู้ใช้ทั่วไป" value={112893} />
+              <Statistic id="visit-user1" title="ผู้ใช้ทั่วไป" value={this.state.endUser} loading={this.state.contactstatus}/>
             </Col>
           </Col>
         </Row>
