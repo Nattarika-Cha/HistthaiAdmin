@@ -1,12 +1,13 @@
 import React, { Component } from "react";
 import { FaProductHunt } from "react-icons/fa";
-import { Row, Col, Input, Select, Button, Table, Switch, Modal, Popconfirm, Upload, Form, Spin } from 'antd';
+import { Row, Col, Input, Select, Button, Table, Switch, Modal, Popconfirm, Upload, Form, Spin, Space } from 'antd';
 import { Container } from 'react-bootstrap';
-import { CloseOutlined, CheckOutlined, PlusOutlined, EditTwoTone, DeleteTwoTone } from '@ant-design/icons'; //PrinterTwoTone
+import { CloseOutlined, CheckOutlined, PlusOutlined, EditTwoTone, DeleteTwoTone, SearchOutlined } from '@ant-design/icons'; //PrinterTwoTone
 import '../css/Product.css';
 import moment from 'moment';
 import axios from 'axios';
 import swal from 'sweetalert';
+import Highlighter from 'react-highlight-words';
 
 var ip = "http://localhost:5000";
 var uuid = "";
@@ -26,6 +27,10 @@ function getBase64(file) {
         reader.onerror = error => reject(error);
     });
 }
+
+function onChange(pagination, filters, sorter, extra) {
+    console.log('params', pagination, filters, sorter, extra);
+  }
 export default class Product extends Component {
     constructor(props) {
         super(props);
@@ -126,7 +131,12 @@ export default class Product extends Component {
             fileListMainSave: [],
             ImgMainSave: [],
             fileListDetailSave: [],
-            ImgDetailSave: []
+            ImgDetailSave: [],
+
+            filteredInfo: null,
+            sortedInfo: null,
+            searchText: '',
+            searchedColumn: '',
         };
 
         this.product = [
@@ -158,27 +168,54 @@ export default class Product extends Component {
                 title: 'รหัสสินค้า',
                 dataIndex: 'productCode',
                 key: 'productCode',
+                ...this.getColumnSearchProps('productCode'),
+
             },
             {
                 title: 'ชื่อสินค้า',
                 dataIndex: 'name',
                 key: 'name',
-                // onFilter: (value, record) => record.name.indexOf(value) === 0,
-                // sorter: (a, b) => a.name.length - b.name.length,
-                // sortDirections: ['descend'],
+                ...this.getColumnSearchProps('name'),
             },
             {
                 title: 'หน่วย',
                 dataIndex: 'unit',
                 key: 'unit',
+                filters: [
+                    {
+                      text: 'ใบ',
+                      value: 'ใบ',
+                    },
+                    {
+                      text: 'กล่อง',
+                      value: 'กล่อง',
+                    },
+                    {
+                      text: 'ลัง',
+                      value: 'ลัง',
+                    },
+                    {
+                      text: 'แผ่น',
+                      value: 'แผ่น',
+                    },
+                  ],
+                  onFilter: (value, record) => record.unit.indexOf(value) === 0,
             },
             {
                 title: 'หมวดหมู่',
                 dataIndex: 'catName',
                 key: 'catName',
-                // onFilter: (value, record) => record.catName.indexOf(value) === 0,
-                // sorter: (a, b) => a.catName.length - b.catName.length,
-                // sortDirections: ['descend'],
+                filters: [
+                    {
+                      text: 'อุปกรณ์เครื่องมือช่าง',
+                      value: 'อุปกรณ์เครื่องมือช่าง',
+                    },
+                    {
+                        text: 'แผ่นสแตนเลส',
+                        value: 'แผ่นสแตนเลส',
+                      },
+                  ],
+                  onFilter: (value, record) => record.catName.indexOf(value) === 0,
             },
             {
                 title: 'ขนาด',
@@ -189,11 +226,13 @@ export default class Product extends Component {
                 title: 'สี',
                 dataIndex: 'color',
                 key: 'color',
+                ...this.getColumnSearchProps('color'),
             },
             {
                 title: 'วันที่',
                 dataIndex: 'createDate',
                 key: 'createDate',
+                ...this.getColumnSearchProps('createDate'),
                 render: render =>
                     <>
                         <div>{moment(render).format('L')}</div>
@@ -951,6 +990,72 @@ export default class Product extends Component {
         });
     }
 
+    getColumnSearchProps = dataIndex => ({
+        filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+          <div style={{ padding: 8 }}>
+            <Input
+              ref={node => {
+                this.searchInput = node;
+              }}
+              placeholder={`Search ${dataIndex}`}
+              value={selectedKeys[0]}
+              onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+              onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+              style={{ width: 188, marginBottom: 8, display: 'block' }}
+            />
+            <Space>
+              <Button
+                type="primary"
+                onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+                size="small"
+                style={{ width: 90 }}
+              >
+                Search
+              </Button>
+              <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+                Reset
+              </Button>
+            </Space>
+          </div>
+        ),
+        filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+        onFilter: (value, record) =>
+          record[dataIndex]
+            ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
+            : '',
+        onFilterDropdownVisibleChange: visible => {
+          if (visible) {
+            setTimeout(() => this.searchInput.select(), 100);
+          }
+        },
+        render: text =>
+          this.state.searchedColumn === dataIndex ? (
+            <Highlighter
+              highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+              searchWords={[this.state.searchText]}
+              autoEscape
+              textToHighlight={text ? text.toString() : ''}
+            />
+          ) : (
+            text
+          ),
+      });
+    
+      handleSearch = (selectedKeys, confirm, dataIndex) => {
+        confirm();
+        this.setState({
+          searchText: selectedKeys[0],
+          searchedColumn: dataIndex,
+        });
+      };
+    
+      handleReset = clearFilters => {
+        clearFilters();
+        this.setState({ searchText: '' });
+      };
+
+    
+
     render() {
         const uploadButton = (
             <div>
@@ -996,6 +1101,7 @@ export default class Product extends Component {
                             scroll={{ x: 1500 }}
                             // align={{center}}
                             pagination={{ pageSizeOptions: ['30', '40'], showSizeChanger: true }}
+                            onChange={onChange}
                         />
                     </Row>
                     <Modal
