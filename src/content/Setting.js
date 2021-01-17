@@ -6,6 +6,7 @@ import { SettingOutlined, EditTwoTone, DeleteTwoTone, SearchOutlined } from '@an
 import axios from 'axios';
 import swal from 'sweetalert';
 import Highlighter from 'react-highlight-words';
+import moment from 'moment';
 
 var ip = "http://localhost:5000";
 
@@ -139,6 +140,11 @@ export default class Setting extends Component {
                 title: 'วันที่',
                 dataIndex: 'pointDate',
                 key: 'pointDate',
+                render: render =>
+                    <>
+                        <div>{moment(render).format('L')}</div>
+                    </>,
+
                 ...this.getColumnSearchProps('pointDate'),
             },
             {
@@ -745,8 +751,8 @@ export default class Setting extends Component {
                                     <Col md={6} xl={6}></Col>
                                     <Col md={6} xl={6}>วันที่</Col>
                                     <Col md={6} xl={6}>
-                                        <Form.Item name="date-time-picker" value={this.state.pointDate} >
-                                            <DatePicker showTime format="YYYY-MM-DD HH:mm:ss" name="pointDate" onChange={this.onChangeDatePoint} />
+                                        <Form.Item name="date-picker" value={this.state.pointDate} >
+                                            <DatePicker name="pointDate" onChange={this.onChangeDatePoint} />
                                         </Form.Item>
                                     </Col>
                                 </Row>

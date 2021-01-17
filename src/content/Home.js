@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { BsFillGrid1X2Fill } from 'react-icons/bs';
-import { Col, Row, Table, Tag, Popconfirm, Statistic, AutoComplete, Button, Modal, Form, Input, Select, InputNumber, Space } from 'antd';
+import { Col, Row, Table, Tag, Popconfirm, Statistic, AutoComplete, Button, Modal, Form, Input, Select, InputNumber, Space, Spin  } from 'antd';
 import { Container } from 'react-bootstrap';
 import '../css/Home.css';
 import ReactApexChart from "react-apexcharts";
@@ -28,6 +28,7 @@ export default class Home extends Component {
       token: "",
       user: [],
       contact: [],
+      statusButtonEdit:false,
       contactFilterSave: [],
       producthit: [],
       productnew: [],
@@ -409,6 +410,8 @@ export default class Home extends Component {
     var url_update_contact = ip + "/Contact/update/" + this.state.productContact?.contactId;
     const updatecontact = await (await axios.put(url_update_contact, data)).data;
     if (updatecontact[0] > 0) {
+      this.setState({ statusButtonEdit: false, contactstatus: true });
+      swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
       // const contact = [...this.state.contact];
       // contact.forEach((contact, index) => {
       //   if (contact.contactId === this.state.productContact?.contactId) {
@@ -421,6 +424,7 @@ export default class Home extends Component {
       //   contact: contact,
       //   isModalVisible: false
       // });
+      });
       var url_contact = ip + "/Contact/find/all";
       const contact = await (await axios.get(url_contact)).data;
       this.setState({
@@ -429,7 +433,9 @@ export default class Home extends Component {
         isModalVisible: false
       });
     } else {
-
+      this.setState({ statusButtonEdit: false });
+      swal("Warning!", "บันทึกข้อมูลไม่สำเร็จ", "warning").then((value) => {
+      });
     }
   };
 
@@ -695,6 +701,7 @@ export default class Home extends Component {
   render() {
     return (
       <Container fluid>
+        <Spin spinning={this.state.statusButtonEdit} size="large">
         <Row id="home">
           <Col xs={1} md={1} xl={1} id="icon">
             <BsFillGrid1X2Fill style={{ fontSize: '280%', color: '#DA213D' }} />
@@ -858,7 +865,7 @@ export default class Home extends Component {
             </Row>
           </Form>
         </Modal>
-
+        </Spin>
       </Container>
     )
   }
