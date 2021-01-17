@@ -44,8 +44,8 @@ export default class Home extends Component {
       searchhitstatus: false,
 
       Statisticstatus: false,
-      memberUser:0,
-      endUser:0,
+      memberUser: 0,
+      endUser: 0,
       contactstatus: true,
 
       isModalVisible: false,
@@ -58,29 +58,8 @@ export default class Home extends Component {
       searchText: '',
       searchedColumn: '',
 
-      series: [{
-        data: [400, 430, 448, 470, 540]
-      }],
-      options: {
-        chart: {
-          type: 'bar',
-          height: 350
-        },
-        title: {
-          text: 'สถิติการเข้าชม' + moment().format('LL')
-        },
-        plotOptions: {
-          bar: {
-            horizontal: true,
-          }
-        },
-        dataLabels: {
-          enabled: false
-        },
-        xaxis: {
-          categories: ['South Korea', 'Canada', 'United Kingdom', 'Netherlands', 'Italy'],
-        },
-      },
+      series: [],
+      options: {},
     };
 
     this.interestproduct = [
@@ -248,11 +227,11 @@ export default class Home extends Component {
         key: 'createDate',
         width: 160,
         render: render =>
-            <>
-                <div>{moment(render).format('L')}</div>
-            </>
+          <>
+            <div>{moment(render).format('L')}</div>
+          </>
 
-    },
+      },
       {
         title: 'สถานะ',
         dataIndex: 'acceptStatus',
@@ -375,8 +354,8 @@ export default class Home extends Component {
           textToHighlight={text ? text.toString() : ''}
         />
       ) : (
-        text
-      ),
+          text
+        ),
   });
 
   handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -501,6 +480,40 @@ export default class Home extends Component {
       memberUser: memberUser?.memberUser,
       endUser: memberUser?.endUser,
       StatisticUserstatus: false,
+    });
+
+    var url_Graph = ip + "/Product/find/view";
+    const graph = await (await axios.get(url_Graph)).data;
+
+    var data = [];
+    var label = [];
+
+    await graph.forEach(async (Graph, index) => {
+      data.push(Graph.view);
+      label.push(Graph.name);
+    });
+    this.setState({
+      series: [{ data: data }],
+      options: {
+        chart: {
+          type: 'bar',
+          height: 350
+        },
+        title: {
+          text: 'สถิติการเข้าชม' + moment().format('LL')
+        },
+        plotOptions: {
+          bar: {
+            horizontal: true,
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        xaxis: {
+          categories: label,
+        },
+      },
     });
   }
 
@@ -700,20 +713,20 @@ export default class Home extends Component {
           <Col xs={24} md={24} xl={24} id="visit-head">สินค้าที่ผู้คนสนใจ</Col>
           <Col xs={24} md={24} xl={24} id="chart">
             <Col>
-              <ReactApexChart options={this.state.options} series={this.state.series} type="bar" height={300}/>
+              <ReactApexChart options={this.state.options} series={this.state.series} type="bar" height={300} />
             </Col>
           </Col>
         </Row>
         <Row id="statistic">
           <Col md={24} xl={24} id="visit-head">จำนวนการเข้าชม</Col>
-          <Col md={11} xl={11}id="visit">
+          <Col md={11} xl={11} id="visit">
             <Col md={24} xl={24} id="visit-member">
-              <Statistic id="visit-nummember1" title="สมาชิก" value={this.state.memberUser} loading={this.state.contactstatus}/>
+              <Statistic id="visit-nummember1" title="สมาชิก" value={this.state.memberUser} loading={this.state.contactstatus} />
             </Col>
           </Col>
-          <Col md={11} xl={11}id="visit1">
+          <Col md={11} xl={11} id="visit1">
             <Col md={24} xl={24} id="visit-user">
-              <Statistic id="visit-user1" title="ผู้ใช้ทั่วไป" value={this.state.endUser} loading={this.state.contactstatus}/>
+              <Statistic id="visit-user1" title="ผู้ใช้ทั่วไป" value={this.state.endUser} loading={this.state.contactstatus} />
             </Col>
           </Col>
         </Row>
@@ -737,7 +750,7 @@ export default class Home extends Component {
               <Button id="btnadd-popularproduct" onClick={this.onSaveNew} disabled={this.state.searchnewstatus}>เพิ่มรายการ</Button>
             </Col>
             <Col xs={24} md={24} xl={24}>
-              <Table columns={this.interestproduct} dataSource={this.state.productnew} loading={this.state.productnewstatus} pagination={false}/>
+              <Table columns={this.interestproduct} dataSource={this.state.productnew} loading={this.state.productnewstatus} pagination={false} />
             </Col>
           </Col>
         </Row>
@@ -761,15 +774,15 @@ export default class Home extends Component {
               <Button id="btnadd-popularproduct" onClick={this.onSaveHit} disabled={this.state.searchhitstatus}>เพิ่มรายการ</Button>
             </Col>
             <Col xs={24} md={24} xl={24}>
-              <Table columns={this.bestseller} dataSource={this.state.producthit} loading={this.state.producthitstatus} pagination={false}/>
+              <Table columns={this.bestseller} dataSource={this.state.producthit} loading={this.state.producthitstatus} pagination={false} />
             </Col>
           </Col>
         </Row>
 
         <Row id="row3">
           <Col id="row3">ข้อความจากผู้ติดต่อ</Col>
-          <Col  xs={24} md={24} xl={24}>
-            <Table columns={this.columnscontact} dataSource={this.state.contact} scroll={{ x: 1500 }} loading={this.state.contactstatus} onChange={onChange}/>
+          <Col xs={24} md={24} xl={24}>
+            <Table columns={this.columnscontact} dataSource={this.state.contact} scroll={{ x: 1500 }} loading={this.state.contactstatus} onChange={onChange} />
           </Col>
         </Row>
 

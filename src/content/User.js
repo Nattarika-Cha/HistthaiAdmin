@@ -7,6 +7,7 @@ import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import '../css/User.css';
+import moment from 'moment';
 
 const { Option } = Select;
 
@@ -94,6 +95,10 @@ export default class User extends Component {
                 key: 'createDate',
                 ellipsis: true,
                 width: 120,
+                render: render =>
+                    <>
+                        <div>{moment(render).format('L')}</div>
+                    </>
             },
             {
                 title: '',
