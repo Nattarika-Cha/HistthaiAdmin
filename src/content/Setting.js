@@ -42,7 +42,7 @@ export default class Setting extends Component {
             catName: '',
             catalogStatus: false,
 
-            catNameEdit:'',
+            catNameEdit: '',
             catId: '',
 
             orderCode: '',
@@ -52,7 +52,7 @@ export default class Setting extends Component {
             pointDate: '',
             pointstatus: false,
 
-            pointId:'',
+            pointId: '',
             orderCodeEdit: '',
             pointStateEdit: '',
             pointEdit: '',
@@ -60,6 +60,12 @@ export default class Setting extends Component {
             pointDateEdit: '',
             pointstatusEdit: false,
 
+            member1: '',
+            member2: '',
+            member3: '',
+            EndUser: '',
+
+            memberStatus: false,
             searchText: '',
             searchedColumn: '',
         };
@@ -190,8 +196,14 @@ export default class Setting extends Component {
         const member = await (await axios.get(url_member)).data;
         this.setState({
             member: member,
-            memberstatus: false
+            member1: member.filter((item) => item.memberCode === "member1")[0]?.memberName,
+            member2: member.filter((item) => item.memberCode === "member2")[0]?.memberName,
+            member3: member.filter((item) => item.memberCode === "member3")[0]?.memberName,
+            EndUser: member.filter((item) => item.memberCode === "EndUser")[0]?.memberName,
+            memberStatus: false
         });
+
+        console.log(member.filter((item) => item.memberCode === "member1")[0]?.memberName, " testststs");
 
         var url_pointData = ip + "/point/find/all";
         const pointData = await (await axios.get(url_pointData)).data;
@@ -211,8 +223,39 @@ export default class Setting extends Component {
     showModal() {
         this.setState({ isModalVisible: true });
     };
-    handleOk() {
-        this.setState({ isModalVisible: false });
+    async handleOk() {
+        this.setState({ statusButtonEdit: true });
+        const data = {
+            member1: this.state.member1,
+            member2: this.state.member2,
+            member3: this.state.member3,
+            EndUser: this.state.EndUser
+        };
+
+        var url_update_member = ip + "/Member/update/";
+        const updatemember = await (await axios.put(url_update_member, data)).data;
+        console.log(updatemember, " updatecatalog")
+        if (updatemember) {
+            this.setState({ statusButtonEdit: false, memberStatus: true });
+            swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
+                this.setState({
+                    isModalVisible: false
+                });
+            });
+
+            var url_member = ip + "/Member/find/all";
+            const member = await (await axios.get(url_member)).data;
+            this.setState({
+                member: member,
+                member1: member.filter((item) => item.memberCode === "member1")[0]?.memberName,
+                member2: member.filter((item) => item.memberCode === "member2")[0]?.memberName,
+                member3: member.filter((item) => item.memberCode === "member3")[0]?.memberName,
+                EndUser: member.filter((item) => item.memberCode === "EndUser")[0]?.memberName,
+                memberStatus: false
+            });
+        } else {
+
+        }
     };
     handleCancel() {
         this.setState({ isModalVisible: false })
@@ -244,11 +287,11 @@ export default class Setting extends Component {
     }
     onChangepointStateEdit(value) {
         this.setState({
-          pointStateEdit: value
+            pointStateEdit: value
         })
-      }
+    }
     showModalPoint(record) {
-        this.setState({ 
+        this.setState({
             isModalPointVisible: true,
             orderCodeEdit: record.orderCode,
             pointStateEdit: record.pointState,
@@ -260,14 +303,14 @@ export default class Setting extends Component {
     };
     async handlePointOk(values) {
         this.setState({ statusButtonEdit: true });
-        const data = { 
+        const data = {
             orderCode: this.state.orderCodeEdit,
             pointState: this.state.pointStateEdit,
             point: this.state.pointEdit,
             userCode: this.state.userCodeEdit,
             pointDate: this.state.pointDateEdit,
         };
-    
+
         var url_update_point = ip + "/Point/update/" + this.state.pointId;
         const updatepoint = await (await axios.put(url_update_point, data)).data;
         console.log(updatepoint, " updatepoint")
@@ -276,32 +319,31 @@ export default class Setting extends Component {
             swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
                 this.setState({
                     orderCodeEdit: '',
-                    pointStateEdit:'',
-                    pointEdit:'',
-                    userCodeEdit:'',
+                    pointStateEdit: '',
+                    pointEdit: '',
+                    userCodeEdit: '',
                     pointStatusEdit: '',
-                    pointDateEdit:'',
+                    pointDateEdit: '',
                     isModalPointVisible: false
                 });
             });
-          var url_point = ip + "/Point/find/all";
-          const point = await (await axios.get(url_point)).data;
-          this.setState({
-            pointData: point,
-            pointStatus: false
-          });
+            var url_point = ip + "/Point/find/all";
+            const point = await (await axios.get(url_point)).data;
+            this.setState({
+                pointData: point,
+                pointStatus: false
+            });
         } else {
-    
+
         }
-      };
+    };
     handlePointCancel() {
         this.setState({ isModalPointVisible: false })
     }
 
 
     showModalCatalog(record) {
-        console.log(record, " record");
-        this.setState({ 
+        this.setState({
             isModalCatalogVisible: true,
             catNameEdit: record.catName,
             catId: record.catId
@@ -310,9 +352,9 @@ export default class Setting extends Component {
     async handleCatalogOk(values) {
         this.setState({ statusButtonEdit: true });
         const data = {
-            catName: this.state.catNameEdit,          
+            catName: this.state.catNameEdit,
         };
-    
+
         var url_update_catalog = ip + "/Catalog/update/" + this.state.catId;
         const updatecatalog = await (await axios.put(url_update_catalog, data)).data;
         console.log(updatecatalog, " updatecatalog")
@@ -324,16 +366,16 @@ export default class Setting extends Component {
                     isModalCatalogVisible: false
                 });
             });
-          var url_catalog = ip + "/Catalog/find/all";
-          const catalog = await (await axios.get(url_catalog)).data;
-          this.setState({
-            catalog: catalog,
-            catalogStatus: false
-          });
+            var url_catalog = ip + "/Catalog/find/all";
+            const catalog = await (await axios.get(url_catalog)).data;
+            this.setState({
+                catalog: catalog,
+                catalogStatus: false
+            });
         } else {
-    
+
         }
-      };
+    };
     handleCatalogCancel() {
         this.setState({ isModalCatalogVisible: false })
     }
@@ -376,27 +418,27 @@ export default class Setting extends Component {
     };
     async handleDeleteCatalog(catId) {
         const data = {
-          catStatus: "N"
+            catStatus: "N"
         };
-    
+
         var url_delete_catalog = ip + "/Catalog/update/delete/" + catId;
         const deletecatalog = await (await axios.put(url_delete_catalog, data)).data;
         if (deletecatalog[0] > 0) {
-          // const productnew = [...this.state.productnew];
-          // this.setState({
-          //   productnew: productnew.filter((item) => item.productId !== productId),
-          //   searchnewstatus: false
-          // });
-          var url_catalog = ip + "/Catalog/find/all";
+            // const productnew = [...this.state.productnew];
+            // this.setState({
+            //   productnew: productnew.filter((item) => item.productId !== productId),
+            //   searchnewstatus: false
+            // });
+            var url_catalog = ip + "/Catalog/find/all";
             const catalog = await (await axios.get(url_catalog)).data;
             this.setState({
                 catalog: catalog,
                 catalogStatus: false
             });
         } else {
-    
+
         }
-      }
+    }
 
     onChangeFildPoint(e) {
         this.setState({
@@ -455,88 +497,88 @@ export default class Setting extends Component {
     };
     async handleDeletePoint(pointId) {
         const data = {
-          pointStatus: "N"
+            pointStatus: "N"
         };
-    
+
         var url_delete_point = ip + "/Point/update/delete/" + pointId;
         const deletepoint = await (await axios.put(url_delete_point, data)).data;
         if (deletepoint[0] > 0) {
             var url_point = ip + "/Point/find/all";
             const point = await (await axios.get(url_point)).data;
             this.setState({
-              pointData: point,
-              pointStatus: false
+                pointData: point,
+                pointStatus: false
             });
         } else {
-    
+
         }
-      }
+    }
 
 
-      getColumnSearchProps = dataIndex => ({
+    getColumnSearchProps = dataIndex => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-          <div style={{ padding: 8 }}>
-            <Input
-              ref={node => {
-                this.searchInput = node;
-              }}
-              placeholder={`Search ${dataIndex}`}
-              value={selectedKeys[0]}
-              onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-              onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
-              style={{ width: 188, marginBottom: 8, display: 'block' }}
-            />
-            <Space>
-              <Button
-                type="primary"
-                onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
-                // icon={<SearchOutlined />}
-                size="small"
-                style={{ width: 90 }}
-              >
-                Search
+            <div style={{ padding: 8 }}>
+                <Input
+                    ref={node => {
+                        this.searchInput = node;
+                    }}
+                    placeholder={`Search ${dataIndex}`}
+                    value={selectedKeys[0]}
+                    onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                    onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+                    style={{ width: 188, marginBottom: 8, display: 'block' }}
+                />
+                <Space>
+                    <Button
+                        type="primary"
+                        onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+                        // icon={<SearchOutlined />}
+                        size="small"
+                        style={{ width: 90 }}
+                    >
+                        Search
               </Button>
-              <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
-                Reset
+                    <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+                        Reset
               </Button>
-            </Space>
-          </div>
+                </Space>
+            </div>
         ),
         filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
         onFilter: (value, record) =>
-          record[dataIndex]
-            ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
-            : '',
+            record[dataIndex]
+                ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
+                : '',
         onFilterDropdownVisibleChange: visible => {
-          if (visible) {
-            setTimeout(() => this.searchInput.select(), 100);
-          }
+            if (visible) {
+                setTimeout(() => this.searchInput.select(), 100);
+            }
         },
         render: text =>
-          this.state.searchedColumn === dataIndex ? (
-            <Highlighter
-              highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-              searchWords={[this.state.searchText]}
-              autoEscape
-              textToHighlight={text ? text.toString() : ''}
-            />
-          ) : (
-            text
-          ),
-      });
-    
-      handleSearch = (selectedKeys, confirm, dataIndex) => {
+            this.state.searchedColumn === dataIndex ? (
+                <Highlighter
+                    highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+                    searchWords={[this.state.searchText]}
+                    autoEscape
+                    textToHighlight={text ? text.toString() : ''}
+                />
+            ) : (
+                    text
+                ),
+    });
+
+    handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
         this.setState({
-          searchText: selectedKeys[0],
-          searchedColumn: dataIndex,
+            searchText: selectedKeys[0],
+            searchedColumn: dataIndex,
         });
-      };
-    
-      handleReset = clearFilters => {
+    };
+
+    handleReset = clearFilters => {
         clearFilters();
         this.setState({ searchText: '' });
-      };
+    };
 
 
     render() {
@@ -558,8 +600,8 @@ export default class Setting extends Component {
                                 <Table
                                     columns={this.member}
                                     dataSource={this.state.member}
-                                    // loading={this.state.productstatus}
-                                    pagination={false}/>
+                                    loading={this.state.memberStatus}
+                                    pagination={false} />
                             </Col>
                             <Col id="col-editlevel" md={24} xl={24}>
                                 <Button id="edit-level" onClick={() => this.showModal()}>แก้ไข</Button>
@@ -613,36 +655,29 @@ export default class Setting extends Component {
                             <Col md={24} xl={24} id="col-marginlevel">
                                 <Row>
                                     <Col md={6} xl={6}></Col>
-                                    <Col md={4} xl={4}>Adviser</Col>
-                                    <Col md={6} xl={6}><Input id="input-level" name="level" /></Col>
+                                    <Col md={4} xl={4}>Member1</Col>
+                                    <Col md={6} xl={6}><Input id="input-level" name="member1" value={this.state.member1} onChange={this.onChangeFildCatalog} /></Col>
                                 </Row>
                             </Col>
                             <Col md={24} xl={24} id="col-marginlevel">
                                 <Row>
                                     <Col md={6} xl={6}></Col>
-                                    <Col md={4} xl={4}>Dealer</Col>
-                                    <Col md={6} xl={6}><Input id="input-level" name="level" /></Col>
+                                    <Col md={4} xl={4}>Member2</Col>
+                                    <Col md={6} xl={6}><Input id="input-level" name="member2" value={this.state.member2} onChange={this.onChangeFildCatalog} /></Col>
                                 </Row>
                             </Col>
                             <Col md={24} xl={24} id="col-marginlevel">
                                 <Row>
                                     <Col md={6} xl={6}></Col>
-                                    <Col md={4} xl={4}>Buyer</Col>
-                                    <Col md={6} xl={6}><Input id="input-level" name="level" /></Col>
+                                    <Col md={4} xl={4}>Member3</Col>
+                                    <Col md={6} xl={6}><Input id="input-level" name="member3" value={this.state.member3} onChange={this.onChangeFildCatalog} /></Col>
                                 </Row>
                             </Col>
                             <Col md={24} xl={24} id="col-marginlevel">
                                 <Row>
                                     <Col md={6} xl={6}></Col>
-                                    <Col md={4} xl={4}>Price Tag</Col>
-                                    <Col md={6} xl={6}><Input id="input-level" name="level" /></Col>
-                                </Row>
-                            </Col>
-                            <Col md={24} xl={24} id="col-marginlevel">
-                                <Row>
-                                    <Col md={6} xl={6}></Col>
-                                    <Col md={4} xl={4}>Admin</Col>
-                                    <Col md={6} xl={6}><Input id="input-level" name="level" /></Col>
+                                    <Col md={4} xl={4}>EndUser</Col>
+                                    <Col md={6} xl={6}><Input id="input-level" name="EndUser" value={this.state.EndUser} onChange={this.onChangeFildCatalog} /></Col>
                                 </Row>
                             </Col>
                         </Form>
@@ -711,7 +746,7 @@ export default class Setting extends Component {
                                     <Col md={6} xl={6}>วันที่</Col>
                                     <Col md={6} xl={6}>
                                         <Form.Item name="date-time-picker" value={this.state.pointDate} >
-                                            <DatePicker showTime format="YYYY-MM-DD HH:mm:ss" name="pointDate" onChange={this.onChangeDatePoint}/>
+                                            <DatePicker showTime format="YYYY-MM-DD HH:mm:ss" name="pointDate" onChange={this.onChangeDatePoint} />
                                         </Form.Item>
                                     </Col>
                                 </Row>
@@ -730,7 +765,7 @@ export default class Setting extends Component {
                                 <Row>
                                     <Col md={6} xl={6}></Col>
                                     <Col md={6} xl={6}>รหัสการขาย</Col>
-                                    <Col md={6} xl={6}><Input id="input-level" name="orderCodeEdit" value={this.state.orderCodeEdit} onChange={this.onChangeFildCatalog}/></Col>
+                                    <Col md={6} xl={6}><Input id="input-level" name="orderCodeEdit" value={this.state.orderCodeEdit} onChange={this.onChangeFildCatalog} /></Col>
                                 </Row>
                             </Col>
                             <Col md={24} xl={24} id="col-marginlevel">
@@ -749,14 +784,14 @@ export default class Setting extends Component {
                                 <Row>
                                     <Col md={6} xl={6}></Col>
                                     <Col md={6} xl={6}>คะแนน</Col>
-                                    <Col md={6} xl={6}><Input id="input-level" name="pointEdit" value={this.state.pointEdit} onChange={this.onChangeFildCatalog}/></Col>
+                                    <Col md={6} xl={6}><Input id="input-level" name="pointEdit" value={this.state.pointEdit} onChange={this.onChangeFildCatalog} /></Col>
                                 </Row>
                             </Col>
                             <Col md={24} xl={24} id="col-marginlevel">
                                 <Row>
                                     <Col md={6} xl={6}></Col>
                                     <Col md={6} xl={6}>รหัสพนักงานขาย</Col>
-                                    <Col md={6} xl={6}><Input id="input-level" name="userCodeEdit" value={this.state.userCodeEdit} onChange={this.onChangeFildCatalog}/></Col>
+                                    <Col md={6} xl={6}><Input id="input-level" name="userCodeEdit" value={this.state.userCodeEdit} onChange={this.onChangeFildCatalog} /></Col>
                                 </Row>
                             </Col>
                             <Col md={24} xl={24} id="col-marginlevel">
@@ -765,7 +800,7 @@ export default class Setting extends Component {
                                     <Col md={6} xl={6}>วันที่</Col>
                                     <Col md={6} xl={6}>
                                         <Form.Item name="date-time-picker" value={this.state.pointDateEdit} >
-                                            <DatePicker showTime format="YYYY-MM-DD HH:mm:ss" name="pointDateEdit" onChange={this.onChangeDatePointEdit}/>
+                                            <DatePicker showTime format="YYYY-MM-DD HH:mm:ss" name="pointDateEdit" onChange={this.onChangeDatePointEdit} />
                                         </ Form.Item>
                                     </Col>
                                 </Row>
