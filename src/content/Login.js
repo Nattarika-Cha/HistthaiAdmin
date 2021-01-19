@@ -2,13 +2,92 @@ import React, { Component } from 'react';
 import { Col, Form, Input, Row, Button } from 'antd';
 import { Container } from 'react-bootstrap';
 import '../css/Login.css';
+import axios from 'axios';
+import swal from 'sweetalert';
+import Cookies from 'universal-cookie';
+
+const cookies = new Cookies();
+
+var ip = "http://localhost:5000";
+
+axios.interceptors.request.use(
+    config => {
+        const { origin } = new URL(config.url);
+        const allowedOrigins = [ip];
+        const token = localStorage.getItem('token');
+        if (allowedOrigins.includes(origin)) {
+            config.headers.authorization = `${token}`;
+        }
+        return config;
+    },
+    error => {
+        return Promise.reject(error);
+    }
+);
 
 export default class Login extends Component {
     constructor(props) {
       super(props);
       this.state = {
-
+        loading: false,
+        token: "",
+        user: [],
+        statusSend: false
       }
+
+      this.onLogin = this.onLogin.bind(this);
+    }
+
+    componentWillMount() {
+        this.setState({
+            token: cookies.get('token', { path: '/' }),
+            user: cookies.get('user', { path: '/' })
+        });
+    }
+
+    async onLogin(values) {
+        this.setState({
+            statusSend: true
+        });
+        const data = {
+            userName: values.username,
+            passWord: values.password
+        };
+
+        var config = {
+            method: 'post',
+            url: ip + '/UserProfile/login/admin',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify(data)
+        };
+
+        const login = await axios(config);
+        const data_login = login.data;
+        if (data_login.statusCode === 200) {
+            const user_data = {
+                id: data_login.id,
+                username: data_login.user,
+                name: data_login.name,
+                img: data_login.img,
+                levelId: data_login.levelId
+            }
+            // console.log(data_login, " user_data");
+            cookies.set('user', JSON.stringify(user_data), { path: '/' });
+            cookies.set('token', data_login.token, { path: '/' });
+            this.setState({
+                storedJwt: data_login.token
+            });
+               window.location.replace('/Home', false);    
+        } else {
+            swal("Error!", "Username หรือ Password ผิดพลาด", "error").then((value) => {
+                this.setState({
+                    statusSend: false
+                });
+            });
+
+        }
     }
 
     render() {

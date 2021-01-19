@@ -54,7 +54,7 @@ export default class User extends Component {
             img: '',
 
             statusButtonEdit: false,
-            product: [
+            usertable: [
                 {
                     title: 'ประเภทสมาชิก',
                     dataIndex: 'memberName',
@@ -310,7 +310,7 @@ export default class User extends Component {
         console.log(memberFilter, " memberFilter");
 
         this.setState({
-            product: [
+            usertable: [
                 {
                     title: 'ประเภทสมาชิก',
                     dataIndex: 'memberName',
@@ -421,7 +421,7 @@ export default class User extends Component {
                         <Col xs={5} md={5} xl={5} id="page-user"> สมาชิก </Col>
                     </Row>
                     <Row id="input-search1">
-                        <Table columns={this.state.product} dataSource={this.state.user} loading={this.state.userstatus} scroll={{ x: 1500 }} />
+                        <Table columns={this.state.usertable} dataSource={this.state.user} loading={this.state.userstatus} scroll={{ x: 1500 }} />
                     </Row>
                     <Modal
                         title="รายละเอียดสมาชิก"

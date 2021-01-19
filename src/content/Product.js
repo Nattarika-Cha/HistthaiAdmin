@@ -1,13 +1,14 @@
 import React, { Component } from "react";
 import { FaProductHunt } from "react-icons/fa";
 import { Row, Col, Input, Select, Button, Table, Switch, Modal, Popconfirm, Upload, Form, Spin, Space } from 'antd';
-import { Container } from 'react-bootstrap';
+import { Container, Image } from 'react-bootstrap';
 import { CloseOutlined, CheckOutlined, PlusOutlined, EditTwoTone, DeleteTwoTone, SearchOutlined } from '@ant-design/icons'; //PrinterTwoTone
 import '../css/Product.css';
 import moment from 'moment';
 import axios from 'axios';
 import swal from 'sweetalert';
 import Highlighter from 'react-highlight-words';
+import imgm from '../img/photocomingsoon.svg';
 
 var ip = "http://localhost:5000";
 var uuid = "";
@@ -30,7 +31,7 @@ function getBase64(file) {
 
 function onChange(pagination, filters, sorter, extra) {
     console.log('params', pagination, filters, sorter, extra);
-  }
+}
 export default class Product extends Component {
     constructor(props) {
         super(props);
@@ -137,128 +138,258 @@ export default class Product extends Component {
             sortedInfo: null,
             searchText: '',
             searchedColumn: '',
+            producttable: [
+                {
+                    title: 'รูปภาพ',
+                    dataIndex: 'img',
+                    key: 'img',
+                    render: (record) =>
+                        <>
+                            {
+                                (record === null) ?
+                                    <Image src={imgm} alt="imgProfile" width={"100%"} />
+                                    :
+                                    <Image src={record} alt="imgProfile" width={"100%"}/>
+                            }
+                        </>,
+                    width: 180
+                },
+                {
+                    title: 'แสดง',
+                    dataIndex: '',
+                    key: 'x',
+                    render: (record) =>
+                        <Switch
+                            checkedChildren={<CheckOutlined />}
+                            unCheckedChildren={<CloseOutlined />}
+                            size="small"
+                            checked={(record.productStatus === "A") ? true : false}
+                            onChange={() => this.onChangeProduct(record)}
+                        //defaultChecked
+                        />,
+                },
+                {
+                    title: 'รหัสโค้ด',
+                    dataIndex: 'barCode',
+                    key: 'barCode',
+                },
+                {
+                    title: 'รหัสสินค้า',
+                    dataIndex: 'productCode',
+                    key: 'productCode',
+                    ...this.getColumnSearchProps('productCode'),
+
+                },
+                {
+                    title: 'ชื่อสินค้า',
+                    dataIndex: 'name',
+                    key: 'name',
+                    ...this.getColumnSearchProps('name'),
+                },
+                {
+                    title: 'หน่วย',
+                    dataIndex: 'unit',
+                    key: 'unit',
+                    filters: [
+                        {
+                            text: 'ใบ',
+                            value: 'ใบ',
+                        },
+                        {
+                            text: 'กล่อง',
+                            value: 'กล่อง',
+                        },
+                        {
+                            text: 'ลัง',
+                            value: 'ลัง',
+                        },
+                        {
+                            text: 'แผ่น',
+                            value: 'แผ่น',
+                        },
+                    ],
+                    onFilter: (value, record) => record.unit.indexOf(value) === 0,
+                },
+                {
+                    title: 'หมวดหมู่',
+                    dataIndex: 'catName',
+                    key: 'catName',
+                    filters: [
+                        {
+                            text: 'อุปกรณ์เครื่องมือช่าง',
+                            value: 'อุปกรณ์เครื่องมือช่าง',
+                        },
+                        {
+                            text: 'แผ่นสแตนเลส',
+                            value: 'แผ่นสแตนเลส',
+                        },
+                    ],
+                    onFilter: (value, record) => record.catName.indexOf(value) === 0,
+                },
+                {
+                    title: 'ขนาด',
+                    dataIndex: 'size',
+                    key: 'size',
+                },
+                {
+                    title: 'สี',
+                    dataIndex: 'color',
+                    key: 'color',
+                    ...this.getColumnSearchProps('color'),
+                },
+                {
+                    title: 'วันที่',
+                    dataIndex: 'createDate',
+                    key: 'createDate',
+                    ...this.getColumnSearchProps('createDate'),
+                    render: render =>
+                        <>
+                            <div>{moment(render).format('L')}</div>
+                        </>
+                },
+                {
+                    title: '',
+                    dataIndex: '',
+                    key: 'x',
+                    width: 45,
+                    render: (record) =>
+                        <>
+                            <div type="primary" onClick={() => this.showModal(record)}><EditTwoTone style={{ fontSize: '20px', cursor: 'pointer' }} twoToneColor="#63549B" /></div>
+                        </>,
+                },
+                {
+                    title: '',
+                    dataIndex: '',
+                    key: 'x',
+                    width: 45,
+                    render: (record) =>
+                        <Popconfirm title="คุณแน่ใจว่าจะลบรายการ？" okText="ลบ" cancelText="ยกเลิก" onConfirm={() => this.handleDeleteProduct(record)}>
+                            <div><DeleteTwoTone style={{ fontSize: '20px', cursor: 'pointer' }} twoToneColor="#DA213D" /></div>
+                        </Popconfirm>,
+                },
+            ]
         };
 
-        this.product = [
-            {
-                title: 'รูปภาพ',
-                dataIndex: 'image',
-                key: 'image',
-            },
-            {
-                title: 'แสดง',
-                dataIndex: '',
-                key: 'x',
-                render: (record) =>
-                    <Switch
-                        checkedChildren={<CheckOutlined />}
-                        unCheckedChildren={<CloseOutlined />}
-                        size="small"
-                        checked={(record.productStatus === "A") ? true : false}
-                        onChange={() => this.onChangeProduct(record)}
-                    //defaultChecked
-                    />,
-            },
-            {
-                title: 'รหัสโค้ด',
-                dataIndex: 'barCode',
-                key: 'barCode',
-            },
-            {
-                title: 'รหัสสินค้า',
-                dataIndex: 'productCode',
-                key: 'productCode',
-                ...this.getColumnSearchProps('productCode'),
+        // this.product = [
+        //     {
+        //         title: 'รูปภาพ',
+        //         dataIndex: 'image',
+        //         key: 'image',
+        //     },
+        //     {
+        //         title: 'แสดง',
+        //         dataIndex: '',
+        //         key: 'x',
+        //         render: (record) =>
+        //             <Switch
+        //                 checkedChildren={<CheckOutlined />}
+        //                 unCheckedChildren={<CloseOutlined />}
+        //                 size="small"
+        //                 checked={(record.productStatus === "A") ? true : false}
+        //                 onChange={() => this.onChangeProduct(record)}
+        //             //defaultChecked
+        //             />,
+        //     },
+        //     {
+        //         title: 'รหัสโค้ด',
+        //         dataIndex: 'barCode',
+        //         key: 'barCode',
+        //     },
+        //     {
+        //         title: 'รหัสสินค้า',
+        //         dataIndex: 'productCode',
+        //         key: 'productCode',
+        //         ...this.getColumnSearchProps('productCode'),
 
-            },
-            {
-                title: 'ชื่อสินค้า',
-                dataIndex: 'name',
-                key: 'name',
-                ...this.getColumnSearchProps('name'),
-            },
-            {
-                title: 'หน่วย',
-                dataIndex: 'unit',
-                key: 'unit',
-                filters: [
-                    {
-                      text: 'ใบ',
-                      value: 'ใบ',
-                    },
-                    {
-                      text: 'กล่อง',
-                      value: 'กล่อง',
-                    },
-                    {
-                      text: 'ลัง',
-                      value: 'ลัง',
-                    },
-                    {
-                      text: 'แผ่น',
-                      value: 'แผ่น',
-                    },
-                  ],
-                  onFilter: (value, record) => record.unit.indexOf(value) === 0,
-            },
-            {
-                title: 'หมวดหมู่',
-                dataIndex: 'catName',
-                key: 'catName',
-                filters: [
-                    {
-                      text: 'อุปกรณ์เครื่องมือช่าง',
-                      value: 'อุปกรณ์เครื่องมือช่าง',
-                    },
-                    {
-                        text: 'แผ่นสแตนเลส',
-                        value: 'แผ่นสแตนเลส',
-                      },
-                  ],
-                  onFilter: (value, record) => record.catName.indexOf(value) === 0,
-            },
-            {
-                title: 'ขนาด',
-                dataIndex: 'size',
-                key: 'size',
-            },
-            {
-                title: 'สี',
-                dataIndex: 'color',
-                key: 'color',
-                ...this.getColumnSearchProps('color'),
-            },
-            {
-                title: 'วันที่',
-                dataIndex: 'createDate',
-                key: 'createDate',
-                ...this.getColumnSearchProps('createDate'),
-                render: render =>
-                    <>
-                        <div>{moment(render).format('L')}</div>
-                    </>
-            },
-            {
-                title: '',
-                dataIndex: '',
-                key: 'x',
-                width: 45,
-                render: (record) =>
-                    <>
-                        <div type="primary" onClick={() => this.showModal(record)}><EditTwoTone style={{ fontSize: '20px', cursor: 'pointer' }} twoToneColor="#63549B" /></div>
-                    </>,
-            },
-            {
-                title: '',
-                dataIndex: '',
-                key: 'x',
-                width: 45,
-                render: (record) =>
-                    <Popconfirm title="คุณแน่ใจว่าจะลบรายการ？" okText="ลบ" cancelText="ยกเลิก" onConfirm={() => this.handleDeleteProduct(record)}>
-                        <div><DeleteTwoTone style={{ fontSize: '20px', cursor: 'pointer' }} twoToneColor="#DA213D" /></div>
-                    </Popconfirm>,
-            },
-        ]
+        //     },
+        //     {
+        //         title: 'ชื่อสินค้า',
+        //         dataIndex: 'name',
+        //         key: 'name',
+        //         ...this.getColumnSearchProps('name'),
+        //     },
+        //     {
+        //         title: 'หน่วย',
+        //         dataIndex: 'unit',
+        //         key: 'unit',
+        //         filters: [
+        //             {
+        //               text: 'ใบ',
+        //               value: 'ใบ',
+        //             },
+        //             {
+        //               text: 'กล่อง',
+        //               value: 'กล่อง',
+        //             },
+        //             {
+        //               text: 'ลัง',
+        //               value: 'ลัง',
+        //             },
+        //             {
+        //               text: 'แผ่น',
+        //               value: 'แผ่น',
+        //             },
+        //           ],
+        //           onFilter: (value, record) => record.unit.indexOf(value) === 0,
+        //     },
+        //     {
+        //         title: 'หมวดหมู่',
+        //         dataIndex: 'catName',
+        //         key: 'catName',
+        //         filters: [
+        //             {
+        //               text: 'อุปกรณ์เครื่องมือช่าง',
+        //               value: 'อุปกรณ์เครื่องมือช่าง',
+        //             },
+        //             {
+        //                 text: 'แผ่นสแตนเลส',
+        //                 value: 'แผ่นสแตนเลส',
+        //               },
+        //           ],
+        //           onFilter: (value, record) => record.catName.indexOf(value) === 0,
+        //     },
+        //     {
+        //         title: 'ขนาด',
+        //         dataIndex: 'size',
+        //         key: 'size',
+        //     },
+        //     {
+        //         title: 'สี',
+        //         dataIndex: 'color',
+        //         key: 'color',
+        //         ...this.getColumnSearchProps('color'),
+        //     },
+        //     {
+        //         title: 'วันที่',
+        //         dataIndex: 'createDate',
+        //         key: 'createDate',
+        //         ...this.getColumnSearchProps('createDate'),
+        //         render: render =>
+        //             <>
+        //                 <div>{moment(render).format('L')}</div>
+        //             </>
+        //     },
+        //     {
+        //         title: '',
+        //         dataIndex: '',
+        //         key: 'x',
+        //         width: 45,
+        //         render: (record) =>
+        //             <>
+        //                 <div type="primary" onClick={() => this.showModal(record)}><EditTwoTone style={{ fontSize: '20px', cursor: 'pointer' }} twoToneColor="#63549B" /></div>
+        //             </>,
+        //     },
+        //     {
+        //         title: '',
+        //         dataIndex: '',
+        //         key: 'x',
+        //         width: 45,
+        //         render: (record) =>
+        //             <Popconfirm title="คุณแน่ใจว่าจะลบรายการ？" okText="ลบ" cancelText="ยกเลิก" onConfirm={() => this.handleDeleteProduct(record)}>
+        //                 <div><DeleteTwoTone style={{ fontSize: '20px', cursor: 'pointer' }} twoToneColor="#DA213D" /></div>
+        //             </Popconfirm>,
+        //     },
+        // ]
 
         this.price = [
             {
@@ -339,14 +470,14 @@ export default class Product extends Component {
 
     async showModal(record) {
         var url_img_main = ip + "/ProductImg/ImgProduct/main/" + record.codeId;
-        const img_main = await(await axios.get(url_img_main)).data;
+        const img_main = await (await axios.get(url_img_main)).data;
         this.setState({
             fileListMainEdit: img_main,
             ImgMainEdit: img_main,
         });
 
         var url_img_detail = ip + "/ProductImg/ImgProduct/detail/" + record.codeId;
-        const img_detail = await(await axios.get(url_img_detail)).data;
+        const img_detail = await (await axios.get(url_img_detail)).data;
         this.setState({
             fileListDetailEdit: img_detail,
             ImgDetailEdit: img_detail,
@@ -390,8 +521,8 @@ export default class Product extends Component {
         console.log(this.state.fileListMainEdit, " fileListMainEdit");
         console.log(this.state.ImgMainEdit, " ImgMainEdit");
 
-        
-            
+
+
         // this.setState({
         //     isModalVisible: true,
         //     productEdit: record,
@@ -694,9 +825,9 @@ export default class Product extends Component {
                 productstatus: false
             });
         } else {
-    
+
         }
-      }
+    }
 
     handleCancelEditProduct() {
         this.setState({
@@ -979,10 +1110,142 @@ export default class Product extends Component {
             productstatus: false
         });
 
+        console.log(product, " product")
+
         var url_catalog = ip + "/Catalog/find/all";
         const catalog = await (await axios.get(url_catalog)).data;
         this.setState({
             catalog: catalog
+        });
+
+        var catalogFilter = [];
+        await catalog.forEach(async (catalog, index) => {
+            var filter = { text: catalog.catName, value: catalog.catName }
+            catalogFilter.push(filter);
+        });
+
+        this.setState({
+            producttable: [
+                {
+                    title: 'รูปภาพ',
+                    dataIndex: 'img',
+                    key: 'img',
+                    render: (record) =>
+                        <>
+                            {
+                                (record === null) ?
+                                    <Image src={imgm} alt="imgProfile" width={"100%"} />
+                                    :
+                                    <Image src={record} alt="imgProfile" width={"100%"}/>
+                            }
+                        </>,
+                    width: 180
+                },
+                {
+                    title: 'แสดง',
+                    dataIndex: '',
+                    key: 'x',
+                    render: (record) =>
+                        <Switch
+                            checkedChildren={<CheckOutlined />}
+                            unCheckedChildren={<CloseOutlined />}
+                            size="small"
+                            checked={(record.productStatus === "A") ? true : false}
+                            onChange={() => this.onChangeProduct(record)}
+                        //defaultChecked
+                        />,
+                },
+                {
+                    title: 'รหัสโค้ด',
+                    dataIndex: 'barCode',
+                    key: 'barCode',
+                },
+                {
+                    title: 'รหัสสินค้า',
+                    dataIndex: 'productCode',
+                    key: 'productCode',
+                    ...this.getColumnSearchProps('productCode'),
+
+                },
+                {
+                    title: 'ชื่อสินค้า',
+                    dataIndex: 'name',
+                    key: 'name',
+                    ...this.getColumnSearchProps('name'),
+                },
+                {
+                    title: 'หน่วย',
+                    dataIndex: 'unit',
+                    key: 'unit',
+                    filters: [
+                        {
+                            text: 'ใบ',
+                            value: 'ใบ',
+                        },
+                        {
+                            text: 'กล่อง',
+                            value: 'กล่อง',
+                        },
+                        {
+                            text: 'ลัง',
+                            value: 'ลัง',
+                        },
+                        {
+                            text: 'แผ่น',
+                            value: 'แผ่น',
+                        },
+                    ],
+                    onFilter: (value, record) => record.unit.indexOf(value) === 0,
+                },
+                {
+                    title: 'หมวดหมู่',
+                    dataIndex: 'catName',
+                    key: 'catName',
+                    filters: catalogFilter,
+                    onFilter: (value, record) => record.catName.indexOf(value) === 0,
+                },
+                {
+                    title: 'ขนาด',
+                    dataIndex: 'size',
+                    key: 'size',
+                },
+                {
+                    title: 'สี',
+                    dataIndex: 'color',
+                    key: 'color',
+                    ...this.getColumnSearchProps('color'),
+                },
+                {
+                    title: 'วันที่',
+                    dataIndex: 'createDate',
+                    key: 'createDate',
+                    ...this.getColumnSearchProps('createDate'),
+                    render: render =>
+                        <>
+                            <div>{moment(render).format('L')}</div>
+                        </>
+                },
+                {
+                    title: '',
+                    dataIndex: '',
+                    key: 'x',
+                    width: 45,
+                    render: (record) =>
+                        <>
+                            <div type="primary" onClick={() => this.showModal(record)}><EditTwoTone style={{ fontSize: '20px', cursor: 'pointer' }} twoToneColor="#63549B" /></div>
+                        </>,
+                },
+                {
+                    title: '',
+                    dataIndex: '',
+                    key: 'x',
+                    width: 45,
+                    render: (record) =>
+                        <Popconfirm title="คุณแน่ใจว่าจะลบรายการ？" okText="ลบ" cancelText="ยกเลิก" onConfirm={() => this.handleDeleteProduct(record)}>
+                            <div><DeleteTwoTone style={{ fontSize: '20px', cursor: 'pointer' }} twoToneColor="#DA213D" /></div>
+                        </Popconfirm>,
+                },
+            ]
         });
 
         var url_member = ip + "/Member/find/all";
@@ -1015,69 +1278,69 @@ export default class Product extends Component {
 
     getColumnSearchProps = dataIndex => ({
         filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-          <div style={{ padding: 8 }}>
-            <Input
-              ref={node => {
-                this.searchInput = node;
-              }}
-              placeholder={`Search ${dataIndex}`}
-              value={selectedKeys[0]}
-              onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-              onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
-              style={{ width: 188, marginBottom: 8, display: 'block' }}
-            />
-            <Space>
-              <Button
-                type="primary"
-                onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
-                size="small"
-                style={{ width: 90 }}
-              >
-                Search
+            <div style={{ padding: 8 }}>
+                <Input
+                    ref={node => {
+                        this.searchInput = node;
+                    }}
+                    placeholder={`Search ${dataIndex}`}
+                    value={selectedKeys[0]}
+                    onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+                    onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+                    style={{ width: 188, marginBottom: 8, display: 'block' }}
+                />
+                <Space>
+                    <Button
+                        type="primary"
+                        onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
+                        size="small"
+                        style={{ width: 90 }}
+                    >
+                        Search
               </Button>
-              <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
-                Reset
+                    <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+                        Reset
               </Button>
-            </Space>
-          </div>
+                </Space>
+            </div>
         ),
         filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
         onFilter: (value, record) =>
-          record[dataIndex]
-            ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
-            : '',
+            record[dataIndex]
+                ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
+                : '',
         onFilterDropdownVisibleChange: visible => {
-          if (visible) {
-            setTimeout(() => this.searchInput.select(), 100);
-          }
+            if (visible) {
+                setTimeout(() => this.searchInput.select(), 100);
+            }
         },
         render: text =>
-          this.state.searchedColumn === dataIndex ? (
-            <Highlighter
-              highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-              searchWords={[this.state.searchText]}
-              autoEscape
-              textToHighlight={text ? text.toString() : ''}
-            />
-          ) : (
-            text
-          ),
-      });
-    
-      handleSearch = (selectedKeys, confirm, dataIndex) => {
+            this.state.searchedColumn === dataIndex ? (
+                <Highlighter
+                    highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+                    searchWords={[this.state.searchText]}
+                    autoEscape
+                    textToHighlight={text ? text.toString() : ''}
+                />
+            ) : (
+                    text
+                ),
+    });
+
+    handleSearch = (selectedKeys, confirm, dataIndex) => {
         confirm();
         this.setState({
-          searchText: selectedKeys[0],
-          searchedColumn: dataIndex,
+            searchText: selectedKeys[0],
+            searchedColumn: dataIndex,
         });
-      };
-    
-      handleReset = clearFilters => {
+    };
+
+    handleReset = clearFilters => {
         clearFilters();
         this.setState({ searchText: '' });
-      };
+    };
 
-    
+
 
     render() {
         const uploadButton = (
@@ -1118,7 +1381,7 @@ export default class Product extends Component {
                     </Row>
                     <Row id="input-search">
                         <Table
-                            columns={this.product}
+                            columns={this.state.producttable}
                             dataSource={this.state.product}
                             loading={this.state.productstatus}
                             scroll={{ x: 1500 }}
