@@ -1,30 +1,26 @@
 import React, { Component } from "react";
-import { Row, Col, Table, Modal, Button, Form, Input, Popconfirm, Select, Spin, DatePicker, Space } from 'antd';
-import { Container } from 'react-bootstrap';
+import { Row, Col, Table, Modal, Button, Form, Input, Popconfirm, Select, Spin, DatePicker, Space, Upload } from 'antd';
+import { Container, Image } from 'react-bootstrap';
 import '../css/Setting.css';
-import { SettingOutlined, EditTwoTone, DeleteTwoTone, SearchOutlined } from '@ant-design/icons';
+import { SettingOutlined, EditTwoTone, DeleteTwoTone, SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import swal from 'sweetalert';
 import Highlighter from 'react-highlight-words';
 import moment from 'moment';
+import imgm from '../img/photocomingsoon.svg';
 
 var ip = "http://localhost:5000";
 
 const { Option } = Select;
 
-// const config = {
-//     rules: [
-//       {
-//         type: 'object',
-//         required: true,
-//         message: 'Please select time!',
-//       },
-//     ],
-//   };
-
-// function handleChange(value) {
-//     console.log(`selected ${value}`);
-// }
+function getBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
+}
 export default class Setting extends Component {
     constructor(props) {
         super(props);
@@ -69,6 +65,18 @@ export default class Setting extends Component {
             memberStatus: false,
             searchText: '',
             searchedColumn: '',
+
+            imgProductData: [],
+            imgproductstatus: false,
+            isModalVisibleImgProduct: false,
+            fileListImgProductSave: [],
+            previewTitle: '',
+            urlProduct: '',
+            imgProduct: '',
+            imgType: '',
+
+            imgHomeData: [],
+            imghomestatus: false,
         };
 
         this.member = [
@@ -168,6 +176,83 @@ export default class Setting extends Component {
                     </Popconfirm>,
             },
         ]
+
+        this.imgproduct = [
+            {
+                title: 'รูปภาพ',
+                dataIndex: 'urlimg',
+                key: 'urlimg',
+                render: (record) =>
+                    <>
+                        {
+                            (record === null) ?
+                                <Image src={imgm} alt="imgProfile" width={"100%"} />
+                                :
+                                <Image src={record} alt="imgProfile" width={"100%"} />
+                        }
+                    </>,
+                width: 250
+            },
+            {
+                title: 'Link URL',
+                dataIndex: 'url',
+                key: 'url'
+            },
+            {
+                title: '',
+                dataIndex: '',
+                key: 'x',
+                width: 45,
+                render: (record) =>
+                    <>
+                        <div type="primary" onClick={() => this.showModalImgProduct(record)}><EditTwoTone style={{ fontSize: '20px', cursor: 'pointer' }} twoToneColor="#63549B" /></div>
+                    </>,
+            },
+            {
+                title: '',
+                dataIndex: '',
+                key: 'x',
+                width: 45,
+                render: (record) =>
+                    <Popconfirm title="คุณแน่ใจว่าจะลบรายการ？" okText="ลบ" cancelText="ยกเลิก" onConfirm={() => this.handleDeleteImgProduct(record.imgSettingId)}>
+                        <div><DeleteTwoTone style={{ fontSize: '20px', cursor: 'pointer' }} twoToneColor="#DA213D" /></div>
+                    </Popconfirm>,
+            },
+        ]
+
+        this.imghome = [
+            {
+                title: 'รูปภาพ',
+                dataIndex: 'urlimg',
+                key: 'urlimg',
+                render: (record) =>
+                    <>
+                        {
+                            (record === null) ?
+                                <Image src={imgm} alt="imgProfile" width={"100%"} />
+                                :
+                                <Image src={record} alt="imgProfile" width={"100%"} />
+                        }
+                    </>,
+                width: 250
+            },
+            {
+                title: 'Link URL',
+                dataIndex: 'url',
+                key: 'url'
+            },
+            {
+                title: '',
+                dataIndex: '',
+                key: 'x',
+                width: 45,
+                render: (record) =>
+                    <>
+                        <div type="primary" onClick={() => this.showModalImgProduct(record)}><EditTwoTone style={{ fontSize: '20px', cursor: 'pointer' }} twoToneColor="#63549B" /></div>
+                    </>,
+            }
+        ]
+
         this.showModal = this.showModal.bind(this);
         this.handleOk = this.handleOk.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
@@ -195,7 +280,31 @@ export default class Setting extends Component {
         this.handleCatalogCancel = this.handleCatalogCancel.bind(this);
 
         this.onChangeDatePoint = this.onChangeDatePoint.bind(this);
+
+        this.showModalAddImgProduct = this.showModalAddImgProduct.bind(this);
+        this.showModalImgProduct = this.showModalImgProduct.bind(this);
+        this.handleDeleteImgProduct = this.handleDeleteImgProduct.bind(this);
+
+        this.handlePreview = this.handlePreview.bind(this);
+        this.handleCancelimage = this.handleCancelimage.bind(this);
+        this.handleChangeListMainSave = this.handleChangeListMainSave.bind(this);
+        this.handleSaveImgProduct = this.handleSaveImgProduct.bind(this);
+        this.handleCancelSaveImgProduct = this.handleCancelSaveImgProduct.bind(this);
+
+        this.onChangeFildProduct = this.onChangeFildProduct.bind(this);
     }
+
+    handlePreview = async file => {
+        if (!file.url && !file.preview) {
+            file.preview = await getBase64(file.originFileObj);
+        }
+
+        this.setState({
+            previewImage: file.url || file.preview,
+            previewVisible: true,
+            previewTitle: file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
+        });
+    };
 
     async componentDidMount() {
         var url_member = ip + "/Member/find/all";
@@ -209,13 +318,25 @@ export default class Setting extends Component {
             memberStatus: false
         });
 
-        console.log(member.filter((item) => item.memberCode === "member1")[0]?.memberName, " testststs");
-
         var url_pointData = ip + "/point/find/all";
         const pointData = await (await axios.get(url_pointData)).data;
         this.setState({
             pointData: pointData,
             pointstatus: false
+        });
+
+        var url_imgsettingproduct = ip + "/ImgSetting/find/all/product";
+        const imgsettingproduct = await (await axios.get(url_imgsettingproduct)).data;
+        this.setState({
+            imgProductData: imgsettingproduct,
+            imgproductstatus: false
+        });
+
+        var url_imgsettinghome = ip + "/ImgSetting/find/all/home";
+        const imgsettinghome = await (await axios.get(url_imgsettinghome)).data;
+        this.setState({
+            imgHomeData: imgsettinghome,
+            imghomestatus: false
         });
 
         var url_catalog = ip + "/Catalog/find/all";
@@ -224,6 +345,130 @@ export default class Setting extends Component {
             catalog: catalog
         });
     }
+
+    onChangeFildProduct(e) {
+        this.setState({
+            [e.target.name]: e.target.value
+        })
+    }
+
+    showModalAddImgProduct() {
+        this.setState({ isModalVisibleImgProduct: true });
+    };
+
+    showModalImgProduct(record) {
+        console.log(record, " record");
+        // this.setState({
+        //     isModalPointVisible: true,
+        //     orderCodeEdit: record.orderCode,
+        //     pointStateEdit: record.pointState,
+        //     pointEdit: record.point,
+        //     userCodeEdit: record.userCode,
+        //     pointId: record.pointId,
+        //     pointDateEdit: record.pointDate,
+        // });
+    };
+
+    async handleDeleteImgProduct(imgSettingId) {
+        console.log(imgSettingId, " imgSettingId");
+        this.setState({ statusButtonEdit: true });
+        var dataSave = {
+            imgStatus: "N"
+        }
+
+        var url_delete_product_setting = ip + "/ImgSetting/updateStatus/" + imgSettingId;
+        const deleteproductsetting = await(await axios.put(url_delete_product_setting, dataSave)).data;
+        console.log(deleteproductsetting, " createproductsetting");
+        if (deleteproductsetting) {
+            this.setState({ statusButtonEdit: false, imgproductstatus: true });
+            swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
+                this.setState({
+                    isModalVisibleImgProduct: false,
+                    fileListImgProductSave: [],
+                    stateimgProduct: '',
+                    urlProduct: ''
+                });
+            });
+            var url_imgsetting = ip + "/ImgSetting/find/all/product";
+            const imgsetting = await(await axios.get(url_imgsetting)).data;
+            this.setState({
+                imgProductData: imgsetting,
+                imgproductstatus: false
+            });
+        } else {
+            this.setState({ statusButtonEdit: false });
+            swal("Warning!", "ลบข้อมูลไม่สำเร็จ", "warning").then((value) => {
+            });
+        }
+
+    }
+
+    handleCancelimage() {
+        this.setState({ previewVisible: false });
+    };
+
+    async handleChangeListMainSave(fileList) {
+        console.log(fileList.fileList, " fileList.fileList");
+        console.log(fileList.fileList[0].type, " type");
+        this.setState({
+            imgProduct: await getBase64(fileList.file.originFileObj),
+            fileListImgProductSave: fileList.fileList,
+            imgType: fileList.fileList[0].type
+        });
+    };
+
+    async handleSaveImgProduct() {
+
+
+        if (this.state.fileListImgProductSave.length !== 0) {
+            this.setState({ statusButtonEdit: true });
+            var dataSave = {
+                img: this.state.imgProduct,
+                url: this.state.urlProduct,
+                name: "P" + moment().unix(),
+                type: this.state.imgType,
+                page: "Product",
+                imgStatus: "A"
+            }
+
+            var url_create_product_setting = ip + "/ImgSetting/create";
+            const createproductsetting = await (await axios.post(url_create_product_setting, dataSave)).data;
+            console.log(createproductsetting, " createproductsetting");
+            if (createproductsetting) {
+                this.setState({ statusButtonEdit: false, imgproductstatus: true });
+                swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
+                    this.setState({
+                        isModalVisibleImgProduct: false,
+                        fileListImgProductSave: [],
+                        stateimgProduct: '',
+                        urlProduct: ''
+                    });
+                });
+                var url_imgsetting = ip + "/ImgSetting/find/all";
+                const imgsetting = await (await axios.get(url_imgsetting)).data;
+                this.setState({
+                    imgProductData: imgsetting,
+                    imgproductstatus: false
+                });
+            } else {
+                this.setState({ statusButtonEdit: false });
+                swal("Warning!", "บันทึกข้อมูลไม่สำเร็จ", "warning").then((value) => {
+                });
+            }
+        } else {
+            swal("Warning!", "กรุณาเลือกรูปภาพ", "warning").then((value) => {
+            });
+        }
+    };
+
+    handleCancelSaveImgProduct() {
+        this.setState({
+            isModalVisibleImgProduct: false,
+            url: '',
+            fileListMainSave: [],
+            ImgMainSave: []
+        });
+    };
 
 
     showModal() {
@@ -588,6 +833,13 @@ export default class Setting extends Component {
 
 
     render() {
+        const uploadButton = (
+            <div>
+                <PlusOutlined style={{ fontSize: "20px", color: '#DA213D' }} />
+                <div style={{ marginTop: 8, color: '#DA213D' }}>เพิ่มรูปภาพ</div>
+            </div>
+        );
+
         return (
             <Container fluid>
                 <Spin spinning={this.state.statusButtonEdit} size="large">
@@ -645,11 +897,28 @@ export default class Setting extends Component {
                     </Row>
                     <Row id="change-imagehome">
                         <Col md={24} xl={24}>ตั้งค่ารูปภาพหน้า Home</Col>
-                        <Col></Col>
+                        <Col md={24} xl={24}>
+                            <Table
+                                columns={this.imghome}
+                                dataSource={this.state.imgHomeData}
+                                loading={this.state.imghomestatus}
+                            >
+                            </Table>
+                        </Col>
                     </Row>
                     <Row id="change-imagehome">
                         <Col md={24} xl={24}>ตั้งค่ารูปภาพหน้า Product</Col>
-                        <Col></Col>
+                        <Col md={24} xl={24}>
+                            <Button id="button-addcatalog" onClick={this.showModalAddImgProduct}>เพิ่มรูปภาพหน้า Product</Button>
+                        </Col>
+                        <Col md={24} xl={24}>
+                            <Table
+                                columns={this.imgproduct}
+                                dataSource={this.state.imgProductData}
+                                loading={this.state.imgproductstatus}
+                            >
+                            </Table>
+                        </Col>
                     </Row>
                     <Modal
                         title="ประเภทสมาชิก"
@@ -828,6 +1097,43 @@ export default class Setting extends Component {
                                     <Col md={6} xl={6}><Input id="input-level" name="catNameEdit" value={this.state.catNameEdit} onChange={this.onChangeFildCatalog} /></Col>
                                 </Row>
                             </Col>
+                        </Form>
+                    </Modal>
+
+                    <Modal
+                        title="เพิ่มรูปภาพหน้า Product"
+                        visible={this.state.isModalVisibleImgProduct}
+                        onOk={this.handleSaveImgProduct}
+                        onCancel={this.handleCancelSaveImgProduct}
+                        width={800}>
+                        <Form id="form">
+                            <Row id="add-img">
+                                <Upload
+                                    action={ip + "/UserProfile/UploadImg"}
+                                    listType="picture-card"
+                                    fileList={this.state.fileListImgProductSave}
+                                    onPreview={this.handlePreview}
+                                    onChange={this.handleChangeListMainSave}
+                                >
+                                    {this.state.fileListImgProductSave.length >= 1 ? null : uploadButton}
+                                </Upload>
+                                <Modal
+                                    visible={this.state.previewVisible}
+                                    title={this.state.previewTitle}
+                                    footer={null}
+                                    onCancel={this.handleCancelimage}
+                                >
+                                    <img alt="example" style={{ width: '100%' }} src={this.state.previewImage} />
+                                </Modal>
+                            </Row>
+                            <Row id="add-img">
+                                <Col md={24} xl={24}>
+                                    <Row>
+                                        <Col md={6} xl={6}>Limk URL :</Col>
+                                        <Col md={15} xl={15}><Input id="input" name="urlProduct" value={this.state.urlProduct} onChange={this.onChangeFildProduct} /></Col>
+                                    </Row>
+                                </Col>
+                            </Row>
                         </Form>
                     </Modal>
                 </Spin>
