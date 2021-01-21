@@ -826,13 +826,15 @@ export default class Product extends Component {
                     status: 'done',
                     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
                     flag: "Insert",
-                    img: await getBase64(fileList.file.originFileObj)
+                    img: await getBase64(fileList.file.originFileObj),
+                    type: fileList.file.type
                 }
 
                 imgMainEdit.push(addData);
             } else if (uuidMain !== fileList.file.uid) {
                 uuidMain = fileList.file.uid;
                 imgMainEdit[0].img = await getBase64(fileList.file.originFileObj);
+                imgMainEdit[0].type = fileList.file.type;
                 imgMainEdit[0].flag = "Edit";
             }
         } else if (fileList.file.status === "removed") {
@@ -859,6 +861,7 @@ export default class Product extends Component {
                         state += 1;
                         imgDetail.uid = fileList.file.uid;
                         imgDetail.img = await getBase64(fileList.file.originFileObj);
+                        imgDetail.type = fileList.file.type;
                         imgDetail.flag = "Edit";
                         return;
                     } else {
@@ -875,7 +878,8 @@ export default class Product extends Component {
                     status: 'done',
                     url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
                     flag: "Insert",
-                    img: await getBase64(fileList.file.originFileObj)
+                    img: await getBase64(fileList.file.originFileObj),
+                    type: fileList.file.type
                 }
 
                 imgDetailEdit.push(addData);
@@ -911,7 +915,8 @@ export default class Product extends Component {
                     status: 'done',
                     url: "",
                     flag: "Insert",
-                    img: await getBase64(fileList.file.originFileObj)
+                    img: await getBase64(fileList.file.originFileObj),
+                    type: fileList.file.type
                 }
 
                 imgMainSave.push(addData);
@@ -938,7 +943,8 @@ export default class Product extends Component {
                     status: 'done',
                     url: "",
                     flag: "Insert",
-                    img: await getBase64(fileList.file.originFileObj)
+                    img: await getBase64(fileList.file.originFileObj),
+                    type: fileList.file.type
                 }
                 imgDetailSave.push(addData);
             }
