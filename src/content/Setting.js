@@ -77,6 +77,12 @@ export default class Setting extends Component {
 
             imgHomeData: [],
             imghomestatus: false,
+
+            isModalVisibleImgProductEdit: false,
+            ImgProductEdit: [],
+            fileListImgProductEdit: [],
+            fileListImgProductEditTemp: [],
+            urlProductEdit: ''
         };
 
         this.member = [
@@ -292,6 +298,10 @@ export default class Setting extends Component {
         this.handleCancelSaveImgProduct = this.handleCancelSaveImgProduct.bind(this);
 
         this.onChangeFildProduct = this.onChangeFildProduct.bind(this);
+
+        this.handleSaveImgProductEdit = this.handleSaveImgProductEdit.bind(this);
+        this.handleCancelSaveImgProductEdit = this.handleCancelSaveImgProductEdit.bind(this);
+        this.handleChangeListMainEdit = this.handleChangeListMainEdit.bind(this);
     }
 
     handlePreview = async file => {
@@ -352,21 +362,111 @@ export default class Setting extends Component {
         })
     }
 
-    showModalAddImgProduct() {
-        this.setState({ isModalVisibleImgProduct: true });
-    };
-
     showModalImgProduct(record) {
         console.log(record, " record");
-        // this.setState({
-        //     isModalPointVisible: true,
-        //     orderCodeEdit: record.orderCode,
-        //     pointStateEdit: record.pointState,
-        //     pointEdit: record.point,
-        //     userCodeEdit: record.userCode,
-        //     pointId: record.pointId,
-        //     pointDateEdit: record.pointDate,
-        // });
+        this.setState({
+            isModalVisibleImgProductEdit: true,
+            ImgProductEdit: record,
+            urlProductEdit: record.url,
+            fileListImgProductEdit: [{
+                uid: record.imgSettingId,
+                imgId: record.imgSettingId,
+                nameImg: record.name,
+                status: 'done',
+                url: record.urlimg,
+                img: '',
+                type: ''
+            }],
+            fileListImgProductEditTemp: [{
+                uid: record.imgSettingId,
+                imgId: record.imgSettingId,
+                nameImg: record.name,
+                status: 'done',
+                url: record.urlimg,
+                img: '',
+                type: ''
+            }]
+        });
+    };
+
+    handleCancelSaveImgProductEdit() {
+        this.setState({
+            isModalVisibleImgProductEdit: false,
+            urlProductEdit: '',
+            fileListImgProductEdit: [],
+            ImgProductEdit: []
+        });
+
+    }
+
+    async handleChangeListMainEdit(fileList) {
+        if (fileList.file.status === "uploading") {
+            const fileListImgProductEditTemp = this.state.fileListImgProductEditTemp;
+            fileListImgProductEditTemp[0].img = await getBase64(fileList.file.originFileObj);
+            fileListImgProductEditTemp[0].type = fileList.fileList[0].type;
+        }
+
+        this.setState({
+            fileListImgProductEdit: fileList.fileList
+        });
+    }
+
+    async handleSaveImgProductEdit() {
+        this.setState({ statusButtonEdit: true });
+        if (this.state.fileListImgProductEdit.length !== 0) {
+            const dataSave = {
+                img: this.state.fileListImgProductEditTemp[0].img,
+                type: this.state.fileListImgProductEditTemp[0].type,
+                url: this.state.urlProductEdit,
+                code: this.state.ImgProductEdit.code,
+                name: this.state.ImgProductEdit.name,
+                page: this.state.ImgProductEdit.page
+            }
+
+            var url_update_setting = ip + "/ImgSetting/edit/" + this.state.ImgProductEdit.imgSettingId;
+            const updatesetting = await(await axios.post(url_update_setting, dataSave)).data;
+            if (updatesetting) {
+                this.setState({ statusButtonEdit: false });
+                swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
+                    this.setState({
+                        isModalVisibleImgProductEdit: false,
+                        urlProductEdit: '',
+                        fileListImgProductEdit: [],
+                        ImgProductEdit: []
+                    });
+                });
+
+                if (this.state.ImgProductEdit.page === "Product") {
+                    var url_imgsettingproduct = ip + "/ImgSetting/find/all/product";
+                    const imgsettingproduct = await(await axios.get(url_imgsettingproduct)).data;
+                    this.setState({
+                        imgProductData: imgsettingproduct,
+                        imgproductstatus: false
+                    });
+                }
+                else {
+                    var url_imgsettinghome = ip + "/ImgSetting/find/all/home";
+                    const imgsettinghome = await(await axios.get(url_imgsettinghome)).data;
+                    this.setState({
+                        imgHomeData: imgsettinghome,
+                        imghomestatus: false
+                    });
+                }
+            } else {
+                this.setState({ statusButtonEdit: false });
+                swal("Warning!", "บันทึกข้อมูลไม่สำเร็จ", "warning").then((value) => {
+                });
+            }
+
+        } else {
+            this.setState({ statusButtonEdit: false });
+            swal("Warning!", "กรุณาเลือกรูปภาพ", "warning").then((value) => {
+            });
+        }
+    }
+
+    showModalAddImgProduct() {
+        this.setState({ isModalVisibleImgProduct: true });
     };
 
     async handleDeleteImgProduct(imgSettingId) {
@@ -377,7 +477,7 @@ export default class Setting extends Component {
         }
 
         var url_delete_product_setting = ip + "/ImgSetting/updateStatus/" + imgSettingId;
-        const deleteproductsetting = await(await axios.put(url_delete_product_setting, dataSave)).data;
+        const deleteproductsetting = await (await axios.put(url_delete_product_setting, dataSave)).data;
         console.log(deleteproductsetting, " createproductsetting");
         if (deleteproductsetting) {
             this.setState({ statusButtonEdit: false, imgproductstatus: true });
@@ -390,7 +490,7 @@ export default class Setting extends Component {
                 });
             });
             var url_imgsetting = ip + "/ImgSetting/find/all/product";
-            const imgsetting = await(await axios.get(url_imgsetting)).data;
+            const imgsetting = await (await axios.get(url_imgsetting)).data;
             this.setState({
                 imgProductData: imgsetting,
                 imgproductstatus: false
@@ -408,12 +508,15 @@ export default class Setting extends Component {
     };
 
     async handleChangeListMainSave(fileList) {
-        console.log(fileList.fileList, " fileList.fileList");
-        console.log(fileList.fileList[0].type, " type");
+        if (fileList.file.status === "uploading") {
+            this.setState({
+                imgProduct: await getBase64(fileList.file.originFileObj),
+                imgType: fileList.fileList[0].type
+            });
+        }
+
         this.setState({
-            imgProduct: await getBase64(fileList.file.originFileObj),
-            fileListImgProductSave: fileList.fileList,
-            imgType: fileList.fileList[0].type
+            fileListImgProductSave: fileList.fileList
         });
     };
 
@@ -433,7 +536,6 @@ export default class Setting extends Component {
 
             var url_create_product_setting = ip + "/ImgSetting/create";
             const createproductsetting = await (await axios.post(url_create_product_setting, dataSave)).data;
-            console.log(createproductsetting, " createproductsetting");
             if (createproductsetting) {
                 this.setState({ statusButtonEdit: false, imgproductstatus: true });
                 swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
@@ -1131,6 +1233,43 @@ export default class Setting extends Component {
                                     <Row>
                                         <Col md={6} xl={6}>Limk URL :</Col>
                                         <Col md={15} xl={15}><Input id="input" name="urlProduct" value={this.state.urlProduct} onChange={this.onChangeFildProduct} /></Col>
+                                    </Row>
+                                </Col>
+                            </Row>
+                        </Form>
+                    </Modal>
+
+                    <Modal
+                        title="แก้ไขรูปภาพหน้า Product"
+                        visible={this.state.isModalVisibleImgProductEdit}
+                        onOk={this.handleSaveImgProductEdit}
+                        onCancel={this.handleCancelSaveImgProductEdit}
+                        width={800}>
+                        <Form id="form">
+                            <Row id="add-img">
+                                <Upload
+                                    action={ip + "/UserProfile/UploadImg"}
+                                    listType="picture-card"
+                                    fileList={this.state.fileListImgProductEdit}
+                                    onPreview={this.handlePreview}
+                                    onChange={this.handleChangeListMainEdit}
+                                >
+                                    {this.state.fileListImgProductEdit.length >= 1 ? null : uploadButton}
+                                </Upload>
+                                <Modal
+                                    visible={this.state.previewVisible}
+                                    title={this.state.previewTitle}
+                                    footer={null}
+                                    onCancel={this.handleCancelimage}
+                                >
+                                    <img alt="example" style={{ width: '100%' }} src={this.state.previewImage} />
+                                </Modal>
+                            </Row>
+                            <Row id="add-img">
+                                <Col md={24} xl={24}>
+                                    <Row>
+                                        <Col md={6} xl={6}>Limk URL :</Col>
+                                        <Col md={15} xl={15}><Input id="input" name="urlProductEdit" value={this.state.urlProductEdit} onChange={this.onChangeFildProduct} /></Col>
                                     </Row>
                                 </Col>
                             </Row>
