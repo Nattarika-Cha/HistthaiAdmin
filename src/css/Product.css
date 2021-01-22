@@ -43,6 +43,18 @@
     color: #FFFFFF;
 }
 
+#button-addproduct-import{
+    background-color: #47d307;
+    border: none;
+    color: #FFFFFF;
+}
+
+#button-addproduct-eximport {
+    background-color: #0126a0;
+    border: none;
+    color: #FFFFFF;
+}
+
 #delete{
     color: #DA213D;
 }
@@ -154,7 +166,7 @@
 
   .ant-spin-nested-loading > div > .ant-spin {
     z-index: 50000;
-    max-height: 20000px;
+    max-height: 960px;
 }
 
 #header-img {

@@ -9,6 +9,7 @@ import axios from 'axios';
 import swal from 'sweetalert';
 import Highlighter from 'react-highlight-words';
 import imgm from '../img/photocomingsoon.svg';
+import readXlsxFile from 'read-excel-file';
 
 var ip = "http://localhost:5000";
 var uuid = "";
@@ -129,6 +130,9 @@ export default class Product extends Component {
             fileListDetailEdit: [],
             ImgDetailEdit: [],
 
+            ststusButtomFile: false,
+            dataImportFile: [],
+
             fileListMainSave: [],
             ImgMainSave: [],
             fileListDetailSave: [],
@@ -149,7 +153,7 @@ export default class Product extends Component {
                                 (record === null) ?
                                     <Image src={imgm} alt="imgProfile" width={"100%"} />
                                     :
-                                    <Image src={record} alt="imgProfile" width={"100%"}/>
+                                    <Image src={record} alt="imgProfile" width={"100%"} />
                             }
                         </>,
                     width: 180
@@ -339,6 +343,9 @@ export default class Product extends Component {
         this.handleChangeFlagProductSave = this.handleChangeFlagProductSave.bind(this);
         this.handleChangeCatIdSave = this.handleChangeCatIdSave.bind(this);
         this.handleDeleteProduct = this.handleDeleteProduct.bind(this);
+
+        this.handleChangeFile = this.handleChangeFile.bind(this);
+        this.onImportFile = this.onImportFile.bind(this);
     }
 
     onChangeFildProduct(e) {
@@ -807,6 +814,18 @@ export default class Product extends Component {
         });
     };
 
+    handlePreviewFile = async file => {
+        if (!file.url && !file.preview) {
+            file.preview = await getBase64(file.originFileObj);
+        }
+
+        this.setState({
+            previewImage: file.url || file.preview,
+            previewVisible: true,
+            previewTitle: file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
+        });
+    };
+
     handleCancelimage() {
         this.setState({ previewVisible: false });
     };
@@ -928,6 +947,121 @@ export default class Product extends Component {
         this.setState({ fileListMainSave: fileList.fileList });
     };
 
+    handleChangeFile(fileList) {
+        if (fileList.file.status === "uploading") {
+            this.setState({ ststusButtomFile: true, statusButtonEdit: true });
+            if (fileList.fileList.length > 0) {
+                readXlsxFile(fileList.fileList[0]?.originFileObj).then((rows) => {
+                    var count_data = rows.length - 1;
+                    var dataImport = [];
+                    if (count_data >= 1) {
+                        for (let i = 1; i <= count_data; i++) {
+                            var data = {
+                                [rows[0][0]]: rows[i][0],
+                                [rows[0][1]]: rows[i][1],
+                                [rows[0][2]]: rows[i][2],
+                                [rows[0][3]]: rows[i][3],
+                                [rows[0][4]]: rows[i][4],
+                                [rows[0][5]]: rows[i][5],
+                                [rows[0][6]]: rows[i][6],
+                                [rows[0][7]]: rows[i][7],
+                                [rows[0][8]]: rows[i][8],
+                                [rows[0][9]]: rows[i][9],
+                                [rows[0][10]]: rows[i][10],
+                                [rows[0][11]]: rows[i][11],
+                                [rows[0][12]]: rows[i][12],
+                                [rows[0][13]]: rows[i][13],
+                                [rows[0][14]]: rows[i][14],
+                                [rows[0][15]]: rows[i][15],
+                                [rows[0][16]]: rows[i][16],
+                                [rows[0][17]]: rows[i][17],
+                                [rows[0][18]]: rows[i][18],
+                                [rows[0][19]]: rows[i][19],
+                                [rows[0][20]]: rows[i][20],
+                                [rows[0][21]]: rows[i][21],
+                                [rows[0][22]]: rows[i][22],
+                                [rows[0][23]]: rows[i][23],
+                                [rows[0][24]]: rows[i][24],
+                                [rows[0][25]]: rows[i][25],
+                                [rows[0][26]]: rows[i][26],
+                                [rows[0][27]]: rows[i][27],
+                                [rows[0][28]]: rows[i][28],
+                                [rows[0][29]]: rows[i][29],
+                                priceProduceStatus: "A",
+                                view: 0,
+                                productStatus: "A",
+                                priceProductId: ((i === 1) || (i === 3) ? 100 : null)
+                            }
+
+                            dataImport.push(data);
+                        }
+
+                        this.setState({ statusButtonEdit: false, dataImportFile: dataImport });
+                    } else {
+                        this.setState({ statusButtonEdit: false });
+                        swal("Warning!", "ไม่พบข้อมูลสินค้าที่จะ Import", "warning").then((value) => {
+                        });
+                    }
+                })
+            }
+        } else if (fileList.file.status === "removed") {
+            this.setState({ ststusButtomFile: false });
+        }
+    }
+
+    async onImportFile() {
+        if (this.state.dataImportFile.length > 0) {
+            this.setState({ statusButtonEdit: true });
+            var url_product = ip + "/Product/find/all/admin";
+            var url_import_product = ip + "/Product/create/import/admin/";
+            const importproduct = await (await axios.post(url_import_product, this.state.dataImportFile)).data;
+            console.log(importproduct, " importproduct")
+            if (importproduct.length <= 0) {
+                this.setState({ statusButtonEdit: false, productstatus: true });
+                swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
+                    this.setState({
+                        dataImportFile: [],
+                        ststusButtomFile: false,
+                        previewImage: '',
+                        previewVisible: false,
+                        previewTitle: ''
+                    });
+                });
+
+                const product = await (await axios.get(url_product)).data;
+                this.setState({
+                    product: product,
+                    productstatus: false
+                });
+
+            } else {
+                this.setState({
+                    dataImportFile: [],
+                    ststusButtomFile: false,
+                    statusButtonEdit: false,
+                    previewImage: '',
+                    previewVisible: false,
+                    productstatus: true,
+                    previewTitle: ''
+                });
+
+                const product = await (await axios.get(url_product)).data;
+                this.setState({
+                    product: product,
+                    productstatus: false
+                });
+                swal("Warning!", "ข้อมูลบางสินค้าไม่สามารถ Import ข้อมูลได้ กรุณาลองใหม่", "warning").then((value) => {
+                    console.log(importproduct, " importproduct");
+
+                });
+            }
+        } else {
+            swal("Warning!", "ไม่พบข้อมูลข้อมูลที่จะ Import", "warning").then((value) => {
+                //console.log(importproduct, " importproduct");
+            });
+        }
+    }
+
     async handleChangeListDetailSave(fileList) {
         const imgDetailSave = this.state.ImgDetailSave;
         // var state = 0;
@@ -1021,7 +1155,7 @@ export default class Product extends Component {
                                 (record === null) ?
                                     <Image src={imgm} alt="imgProfile" width={"100%"} />
                                     :
-                                    <Image src={record} alt="imgProfile" width={"100%"}/>
+                                    <Image src={record} alt="imgProfile" width={"100%"} />
                             }
                         </>,
                     width: 180
@@ -1225,8 +1359,6 @@ export default class Product extends Component {
         this.setState({ searchText: '' });
     };
 
-
-
     render() {
         const uploadButton = (
             <div>
@@ -1234,6 +1366,7 @@ export default class Product extends Component {
                 <div style={{ marginTop: 8, color: '#DA213D' }}>เพิ่มรูปภาพ</div>
             </div>
         );
+        console.log(this.state.ststusButtomFile, " ststusButtomFile");
         // const uploadButton1 = (
         //     <div>
         //         <PlusOutlined style={{ fontSize: "20px", color: '#DA213D' }} />
@@ -1247,21 +1380,28 @@ export default class Product extends Component {
                         <Col xs={1} md={1} xl={1} id="icon-product">
                             <FaProductHunt style={{ fontSize: '400%', color: '#DA213D' }} />
                         </Col>
-                        <Col xs={5} md={5} xl={5} id="page-product">
-                            สินค้า
-                        </Col>
+                        <Col xs={5} md={5} xl={5} id="page-product">สินค้า</Col>
                     </Row>
-                    {/* <Row id="input-search">
-                        <Input.Group compact>
-                            <Input.Search style={{ width: '30%' }} placeholder="ค้นหาสินค้า (รหัสสินค้า หรือ ชื่อสินค้า)" />
-                        </Input.Group>
-                    </Row> */}
                     <Row id="input-search">
                         <Col md={4} xl={3} id="col">
                             <Button id="button-addproduct" onClick={this.showModalSaveProduct}>เพิ่มรายการสินค้า</Button>
                         </Col>
-                        <Col md={5} xl={4} id="col">
-                            <Button id="button-addproduct">เพิ่มไฟล์รายการสินค้า</Button>
+                        <Col md={4} xl={3} id="col">
+                            <Button id="button-addproduct-import" hidden={!this.state.ststusButtomFile} onClick={this.onImportFile}>นำเข้ารายการสินค้า</Button>
+                            <Upload
+                                action={ip + "/UserProfile/UploadImg"}
+                                // listType= "picture"
+                                onPreview={this.handlePreviewFile}
+                                onChange={this.handleChangeFile}
+
+                            >
+                                <Button id="button-addproduct" hidden={this.state.ststusButtomFile}>เพิ่มไฟล์รายการสินค้า</Button>
+                            </Upload>
+                        </Col>
+                        <Col md={4} xl={3} id="col">
+                            <a href="http://128.199.198.10/API/excel/TemplateProductImport.xlsx" rel="noopener noreferrer" download="TemplateProductImport.xlsx">
+                                <Button id="button-addproduct-eximport">ตัวอย่างไฟล์รายการสินค้า</Button>
+                            </a>
                         </Col>
                     </Row>
                     <Row id="input-search">
