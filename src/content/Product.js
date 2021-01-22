@@ -10,6 +10,7 @@ import swal from 'sweetalert';
 import Highlighter from 'react-highlight-words';
 import imgm from '../img/photocomingsoon.svg';
 import readXlsxFile from 'read-excel-file';
+import { JsonToCsv, useJsonToCsv } from 'react-json-csv';
 
 var ip = "http://localhost:5000";
 var uuid = "";
@@ -137,6 +138,8 @@ export default class Product extends Component {
             ImgMainSave: [],
             fileListDetailSave: [],
             ImgDetailSave: [],
+
+            fileList: [],
 
             filteredInfo: null,
             sortedInfo: null,
@@ -990,13 +993,14 @@ export default class Product extends Component {
                                 priceProduceStatus: "A",
                                 view: 0,
                                 productStatus: "A",
-                                priceProductId: ((i === 1) || (i === 3) ? 100 : null)
+                                // priceProductId: ((i === 1) || (i === 3) ? 100 : null)
                             }
 
                             dataImport.push(data);
                         }
 
                         this.setState({ statusButtonEdit: false, dataImportFile: dataImport });
+                        this.setState({ fileList: fileList.fileList });
                     } else {
                         this.setState({ statusButtonEdit: false });
                         swal("Warning!", "ไม่พบข้อมูลสินค้าที่จะ Import", "warning").then((value) => {
@@ -1024,7 +1028,8 @@ export default class Product extends Component {
                         ststusButtomFile: false,
                         previewImage: '',
                         previewVisible: false,
-                        previewTitle: ''
+                        previewTitle: '',
+                        fileList: []
                     });
                 });
 
@@ -1042,7 +1047,8 @@ export default class Product extends Component {
                     previewImage: '',
                     previewVisible: false,
                     productstatus: true,
-                    previewTitle: ''
+                    previewTitle: '',
+                    fileList: []
                 });
 
                 const product = await (await axios.get(url_product)).data;
@@ -1051,7 +1057,56 @@ export default class Product extends Component {
                     productstatus: false
                 });
                 swal("Warning!", "ข้อมูลบางสินค้าไม่สามารถ Import ข้อมูลได้ กรุณาลองใหม่", "warning").then((value) => {
-                    console.log(importproduct, " importproduct");
+                    // console.log(importproduct, " importproduct");
+                    const className = 'class-name-for-style',
+                        filename = 'ProductImportError',
+                        fields = {
+                            "barCode": "barCode",
+                            "productCode": "productCode",
+                            "name": "name",
+                            "size": "size",
+                            "color": "color",
+                            "unit": "unit",
+                            "brand": "brand",
+                            "detail": "detail",
+                            "direction": "direction",
+                            "caution": "caution",
+                            "keepespreserve": "keepespreserve",
+                            "firstaidprocedure": "firstaidprocedure",
+                            "flagProduct": "flagProduct",
+                            "catId": "catId",
+                            "enduser": "enduser",
+                            "level1": "level1",
+                            "level2": "level2",
+                            "level3": "level3",
+                            "level4": "level4",
+                            "level5": "level5",
+                            "level6": "level6",
+                            "level7": "level7",
+                            "level8": "level8",
+                            "level9": "level9",
+                            "level10": "level10",
+                            "level11": "level11",
+                            "level12": "level12",
+                            "level13": "level13",
+                            "level14": "level14",
+                            "level15": "level15",
+                        },
+                        style = { padding: "5px" },
+                        data = importproduct,
+                        text = "Convert Json to Excel";
+                    
+                    <JsonToCsv
+                        data={data}
+                        className={className}
+                        filename={filename}
+                        fields={fields}
+                        style={style}
+                        text={text}
+                    />
+
+                    const { saveAsCsv } = useJsonToCsv();
+                    saveAsCsv({ data, fields, filename })
 
                 });
             }
@@ -1393,7 +1448,7 @@ export default class Product extends Component {
                                 // listType= "picture"
                                 onPreview={this.handlePreviewFile}
                                 onChange={this.handleChangeFile}
-
+                                fileList={this.state.fileList}
                             >
                                 <Button id="button-addproduct" hidden={this.state.ststusButtomFile}>เพิ่มไฟล์รายการสินค้า</Button>
                             </Upload>
@@ -1446,7 +1501,7 @@ export default class Product extends Component {
                                 </Col>
                                 <Col md={12} xl={12}>
                                     <Row>
-                                        <Col md={6} xl={6}>ยี้ห้อ :</Col>
+                                        <Col md={6} xl={6}>ยี่ห้อ :</Col>
                                         <Col md={12} xl={12}><Input id="input" name="brand" value={this.state.brand} onChange={this.onChangeFildProduct} /></Col>
                                     </Row>
                                 </Col>
@@ -1648,7 +1703,7 @@ export default class Product extends Component {
                                 </Col>
                                 <Col md={12} xl={12}>
                                     <Row>
-                                        <Col md={6} xl={6}>ยี้ห้อ :</Col>
+                                        <Col md={6} xl={6}>ยี่ห้อ :</Col>
                                         <Col md={12} xl={12}><Input id="input" name="brandSave" value={this.state.brandSave} onChange={this.onChangeFildProduct} /></Col>
                                     </Row>
                                 </Col>
