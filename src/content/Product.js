@@ -12,7 +12,7 @@ import imgm from '../img/photocomingsoon.svg';
 import readXlsxFile from 'read-excel-file';
 import { JsonToCsv, useJsonToCsv } from 'react-json-csv';
 
-var ip = "http://localhost:5000";
+var ip = "http://128.199.198.10/API";
 var uuid = "";
 var uuidMain = "";
 var uuidSave = "";

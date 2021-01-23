@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Container, Image } from 'react-bootstrap';
 import { Row, Col, Input, Select, Popconfirm, Table, Modal, Form, Avatar, Button, Space, Spin } from 'antd'
 import { BsFillPersonLinesFill } from "react-icons/bs";
-import { DeleteTwoTone, EyeTwoTone, AntDesignOutlined } from '@ant-design/icons';
+import { DeleteTwoTone, EditTwoTone, AntDesignOutlined } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
 import axios from 'axios';
@@ -12,7 +12,7 @@ import '../css/User.css';
 
 const { Option } = Select;
 
-var ip = "http://localhost:5000";
+var ip = "http://128.199.198.10/API";
 var ip_img_profile = "http://128.199.198.10/API/profile/";
 // const data = [
 //     {
@@ -115,7 +115,7 @@ export default class User extends Component {
                     width: 60,
                     render: (record) =>
                         <>
-                            <div type="primary" onClick={() => this.showModal(record)}><EyeTwoTone style={{ fontSize: '20px' }} twoToneColor="#63549B" /></div>
+                            <div type="primary" onClick={() => this.showModal(record)}><EditTwoTone style={{ fontSize: '20px' }} twoToneColor="#63549B" /></div>
                         </>,
                 },
                 {
@@ -371,7 +371,7 @@ export default class User extends Component {
                     width: 60,
                     render: (record) =>
                         <>
-                            <div type="primary" onClick={() => this.showModal(record)}><EyeTwoTone style={{ fontSize: '20px' }} twoToneColor="#63549B" /></div>
+                            <div type="primary" onClick={() => this.showModal(record)}><EditTwoTone style={{ fontSize: '20px' }} twoToneColor="#63549B" /></div>
                         </>,
                 },
                 {
