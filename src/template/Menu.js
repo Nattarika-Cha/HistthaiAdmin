@@ -38,11 +38,11 @@ export default class MenuAdmin extends Component {
     render() {
         return (
             <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
-                <Menu.Item key="1" icon={<BsFillGrid1X2Fill />}><NavLink to="/Home">หน้าหลัก</NavLink></Menu.Item>
-                <Menu.Item key="2" icon={<FaProductHunt />}><NavLink to="/Product">สินค้า</NavLink></Menu.Item>
-                <Menu.Item key="3" icon={<BsFillPersonLinesFill />}><NavLink to="/User">สมาชิก</NavLink></Menu.Item>
-                <Menu.Item key="4" icon={<BsFillGearFill />}><NavLink to="/Setting">ตั้งค่า</NavLink></Menu.Item>
-                <Menu.Item key="5" icon={<FaSignOutAlt />}><NavLink to="/Logout">ออกจากระบบ</NavLink></Menu.Item>
+                <Menu.Item key="1" icon={<BsFillGrid1X2Fill />}><NavLink to="/Admin/Home">หน้าหลัก</NavLink></Menu.Item>
+                <Menu.Item key="2" icon={<FaProductHunt />}><NavLink to="/Admin/Product">สินค้า</NavLink></Menu.Item>
+                <Menu.Item key="3" icon={<BsFillPersonLinesFill />}><NavLink to="/Admin/User">สมาชิก</NavLink></Menu.Item>
+                <Menu.Item key="4" icon={<BsFillGearFill />}><NavLink to="/Admin/Setting">ตั้งค่า</NavLink></Menu.Item>
+                <Menu.Item key="5" icon={<FaSignOutAlt />}><NavLink to="/Admin/Logout">ออกจากระบบ</NavLink></Menu.Item>
             </Menu>
         );
     }

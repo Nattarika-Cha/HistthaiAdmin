@@ -79,7 +79,7 @@ export default class Login extends Component {
             this.setState({
                 storedJwt: data_login.token
             });
-               window.location.replace('/Home', false);    
+               window.location.replace('/Admin/Home', false);    
         } else {
             swal("Error!", "Username หรือ Password ผิดพลาด", "error").then((value) => {
                 this.setState({

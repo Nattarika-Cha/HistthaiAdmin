@@ -17,7 +17,7 @@ export default class Logout extends Component {
             token: cookies.remove('token', { path: '/' }),
             user: cookies.remove('user', { path: '/' })
         });
-        window.location.replace('/Login', false); 
+        window.location.replace('/Admin/Login', false); 
       }
 
     render() {
