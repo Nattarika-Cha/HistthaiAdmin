@@ -1,13 +1,13 @@
 import React, { Component } from "react";
 import { BsFillGrid1X2Fill } from 'react-icons/bs';
-import { Col, Row, Table, Tag, Popconfirm, Statistic, AutoComplete, Button, Modal, Form, Input, Select, InputNumber, Space, Spin } from 'antd';
+import { Col, Row, Table, Tag, Popconfirm, Statistic, AutoComplete, Button, Modal, Form, Input, Select, InputNumber, Space, Spin  } from 'antd';
 import { Container } from 'react-bootstrap';
 import '../css/Home.css';
 import ReactApexChart from "react-apexcharts";
 import axios from 'axios';
 import swal from 'sweetalert';
 import moment from 'moment';
-import { DeleteTwoTone, EditTwoTone, CopyTwoTone } from '@ant-design/icons';
+import { DeleteTwoTone, EditTwoTone } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
 
@@ -16,7 +16,6 @@ import { SearchOutlined } from '@ant-design/icons';
 const { Option } = Select;
 const { TextArea } = Input;
 
-var ip_web = "http://localhost:3000";
 var ip = "http://localhost:5000";
 // var ip_img_profile = "http://128.199.198.10/API/profile/";
 
@@ -268,17 +267,7 @@ export default class Home extends Component {
         title: '',
         dataIndex: '',
         key: 'x',
-        width: 45,
-        render: (record) =>
-          <>
-            <div type="primary" onClick={() => this.copyCodeToClipboard(record)}><CopyTwoTone style={{ fontSize: '20px', cursor: 'pointer' }} twoToneColor="#FF0099" /></div>
-          </>,
-      },
-      {
-        title: '',
-        dataIndex: '',
-        key: 'x',
-        width: 45,
+        width: 120,
         render: (record) =>
           <>
             <div type="primary" onClick={() => this.showModal(record)}><EditTwoTone style={{ fontSize: '20px', cursor: 'pointer' }} twoToneColor="#63549B" /></div>
@@ -288,7 +277,7 @@ export default class Home extends Component {
         title: '',
         dataIndex: '',
         key: 'x',
-        width: 45,
+        width: 120,
         render: (record) =>
           <Popconfirm title="คุณแน่ใจว่าจะลบรายการ？" okText="ลบ" cancelText="ยกเลิก" onConfirm={() => this.handleDeleteContact(record.contactId)}>
             <div id="delete"><DeleteTwoTone style={{ fontSize: '20px', cursor: 'pointer' }} twoToneColor="#DA213D" /></div>
@@ -316,15 +305,7 @@ export default class Home extends Component {
     this.onChangeNumCall = this.onChangeNumCall.bind(this);
     this.onChangeFildProduct = this.onChangeFildProduct.bind(this);
     this.onChangeAcceptStatus = this.onChangeAcceptStatus.bind(this);
-    this.copyCodeToClipboard = this.copyCodeToClipboard.bind(this);
 
-  }
-
-  copyCodeToClipboard(record) {
-    console.log(ip_web + "/FormRegister/" +record.keyRegister, " record");
-    var el = ip_web + "/FormRegister/" +record.keyRegister;
-    navigator.clipboard.writeText(el);
-    swal("Success!", "Copy URL Success", "success");
   }
 
   getColumnSearchProps = dataIndex => ({
@@ -514,7 +495,7 @@ export default class Home extends Component {
       label.push(Graph.name);
     });
     this.setState({
-      series: [{ data: data }],
+      series: [{ data }],
       options: {
         chart: {
           type: 'bar',
@@ -696,7 +677,7 @@ export default class Home extends Component {
 
   async handleDeleteContact(contactId) {
     const data = {
-      userStatus: "N"
+      contactStatus: "N"
     };
 
     var url_update_product_Contact = ip + "/Contact/updateStatus/" + contactId;

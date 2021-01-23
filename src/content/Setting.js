@@ -95,6 +95,12 @@ export default class Setting extends Component {
 
         this.catalog = [
             {
+                title: 'ไอดีสินค้า',
+                dataIndex: 'catId',
+                key: 'catId',
+                ...this.getColumnSearchProps('catId'),
+            },
+            {
                 title: 'รหัสประเภทสินค้า',
                 dataIndex: 'catCode',
                 key: 'catCode',
@@ -954,7 +960,7 @@ export default class Setting extends Component {
                     </Col>
                     </Row>
                     <Row id="row-level">
-                        <Col md={11} xl={11} id="col-level">
+                        <Col md={8} xl={8} id="col-level">
                             <Col md={24} xl={24} id="header-collevel">ประเภทสมาชิก</Col>
                             <Col md={24} xl={24}>
                                 <Table
@@ -967,7 +973,7 @@ export default class Setting extends Component {
                                 <Button id="edit-level" onClick={() => this.showModal()}>แก้ไข</Button>
                             </Col>
                         </Col>
-                        <Col md={12} xl={12} id="col-level1">
+                        <Col md={15} xl={15} id="col-level1">
                             <Col md={24} xl={24} id="header-collevel">ประเภทรายการสินค้า</Col>
                             <Col md={24} xl={24}>
                                 <Button id="button-addcatalog" onClick={this.showModalAddCatalog}>เพิ่มประเภทรายการสินค้า</Button>
