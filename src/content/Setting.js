@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Row, Col, Table, Modal, Button, Form, Input, Popconfirm, Select, Spin, DatePicker, Space, Upload } from 'antd';
+import { Row, Col, Table, Modal, Button, Form, Input, Popconfirm, Select, Spin, DatePicker, Space, Upload, Tag } from 'antd';
 import { Container, Image } from 'react-bootstrap';
 import '../css/Setting.css';
 import { SettingOutlined, EditTwoTone, DeleteTwoTone, SearchOutlined, PlusOutlined } from '@ant-design/icons';
@@ -136,13 +136,13 @@ export default class Setting extends Component {
 
         this.point = [
             {
-                title: 'รหัสการขาย',
+                title: 'เลขที่บิล',
                 dataIndex: 'orderCode',
                 key: 'orderCode',
                 ...this.getColumnSearchProps('orderCode'),
             },
             {
-                title: 'คะแนน',
+                title: 'ยอดเงินสะสม',
                 dataIndex: '',
                 key: 'x',
                 render: (record) =>
@@ -155,6 +155,38 @@ export default class Setting extends Component {
                 dataIndex: 'userCode',
                 key: 'userCode',
                 ...this.getColumnSearchProps('userCode'),
+            },
+            {
+                title: 'สถานะ',
+                dataIndex: 'pointState',
+                key: 'pointState',
+                filters: [
+                    {
+                      text: 'รอชำระเงิน',
+                      value: '0',
+                    },
+                    {
+                      text: 'ชำระเงินแล้ว',
+                      value: '1',
+                    },
+                  ],
+                onFilter: (value, record) => record.pointState.indexOf(value) === 0,
+                render: tags => (
+                    <>
+                      {
+                        (tags === "1") ?
+                          <Tag color="green" key="1">
+                            {"ชำระเงินแล้ว"}
+                          </Tag>
+                          : (tags === "0") ?
+                            <Tag color="red" key="0">
+                              {"รอชำระเงิน"}
+                            </Tag>
+                            : 
+                                <></>
+                      }
+                    </>
+                  ),
             },
             {
                 title: 'วันที่',
@@ -1104,8 +1136,8 @@ export default class Setting extends Component {
                                     <Col md={6} xl={6}>สถานะ</Col>
                                     <Col md={6} xl={6}>
                                         <Select defaultValue="สถานะ" style={{ width: 195 }} labelInValue value={{ value: this.state.pointState }} name="pointState" onChange={this.onChangepointState} id="input-point">
-                                            <Option value="0">0 : ลบคะแนน</Option>
-                                            <Option value="1">1 : เพิ่มคะแนน</Option>
+                                            <Option value="0">รอชำระเงิน</Option>
+                                            <Option value="1">ชำระเงินแล้ว</Option>
                                         </Select>
                                     </Col>
                                 </Row>
@@ -1158,8 +1190,8 @@ export default class Setting extends Component {
                                     <Col md={6} xl={6}>สถานะ</Col>
                                     <Col md={6} xl={6}>
                                         <Select defaultValue="สถานะ" style={{ width: 195 }} id="input-point" name="pointStateEdit" value={this.state.pointStateEdit} onChange={this.onChangepointStateEdit}>
-                                            <Option value="0">0 : ลบคะแนน</Option>
-                                            <Option value="1">1 : เพิ่มคะแนน</Option>
+                                            <Option value="0">รอชำระเงิน</Option>
+                                            <Option value="1">ชำระเงินแล้ว</Option>
                                         </Select>
                                     </Col>
                                 </Row>
