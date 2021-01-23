@@ -11,6 +11,8 @@ import { DeleteTwoTone, EditTwoTone } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
 
+// import { config } from '../config/config.json';
+
 const { Option } = Select;
 const { TextArea } = Input;
 
@@ -699,6 +701,7 @@ export default class Home extends Component {
   }
 
   render() {
+    // console.log(config, " ipServer");
     return (
       <Container fluid>
         <Spin spinning={this.state.statusButtonEdit} size="large">
