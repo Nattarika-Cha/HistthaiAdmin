@@ -40,6 +40,7 @@ export default class User extends Component {
             searchedColumn: '',
             member: [],
             level: [],
+            // userCode: [],
 
             userProfileId: 0,
             memberId: 0,
@@ -137,6 +138,7 @@ export default class User extends Component {
         this.handleChangeMemberIdEdit = this.handleChangeMemberIdEdit.bind(this);
         this.handleChangeLevelIdEdit = this.handleChangeLevelIdEdit.bind(this);
         this.handleDeleteUser = this.handleDeleteUser.bind(this);
+        this.onChangeFilduserCode = this.onChangeFilduserCode.bind(this);
     }
 
     getColumnSearchProps = dataIndex => ({
@@ -225,11 +227,18 @@ export default class User extends Component {
         });
     };
 
+    onChangeFilduserCode(e) {
+        this.setState({
+            [e.target.name]: e.target.value
+        })
+    }
+
     async handleOk() {
         this.setState({ statusButtonEdit: true });
         const data = {
             memberId: this.state.memberId,
-            levelId: this.state.levelId
+            levelId: this.state.levelId,
+            userCode: this.state.userCode,
         };
 
         var url_update_member_level = ip + "/UserProfile/updatememberlevel/" + this.state.userProfileId;
@@ -471,7 +480,7 @@ export default class User extends Component {
                                 <Row id="row-margin">
                                     <Col md={6} xl={6}></Col>
                                     <Col md={5} xl={5} id="col-header">รหัสสมาชิก</Col>
-                                    <Col>{this.state.userCode}</Col>
+                                    <Col><Input id="input-level" name="userCode" value={this.state.userCode} onChange={this.onChangeFilduserCode} /></Col>
                                 </Row>
                                 <Row id="row-margin">
                                     <Col md={6} xl={6}></Col>
