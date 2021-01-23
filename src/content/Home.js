@@ -16,7 +16,7 @@ import { SearchOutlined } from '@ant-design/icons';
 const { Option } = Select;
 const { TextArea } = Input;
 
-var ip = "http://128.199.198.10/API";
+var ip = "http://localhost:5000";
 // var ip_img_profile = "http://128.199.198.10/API/profile/";
 
 function onChange(pagination, filters, sorter, extra) {

@@ -8,7 +8,7 @@ import Cookies from 'universal-cookie';
 
 const cookies = new Cookies();
 
-var ip = "http://128.199.198.10/API";
+var ip = "http://localhost:5000";
 
 axios.interceptors.request.use(
     config => {
