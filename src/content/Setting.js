@@ -9,7 +9,7 @@ import Highlighter from 'react-highlight-words';
 import moment from 'moment';
 import imgm from '../img/photocomingsoon.svg';
 
-var ip = "http://localhost:5000";
+var ip = "http://128.199.198.10/API";
 
 const { Option } = Select;
 
@@ -286,6 +286,7 @@ export default class Setting extends Component {
         this.handlePointOk = this.handlePointOk.bind(this);
         this.handlePointCancel = this.handlePointCancel.bind(this);
         this.onChangeDatePointEdit = this.onChangeDatePointEdit.bind(this);
+        this.onChangepointStateEdit = this.onChangepointStateEdit.bind(this);
 
         this.showModalCatalog = this.showModalCatalog.bind(this);
         this.handleCatalogOk = this.handleCatalogOk.bind(this);
