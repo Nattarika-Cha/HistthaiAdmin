@@ -1022,9 +1022,9 @@ export default class Setting extends Component {
                         </Col>
                     </Row>
                     <Row id="change-imagehome">
-                        <Col md={24} xl={24}>คะแนนสมาชิก</Col>
+                        <Col md={24} xl={24}>ยอดเงินสะสม</Col>
                         <Col md={24} xl={24}>
-                            <Button id="button-addcatalog" onClick={this.showModalAddPoint}>เพิ่มคะแนนสมาชิก</Button>
+                            <Button id="button-addcatalog" onClick={this.showModalAddPoint}>เพิ่มยอดเงินสะสมสมาชิก</Button>
                         </Col>
                         <Col md={24} xl={24}>
                             <Table
@@ -1117,7 +1117,7 @@ export default class Setting extends Component {
                     </Modal>
 
                     <Modal
-                        title="Hits Point"
+                        title="ยอดเงินสะสม"
                         visible={this.state.isModalAddPointVisible}
                         onOk={this.handleSavePoint}
                         onCancel={this.handleAddPointCancel}
@@ -1126,7 +1126,7 @@ export default class Setting extends Component {
                             <Col md={24} xl={24} id="col-marginlevel">
                                 <Row>
                                     <Col md={6} xl={6}></Col>
-                                    <Col md={6} xl={6}>รหัสการขาย</Col>
+                                    <Col md={6} xl={6}>เลขที่บิล</Col>
                                     <Col md={6} xl={6}><Input id="input-level" name="orderCode" value={this.state.orderCode} onChange={this.onChangeFildPoint} /></Col>
                                 </Row>
                             </Col>
@@ -1171,7 +1171,7 @@ export default class Setting extends Component {
                     </Modal>
 
                     <Modal
-                        title="แก้ไข Hits Piont"
+                        title="แก้ไขยอดเงินสะสม"
                         visible={this.state.isModalPointVisible}
                         onOk={this.handlePointOk}
                         onCancel={this.handlePointCancel}
@@ -1180,7 +1180,7 @@ export default class Setting extends Component {
                             <Col md={24} xl={24} id="col-marginlevel">
                                 <Row>
                                     <Col md={6} xl={6}></Col>
-                                    <Col md={6} xl={6}>รหัสการขาย</Col>
+                                    <Col md={6} xl={6}>เลขที่บิล</Col>
                                     <Col md={6} xl={6}><Input id="input-level" name="orderCodeEdit" value={this.state.orderCodeEdit} onChange={this.onChangeFildCatalog} /></Col>
                                 </Row>
                             </Col>
