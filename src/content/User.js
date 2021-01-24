@@ -316,7 +316,6 @@ export default class User extends Component {
             memberFilter.push(filter);
         });
 
-        console.log(memberFilter, " memberFilter");
 
         this.setState({
             usertable: [

@@ -402,7 +402,6 @@ export default class Setting extends Component {
     }
 
     showModalImgProduct(record) {
-        console.log(record, " record");
         this.setState({
             isModalVisibleImgProductEdit: true,
             ImgProductEdit: record,
@@ -509,7 +508,6 @@ export default class Setting extends Component {
     };
 
     async handleDeleteImgProduct(imgSettingId) {
-        console.log(imgSettingId, " imgSettingId");
         this.setState({ statusButtonEdit: true });
         var dataSave = {
             imgStatus: "N"
@@ -517,7 +515,7 @@ export default class Setting extends Component {
 
         var url_delete_product_setting = ip + "/ImgSetting/updateStatus/" + imgSettingId;
         const deleteproductsetting = await (await axios.put(url_delete_product_setting, dataSave)).data;
-        console.log(deleteproductsetting, " createproductsetting");
+
         if (deleteproductsetting) {
             this.setState({ statusButtonEdit: false, imgproductstatus: true });
             swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
@@ -626,7 +624,7 @@ export default class Setting extends Component {
 
         var url_update_member = ip + "/Member/update/";
         const updatemember = await (await axios.put(url_update_member, data)).data;
-        console.log(updatemember, " updatecatalog")
+
         if (updatemember) {
             this.setState({ statusButtonEdit: false, memberStatus: true });
             swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
@@ -705,7 +703,7 @@ export default class Setting extends Component {
 
         var url_update_point = ip + "/Point/update/" + this.state.pointId;
         const updatepoint = await (await axios.put(url_update_point, data)).data;
-        console.log(updatepoint, " updatepoint")
+
         if (updatepoint[0] > 0) {
             this.setState({ statusButtonEdit: false, pointStatus: true });
             swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
@@ -749,7 +747,7 @@ export default class Setting extends Component {
 
         var url_update_catalog = ip + "/Catalog/update/" + this.state.catId;
         const updatecatalog = await (await axios.put(url_update_catalog, data)).data;
-        console.log(updatecatalog, " updatecatalog")
+
         if (updatecatalog[0] > 0) {
             this.setState({ statusButtonEdit: false, catalogStatus: true });
             swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
@@ -787,7 +785,7 @@ export default class Setting extends Component {
 
         var url_create_catalog = ip + "/Catalog/create";
         const createcatalog = await (await axios.post(url_create_catalog, dataSave)).data
-        // console.log(createcatalog, "mcdks")
+
         if (createcatalog !== null) {
             this.setState({ statusButtonEdit: false, catalogStatus: true });
             swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
@@ -842,9 +840,6 @@ export default class Setting extends Component {
         this.setState({
             pointDate: date?._d
         });
-        // console.log(date, " date");
-        // console.log(dateString, " dateString");
-        // console.log(this.state.pointData, " id");
     }
 
     async handleSavePoint() {
@@ -858,11 +853,9 @@ export default class Setting extends Component {
             pointStatus: "A",
         }
 
-        console.log(dataSave, " dataSave");
-
         var url_create_pointData = ip + "/Point/create";
         const createpointData = await (await axios.post(url_create_pointData, dataSave)).data
-        // console.log(createcatalog, "mcdks")
+
         if (createpointData !== null) {
             this.setState({ statusButtonEdit: false, pointstatus: true });
             swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {

@@ -321,7 +321,6 @@ export default class Home extends Component {
   }
 
   copyCodeToClipboard(record) {
-    console.log(ip_web + "/FormRegister/" + record.keyRegister, " record");
     var el = ip_web + "/FormRegister/" + record.keyRegister;
     navigator.clipboard.writeText(el);
     swal("Success!", "Copy URL Success", "success");
@@ -496,7 +495,7 @@ export default class Home extends Component {
 
     var url_Statistic_User = ip + "/StatisticsUser/find/all";
     const memberUser = await (await axios.get(url_Statistic_User)).data;
-    console.log(memberUser, " memberUser")
+
     this.setState({
       memberUser: memberUser?.memberUser,
       endUser: memberUser?.endUser,
@@ -613,7 +612,9 @@ export default class Home extends Component {
 
       var url_create_prouct_new = ip + "/ProductShow/create/";
       const createproductnew = await (await axios.post(url_create_prouct_new, data)).data;
-      console.log(createproductnew)
+      if(createproductnew) {
+
+      }
 
       var url_product_new = ip + "/ProductShow/find/new";
       const productnew = await (await axios.get(url_product_new)).data;
@@ -639,7 +640,9 @@ export default class Home extends Component {
 
       var url_create_prouct_hit = ip + "/ProductShow/create/";
       const createproducthit = await (await axios.post(url_create_prouct_hit, data)).data;
-      console.log(createproducthit)
+      if(createproducthit) {
+        
+      }
 
       var url_product_hit = ip + "/ProductShow/find/hit";
       const producthit = await (await axios.get(url_product_hit)).data;
@@ -728,7 +731,6 @@ export default class Home extends Component {
   }
 
   render() {
-    // console.log(ipconfig, " ipServer");
     return (
       <Container fluid>
         <Spin spinning={this.state.statusButtonEdit} size="large">
