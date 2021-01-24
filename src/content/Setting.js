@@ -9,7 +9,7 @@ import Highlighter from 'react-highlight-words';
 import moment from 'moment';
 import imgm from '../img/photocomingsoon.svg';
 
-var ip = "http://localhost:5000";
+var ip = "http://128.199.198.10/API";
 
 const { Option } = Select;
 

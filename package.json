@@ -1,7 +1,7 @@
 {
   "name": "hitsthaiadmin",
   "homepage": "https://www.hitsthai.com/Admin/",
-  "proxy": "http://localhost:5000",
+  "proxy": "http://128.199.198.10/API",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
