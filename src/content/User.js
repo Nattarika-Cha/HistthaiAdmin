@@ -12,8 +12,8 @@ import '../css/User.css';
 
 const { Option } = Select;
 
-var ip = "http://128.199.198.10/API";
-var ip_img_profile = "http://128.199.198.10/API/profile/";
+var ip = "https://www.hitsthai.com/API";
+var ip_img_profile = "https://www.hitsthai.com/API/profile/";
 // const data = [
 //     {
 //         key: '1',
@@ -442,7 +442,7 @@ export default class User extends Component {
                             <Row id="row-header">รายละเอียดสมาชิก</Row>
                             <Col md={24} xl={24} id="image-profile">
                                 {
-                                    (this.state.img === "http://128.199.198.10/API/profile/null") ?
+                                    (this.state.img === "https://www.hitsthai.com/API/profile/null") ?
                                         <Avatar size={{ md: 100, lg: 130, xl: 150, xxl: 200 }} icon={<AntDesignOutlined />} />
                                         :
                                         <Image src={this.state.img} alt="imgProfile" id="imgprofile" responsive />

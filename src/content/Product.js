@@ -12,7 +12,7 @@ import imgm from '../img/photocomingsoon.svg';
 import readXlsxFile from 'read-excel-file';
 import { JsonToCsv, useJsonToCsv } from 'react-json-csv';
 
-var ip = "http://128.199.198.10/API";
+var ip = "https://www.hitsthai.com/API";
 var uuid = "";
 var uuidMain = "";
 var uuidSave = "";
@@ -1454,7 +1454,7 @@ export default class Product extends Component {
                             </Upload>
                         </Col>
                         <Col md={4} xl={3} id="col">
-                            <a href="http://128.199.198.10/API/excel/TemplateProductImport.xlsx" rel="noopener noreferrer" download="TemplateProductImport.xlsx">
+                            <a href="https://www.hitsthai.com/API/excel/TemplateProductImport.xlsx" rel="noopener noreferrer" download="TemplateProductImport.xlsx">
                                 <Button id="button-addproduct-eximport">ตัวอย่างไฟล์รายการสินค้า</Button>
                             </a>
                         </Col>
