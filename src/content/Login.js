@@ -40,8 +40,8 @@ export default class Login extends Component {
 
     componentWillMount() {
         this.setState({
-            token: cookies.get('token', { path: '/' }),
-            user: cookies.get('user', { path: '/' })
+            token: cookies.get('token_key', { path: '/Admin/' }),
+            user: cookies.get('user', { path: '/Admin/' })
         });
     }
 
@@ -74,8 +74,8 @@ export default class Login extends Component {
                 levelId: data_login.levelId
             }
             // console.log(data_login, " user_data");
-            cookies.set('user', JSON.stringify(user_data), { path: '/' });
-            cookies.set('token', data_login.token, { path: '/' });
+            cookies.set('user', JSON.stringify(user_data), { path: '/Admin/' });
+            cookies.set('token_key', data_login.token, { path: '/Admin/' });
             this.setState({
                 storedJwt: data_login.token
             });

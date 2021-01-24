@@ -23,16 +23,16 @@ export default class Index extends Component {
 
     componentWillMount() {
         this.setState({
-            token: cookies.get('token', { path: '/' }),
-            user: cookies.get('user', { path: '/' }),
+            token: cookies.get('token_key', { path: '/Admin/' }),
+            user: cookies.get('user', { path: '/Admin/' }),
             statusUser: true
         });
     }
 
     componentDidMount() {
         this.setState({
-            token: cookies.get('token', { path: '/' }),
-            user: cookies.get('user', { path: '/' }),
+            token: cookies.get('token_key', { path: '/Admin/' }),
+            user: cookies.get('user', { path: '/Admin/' }),
             statusUser: true
         });
     }
