@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { BsFillGrid1X2Fill } from 'react-icons/bs';
-import { Col, Row, Table, Tag, Popconfirm, Statistic, AutoComplete, Button, Modal, Form, Input, Select, InputNumber, Space, Spin  } from 'antd';
+import { Col, Row, Table, Tag, Popconfirm, Statistic, AutoComplete, Button, Modal, Form, Input, Select, InputNumber, Space, Spin } from 'antd';
 import { Container } from 'react-bootstrap';
 import '../css/Home.css';
 import ReactApexChart from "react-apexcharts";
@@ -11,7 +11,7 @@ import { DeleteTwoTone, EditTwoTone, CopyTwoTone } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
 
-// import { config } from '../config/config.json';
+// import ipconfig from '../config/ipconfig';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -31,7 +31,7 @@ export default class Home extends Component {
       token: "",
       user: [],
       contact: [],
-      statusButtonEdit:false,
+      statusButtonEdit: false,
       contactFilterSave: [],
       producthit: [],
       productnew: [],
@@ -321,8 +321,8 @@ export default class Home extends Component {
   }
 
   copyCodeToClipboard(record) {
-    console.log(ip_web + "/FormRegister/" +record.keyRegister, " record");
-    var el = ip_web + "/FormRegister/" +record.keyRegister;
+    console.log(ip_web + "/FormRegister/" + record.keyRegister, " record");
+    var el = ip_web + "/FormRegister/" + record.keyRegister;
     navigator.clipboard.writeText(el);
     swal("Success!", "Copy URL Success", "success");
   }
@@ -433,18 +433,18 @@ export default class Home extends Component {
     if (updatecontact[0] > 0) {
       this.setState({ statusButtonEdit: false, contactstatus: true });
       swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
-      // const contact = [...this.state.contact];
-      // contact.forEach((contact, index) => {
-      //   if (contact.contactId === this.state.productContact?.contactId) {
-      //     contact.acceptStatus = this.state.acceptStatus;
-      //     contact.numCall = this.state.numCall;
-      //     contact.remark = this.state.remark;
-      //   }
-      // });
-      // this.setState({
-      //   contact: contact,
-      //   isModalVisible: false
-      // });
+        // const contact = [...this.state.contact];
+        // contact.forEach((contact, index) => {
+        //   if (contact.contactId === this.state.productContact?.contactId) {
+        //     contact.acceptStatus = this.state.acceptStatus;
+        //     contact.numCall = this.state.numCall;
+        //     contact.remark = this.state.remark;
+        //   }
+        // });
+        // this.setState({
+        //   contact: contact,
+        //   isModalVisible: false
+        // });
       });
       var url_contact = ip + "/Contact/find/all";
       const contact = await (await axios.get(url_contact)).data;
@@ -540,8 +540,12 @@ export default class Home extends Component {
 
   async onSearchFildNew(value) {
     if (value !== "") {
-      var url_wordsearch_new = ip + "/Product/find/wordsearchproductshow/" + value;
-      const wordsearchnew = await (await axios.get(url_wordsearch_new)).data;
+      const dataSearch = {
+        search: value
+      }
+
+      var url_wordsearch_new = ip + "/Product/find/wordsearchproductshow/";
+      const wordsearchnew = await (await axios.post(url_wordsearch_new, dataSearch)).data;
       this.setState({
         optionsnew: wordsearchnew
       });
@@ -554,8 +558,12 @@ export default class Home extends Component {
 
   async onSearchFildHit(value) {
     if (value !== "") {
-      var url_wordsearch_hit = ip + "/Product/find/wordsearchproductshow/" + value;
-      const wordsearchhit = await (await axios.get(url_wordsearch_hit)).data;
+      const dataSearch = {
+        search: value
+      }
+
+      var url_wordsearch_hit = ip + "/Product/find/wordsearchproductshow/";
+      const wordsearchhit = await (await axios.post(url_wordsearch_hit, dataSearch)).data;
       this.setState({
         optionshit: wordsearchhit
       });
@@ -720,173 +728,173 @@ export default class Home extends Component {
   }
 
   render() {
-    // console.log(config, " ipServer");
+    // console.log(ipconfig, " ipServer");
     return (
       <Container fluid>
         <Spin spinning={this.state.statusButtonEdit} size="large">
-        <Row id="home">
-          <Col xs={1} md={1} xl={1} id="icon">
-            <BsFillGrid1X2Fill style={{ fontSize: '280%', color: '#DA213D' }} />
-          </Col>
-          <Col xs={5} md={5} xl={5} id="page-home">หน้าหลัก</Col>
-        </Row>
+          <Row id="home">
+            <Col xs={1} md={1} xl={1} id="icon">
+              <BsFillGrid1X2Fill style={{ fontSize: '280%', color: '#DA213D' }} />
+            </Col>
+            <Col xs={5} md={5} xl={5} id="page-home">หน้าหลัก</Col>
+          </Row>
 
-        <Row id="row2">
-          <Col xs={24} md={24} xl={24} id="visit-head">สินค้าที่ผู้คนสนใจ</Col>
-          <Col xs={24} md={24} xl={24} id="chart">
-            <Col>
-              <ReactApexChart options={this.state.options} series={this.state.series} type="bar" height={300} />
+          <Row id="row2">
+            <Col xs={24} md={24} xl={24} id="visit-head">สินค้าที่ผู้คนสนใจ</Col>
+            <Col xs={24} md={24} xl={24} id="chart">
+              <Col>
+                <ReactApexChart options={this.state.options} series={this.state.series} type="bar" height={300} />
+              </Col>
             </Col>
-          </Col>
-        </Row>
-        <Row id="statistic">
-          <Col md={24} xl={24} id="visit-head">จำนวนการเข้าชม</Col>
-          <Col md={11} xl={11} id="visit">
-            <Col md={24} xl={24} id="visit-member">
-              <Statistic id="visit-nummember1" title="สมาชิก" value={this.state.memberUser} loading={this.state.contactstatus} />
+          </Row>
+          <Row id="statistic">
+            <Col md={24} xl={24} id="visit-head">จำนวนการเข้าชม</Col>
+            <Col md={11} xl={11} id="visit">
+              <Col md={24} xl={24} id="visit-member">
+                <Statistic id="visit-nummember1" title="สมาชิก" value={this.state.memberUser} loading={this.state.contactstatus} />
+              </Col>
             </Col>
-          </Col>
-          <Col md={11} xl={11} id="visit1">
-            <Col md={24} xl={24} id="visit-user">
-              <Statistic id="visit-user1" title="ผู้ใช้ทั่วไป" value={this.state.endUser} loading={this.state.contactstatus} />
+            <Col md={11} xl={11} id="visit1">
+              <Col md={24} xl={24} id="visit-user">
+                <Statistic id="visit-user1" title="ผู้ใช้ทั่วไป" value={this.state.endUser} loading={this.state.contactstatus} />
+              </Col>
             </Col>
-          </Col>
-        </Row>
+          </Row>
 
-        <Row id="interest-product">
-          <Col md={24} xl={24}>
-            <Col xs={24} md={24} xl={24} id="interestedproduct">สินค้าใหม่</Col>
-            <Col xs={24} md={24} xl={24} id="input-search-product">
-              <AutoComplete
-                style={{ width: "20%" }}
-                options={this.state.optionsnew}
-                onChange={this.onChangeNew}
-                onSelect={this.onSelectNew}
-                onSearch={this.onSearchFildNew}
-                placeholder="เพิ่มสินค้าใหม่"
-                filterOption={(inputValue, option) =>
-                  option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-                }
-                disabled={this.state.searchnewstatus}
-              />
-              <Button id="btnadd-popularproduct" onClick={this.onSaveNew} disabled={this.state.searchnewstatus}>เพิ่มรายการ</Button>
+          <Row id="interest-product">
+            <Col md={24} xl={24}>
+              <Col xs={24} md={24} xl={24} id="interestedproduct">สินค้าใหม่</Col>
+              <Col xs={24} md={24} xl={24} id="input-search-product">
+                <AutoComplete
+                  style={{ width: "20%" }}
+                  options={this.state.optionsnew}
+                  onChange={this.onChangeNew}
+                  onSelect={this.onSelectNew}
+                  onSearch={this.onSearchFildNew}
+                  placeholder="เพิ่มสินค้าใหม่"
+                  filterOption={(inputValue, option) =>
+                    option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                  }
+                  disabled={this.state.searchnewstatus}
+                />
+                <Button id="btnadd-popularproduct" onClick={this.onSaveNew} disabled={this.state.searchnewstatus}>เพิ่มรายการ</Button>
+              </Col>
+              <Col xs={24} md={24} xl={24}>
+                <Table columns={this.interestproduct} dataSource={this.state.productnew} loading={this.state.productnewstatus} pagination={false} />
+              </Col>
             </Col>
+          </Row>
+
+          <Row id="interest-product">
+            <Col md={24} xl={24}>
+              <Col xs={24} md={24} xl={24} id="interestedproduct">สินค้าขายดี</Col>
+              <Col xs={24} md={24} xl={24} id="input-search-product">
+                <AutoComplete
+                  style={{ width: "20%" }}
+                  options={this.state.optionshit}
+                  onChange={this.onChangeHit}
+                  onSelect={this.onSelectHit}
+                  onSearch={this.onSearchFildHit}
+                  placeholder="เพิ่มสินค้าขายดี"
+                  filterOption={(inputValue, option) =>
+                    option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                  }
+                  disabled={this.state.searchhitstatus}
+                />
+                <Button id="btnadd-popularproduct" onClick={this.onSaveHit} disabled={this.state.searchhitstatus}>เพิ่มรายการ</Button>
+              </Col>
+              <Col xs={24} md={24} xl={24}>
+                <Table columns={this.bestseller} dataSource={this.state.producthit} loading={this.state.producthitstatus} pagination={false} />
+              </Col>
+            </Col>
+          </Row>
+
+          <Row id="row3">
+            <Col id="row3">ข้อความจากผู้ติดต่อ</Col>
             <Col xs={24} md={24} xl={24}>
-              <Table columns={this.interestproduct} dataSource={this.state.productnew} loading={this.state.productnewstatus} pagination={false} />
+              <Table columns={this.columnscontact} dataSource={this.state.contact} scroll={{ x: 1500 }} loading={this.state.contactstatus} onChange={onChange} />
             </Col>
-          </Col>
-        </Row>
+          </Row>
 
-        <Row id="interest-product">
-          <Col md={24} xl={24}>
-            <Col xs={24} md={24} xl={24} id="interestedproduct">สินค้าขายดี</Col>
-            <Col xs={24} md={24} xl={24} id="input-search-product">
-              <AutoComplete
-                style={{ width: "20%" }}
-                options={this.state.optionshit}
-                onChange={this.onChangeHit}
-                onSelect={this.onSelectHit}
-                onSearch={this.onSearchFildHit}
-                placeholder="เพิ่มสินค้าขายดี"
-                filterOption={(inputValue, option) =>
-                  option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-                }
-                disabled={this.state.searchhitstatus}
-              />
-              <Button id="btnadd-popularproduct" onClick={this.onSaveHit} disabled={this.state.searchhitstatus}>เพิ่มรายการ</Button>
-            </Col>
-            <Col xs={24} md={24} xl={24}>
-              <Table columns={this.bestseller} dataSource={this.state.producthit} loading={this.state.producthitstatus} pagination={false} />
-            </Col>
-          </Col>
-        </Row>
-
-        <Row id="row3">
-          <Col id="row3">ข้อความจากผู้ติดต่อ</Col>
-          <Col xs={24} md={24} xl={24}>
-            <Table columns={this.columnscontact} dataSource={this.state.contact} scroll={{ x: 1500 }} loading={this.state.contactstatus} onChange={onChange} />
-          </Col>
-        </Row>
-
-        <Modal
-          title="แก้ไขข้อความจากผู้ติดต่อ"
-          visible={this.state.isModalVisible}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
-          width={800}>
-          <Form id="form">
-            <Col md={24} xl={24} id="product-detail">รายละเอียดข้อมูลผู้ติดต่อ</Col>
-            <Row id="add-product">
-              <Col md={12} xl={12}>
-                <Row>
-                  <Col md={7} xl={7}>ชื่อผู้ติดต่อ :</Col>
-                  <Col md={12} xl={12}>{this.state.productContact?.name}</Col>
-                </Row>
-              </Col>
-              <Col md={12} xl={12}>
-                <Row>
-                  <Col md={6} xl={6}>เบอร์โทรศัพท์ :</Col>
-                  <Col md={12} xl={12}>{this.state.productContact?.phone}</Col>
-                </Row>
-              </Col>
-            </Row>
-            <Row id="add-product">
-              <Col md={12} xl={12}>
-                <Row>
-                  <Col md={7} xl={7}>Line Id :</Col>
-                  <Col md={12} xl={12}>{this.state.productContact?.line}</Col>
-                </Row>
-              </Col>
-              <Col md={12} xl={12}>
-                <Row>
-                  <Col md={6} xl={6}>email :</Col>
-                  <Col md={12} xl={12}>{this.state.productContact?.email}</Col>
-                </Row>
-              </Col>
-            </Row>
-            <Row id="add-product">
-              <Col md={12} xl={12}>
-                <Row>
-                  <Col md={7} xl={7}>เรื่อง :</Col>
-                  <Col md={12} xl={12}>{this.state.productContact?.type}</Col>
-                </Row>
-              </Col>
-              <Col md={12} xl={12}>
-                <Row>
-                  <Col md={6} xl={6}>ข้อความ :</Col>
-                  <Col md={12} xl={12}>{this.state.productContact?.msg}</Col>
-                </Row>
-              </Col>
-            </Row>
-            <Row id="add-product">
-              <Col md={12} xl={12}>
-                <Row>
-                  <Col md={7} xl={7}>จำนวนครั้งที่โทร :</Col>
-                  <Col md={12} xl={12}><InputNumber name="numCall" min={0} value={this.state.numCall} onChange={this.onChangeNumCall} /></Col>
-                </Row>
-              </Col>
-              <Col md={12} xl={12}>
-                <Row>
-                  <Col md={6} xl={6}>สถานะ :</Col>
-                  <Col md={12} xl={12}>
-                    <Select labelInValue value={{ value: ('' + this.state.acceptStatus) }} id="input" name="acceptStatus" onChange={this.onChangeAcceptStatus}>
-                      <Option value="A">เสร็จสิ้น</Option>
-                      <Option value="N">รอดำเนินการ</Option>
-                    </Select>
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
-            <Row id="add-product">
-              <Col md={24} xl={24}>
-                <Row>
-                  <Col md={3} xl={3}>โน๊ต :</Col>
-                  <Col md={18} xl={18}><TextArea id="input" name="remark" value={this.state.remark} onChange={this.onChangeFildProduct} /></Col>
-                </Row>
-              </Col>
-            </Row>
-          </Form>
-        </Modal>
+          <Modal
+            title="แก้ไขข้อความจากผู้ติดต่อ"
+            visible={this.state.isModalVisible}
+            onOk={this.handleOk}
+            onCancel={this.handleCancel}
+            width={800}>
+            <Form id="form">
+              <Col md={24} xl={24} id="product-detail">รายละเอียดข้อมูลผู้ติดต่อ</Col>
+              <Row id="add-product">
+                <Col md={12} xl={12}>
+                  <Row>
+                    <Col md={7} xl={7}>ชื่อผู้ติดต่อ :</Col>
+                    <Col md={12} xl={12}>{this.state.productContact?.name}</Col>
+                  </Row>
+                </Col>
+                <Col md={12} xl={12}>
+                  <Row>
+                    <Col md={6} xl={6}>เบอร์โทรศัพท์ :</Col>
+                    <Col md={12} xl={12}>{this.state.productContact?.phone}</Col>
+                  </Row>
+                </Col>
+              </Row>
+              <Row id="add-product">
+                <Col md={12} xl={12}>
+                  <Row>
+                    <Col md={7} xl={7}>Line Id :</Col>
+                    <Col md={12} xl={12}>{this.state.productContact?.line}</Col>
+                  </Row>
+                </Col>
+                <Col md={12} xl={12}>
+                  <Row>
+                    <Col md={6} xl={6}>email :</Col>
+                    <Col md={12} xl={12}>{this.state.productContact?.email}</Col>
+                  </Row>
+                </Col>
+              </Row>
+              <Row id="add-product">
+                <Col md={12} xl={12}>
+                  <Row>
+                    <Col md={7} xl={7}>เรื่อง :</Col>
+                    <Col md={12} xl={12}>{this.state.productContact?.type}</Col>
+                  </Row>
+                </Col>
+                <Col md={12} xl={12}>
+                  <Row>
+                    <Col md={6} xl={6}>ข้อความ :</Col>
+                    <Col md={12} xl={12}>{this.state.productContact?.msg}</Col>
+                  </Row>
+                </Col>
+              </Row>
+              <Row id="add-product">
+                <Col md={12} xl={12}>
+                  <Row>
+                    <Col md={7} xl={7}>จำนวนครั้งที่โทร :</Col>
+                    <Col md={12} xl={12}><InputNumber name="numCall" min={0} value={this.state.numCall} onChange={this.onChangeNumCall} /></Col>
+                  </Row>
+                </Col>
+                <Col md={12} xl={12}>
+                  <Row>
+                    <Col md={6} xl={6}>สถานะ :</Col>
+                    <Col md={12} xl={12}>
+                      <Select labelInValue value={{ value: ('' + this.state.acceptStatus) }} id="input" name="acceptStatus" onChange={this.onChangeAcceptStatus}>
+                        <Option value="A">เสร็จสิ้น</Option>
+                        <Option value="N">รอดำเนินการ</Option>
+                      </Select>
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+              <Row id="add-product">
+                <Col md={24} xl={24}>
+                  <Row>
+                    <Col md={3} xl={3}>โน๊ต :</Col>
+                    <Col md={18} xl={18}><TextArea id="input" name="remark" value={this.state.remark} onChange={this.onChangeFildProduct} /></Col>
+                  </Row>
+                </Col>
+              </Row>
+            </Form>
+          </Modal>
         </Spin>
       </Container>
     )
