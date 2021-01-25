@@ -12,7 +12,7 @@ import imgm from '../img/photocomingsoon.svg';
 import readXlsxFile from 'read-excel-file';
 import { JsonToCsv, useJsonToCsv } from 'react-json-csv';
 
-var ip = "http://128.199.198.10/API";
+var ip = "https://www.hitsthai.com/API";
 var uuid = "";
 var uuidMain = "";
 var uuidSave = "";
@@ -407,8 +407,6 @@ export default class Product extends Component {
             enduser: record.enduser,
         });
 
-        console.log(this.state.fileListMainEdit, " fileListMainEdit");
-        console.log(this.state.ImgMainEdit, " ImgMainEdit");
 
 
 
@@ -480,8 +478,6 @@ export default class Product extends Component {
     };
 
     async handEditProduct() {
-        console.log(this.state.ImgMainEdit, " this.state.ImgMainEdit");
-        console.log(this.state.ImgDetailEdit, " this.state.ImgDetailEdit");
 
         if ((this.state.ImgMainEdit.length !== 0) && (this.state.ImgMainEdit[0]?.flag !== "Removed")) {
             this.setState({ statusButtonEdit: true });
@@ -590,8 +586,6 @@ export default class Product extends Component {
     };
 
     async handleSaveProduct() {
-        console.log(this.state.ImgMainSave, " this.state.ImgMainEdit");
-        console.log(this.state.ImgDetailSave, " this.state.ImgDetailEdit");
 
         if ((this.state.ImgMainSave.length !== 0) && (this.state.ImgMainSave[0]?.flag !== "Removed")) {
             this.setState({ statusButtonEdit: true });
@@ -634,7 +628,6 @@ export default class Product extends Component {
 
             var url_create_product_price = ip + "/Product/create/admin/";
             const createproductprice = await (await axios.post(url_create_product_price, dataSave)).data;
-            console.log(createproductprice, " createproductprice");
             if (createproductprice) {
                 this.setState({ statusButtonEdit: false, productstatus: true });
                 swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
@@ -701,8 +694,7 @@ export default class Product extends Component {
         const productId = record.productId;
         const priceProductId = record.priceProductId;
         const codeId = record.codeId;
-        // console.log(productId, " productId");
-        // console.log(priceProductId, " priceProductId");
+
         var url_delete_product = ip + "/Product/delete/" + productId + "/" + priceProductId + "/" + codeId;
         const deleteproduct = await (await axios.delete(url_delete_product)).data;
         if (deleteproduct !== null) {
@@ -946,7 +938,7 @@ export default class Product extends Component {
         } else if (fileList.file.status === "removed") {
             imgMainSave.splice(0, 1);
         }
-        //console.log(this.state.ImgMainSave, " imgDetailSave");
+        
         this.setState({ fileListMainSave: fileList.fileList });
     };
 
@@ -1019,7 +1011,7 @@ export default class Product extends Component {
             var url_product = ip + "/Product/find/all/admin";
             var url_import_product = ip + "/Product/create/import/admin/";
             const importproduct = await (await axios.post(url_import_product, this.state.dataImportFile)).data;
-            console.log(importproduct, " importproduct")
+
             if (importproduct.length <= 0) {
                 this.setState({ statusButtonEdit: false, productstatus: true });
                 swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
@@ -1057,7 +1049,7 @@ export default class Product extends Component {
                     productstatus: false
                 });
                 swal("Warning!", "ข้อมูลบางสินค้าไม่สามารถ Import ข้อมูลได้ กรุณาลองใหม่", "warning").then((value) => {
-                    // console.log(importproduct, " importproduct");
+                    
                     const className = 'class-name-for-style',
                         filename = 'ProductImportError',
                         fields = {
@@ -1112,7 +1104,7 @@ export default class Product extends Component {
             }
         } else {
             swal("Warning!", "ไม่พบข้อมูลข้อมูลที่จะ Import", "warning").then((value) => {
-                //console.log(importproduct, " importproduct");
+
             });
         }
     }
@@ -1143,7 +1135,6 @@ export default class Product extends Component {
             });
         }
 
-        //console.log(this.state.ImgDetailSave, " imgDetailSave");
         this.setState({ fileListDetailSave: fileList.fileList });
     };
 
@@ -1183,8 +1174,6 @@ export default class Product extends Component {
             product: product,
             productstatus: false
         });
-
-        console.log(product, " product")
 
         var url_catalog = ip + "/Catalog/find/all";
         const catalog = await (await axios.get(url_catalog)).data;
@@ -1421,7 +1410,6 @@ export default class Product extends Component {
                 <div style={{ marginTop: 8, color: '#DA213D' }}>เพิ่มรูปภาพ</div>
             </div>
         );
-        console.log(this.state.ststusButtomFile, " ststusButtomFile");
         // const uploadButton1 = (
         //     <div>
         //         <PlusOutlined style={{ fontSize: "20px", color: '#DA213D' }} />
@@ -1454,7 +1442,7 @@ export default class Product extends Component {
                             </Upload>
                         </Col>
                         <Col md={4} xl={3} id="col">
-                            <a href="http://128.199.198.10/API/excel/TemplateProductImport.xlsx" rel="noopener noreferrer" download="TemplateProductImport.xlsx">
+                            <a href="https://www.hitsthai.com/API/excel/TemplateProductImport.xlsx" rel="noopener noreferrer" download="TemplateProductImport.xlsx">
                                 <Button id="button-addproduct-eximport">ตัวอย่างไฟล์รายการสินค้า</Button>
                             </a>
                         </Col>

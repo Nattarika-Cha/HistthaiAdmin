@@ -118,7 +118,7 @@
 
 #interest-product{
     margin-left: 3%;
-    margin-bottom: 3%;
+    margin-bottom: 2%;
     margin-right: 3%;
 }
 
@@ -133,8 +133,9 @@
 }
 
 #interestedproduct{
-    padding-bottom: 2%;
+    padding-left: 2%;
     font-size: larger;
+    margin-bottom: 1%;
 }
 
 #btnadd-popularproduct{

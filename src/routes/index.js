@@ -23,16 +23,16 @@ export default class Index extends Component {
 
     componentWillMount() {
         this.setState({
-            token: cookies.get('token', { path: '/' }),
-            user: cookies.get('user', { path: '/' }),
+            token: cookies.get('token_key', { path: '/Admin/' }),
+            user: cookies.get('user', { path: '/Admin/' }),
             statusUser: true
         });
     }
 
     componentDidMount() {
         this.setState({
-            token: cookies.get('token', { path: '/' }),
-            user: cookies.get('user', { path: '/' }),
+            token: cookies.get('token_key', { path: '/Admin/' }),
+            user: cookies.get('user', { path: '/Admin/' }),
             statusUser: true
         });
     }
@@ -44,14 +44,14 @@ export default class Index extends Component {
                     (this.state.statusUser) ?
                         (this.state.token !== undefined) ?
                             <>
-                                <Route exact path="/Home" component={Home} />
-                                <Route exact path="/Product" component={Product} />
-                                <Route exact path="/User" component={User} />
-                                <Route exact path="/Setting" component={Setting} />
-                                <Route exact path="/Logout" component={Logout} />
+                                <Route exact path="/Admin/Home" component={Home} />
+                                <Route exact path="/Admin/Product" component={Product} />
+                                <Route exact path="/Admin/User" component={User} />
+                                <Route exact path="/Admin/Setting" component={Setting} />
+                                <Route exact path="/Admin/Logout" component={Logout} />
                             </>
                             :
-                            <Route exact path="/Login" component={Login} />
+                            <Route exact path="/Admin/Login" component={Login} />
                         :
                         <></>
                 }

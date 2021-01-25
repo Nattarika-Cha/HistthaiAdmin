@@ -1,5 +1,7 @@
 {
   "name": "hitsthaiadmin",
+  "homepage": "https://www.hitsthai.com/Admin/",
+  "proxy": "https://www.hitsthai.com/API",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -60,6 +62,7 @@
   "devDependencies": {
     "@babel/core": "^7.12.10",
     "@babel/preset-env": "^7.12.11",
+    "json-loader": "^0.5.7",
     "react-alice-carousel": "^2.1.0"
   }
 }

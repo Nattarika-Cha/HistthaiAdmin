@@ -8,7 +8,7 @@ import Cookies from 'universal-cookie';
 
 const cookies = new Cookies();
 
-var ip = "http://128.199.198.10/API";
+var ip = "https://www.hitsthai.com/API";
 
 axios.interceptors.request.use(
     config => {
@@ -40,8 +40,8 @@ export default class Login extends Component {
 
     componentWillMount() {
         this.setState({
-            token: cookies.get('token', { path: '/' }),
-            user: cookies.get('user', { path: '/' })
+            token: cookies.get('token_key', { path: '/Admin/' }),
+            user: cookies.get('user', { path: '/Admin/' })
         });
     }
 
@@ -73,13 +73,13 @@ export default class Login extends Component {
                 img: data_login.img,
                 levelId: data_login.levelId
             }
-            // console.log(data_login, " user_data");
-            cookies.set('user', JSON.stringify(user_data), { path: '/' });
-            cookies.set('token', data_login.token, { path: '/' });
+            
+            cookies.set('user', JSON.stringify(user_data), { path: '/Admin/' });
+            cookies.set('token_key', data_login.token, { path: '/Admin/' });
             this.setState({
                 storedJwt: data_login.token
             });
-               window.location.replace('/Home', false);    
+               window.location.replace('/Admin/Home', false);    
         } else {
             swal("Error!", "Username หรือ Password ผิดพลาด", "error").then((value) => {
                 this.setState({

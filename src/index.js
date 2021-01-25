@@ -23,7 +23,7 @@ import { BrowserRouter } from 'react-router-dom'
 import './index.css';
 
 const AppWithRouter = () => (
-    <BrowserRouter>
+    <BrowserRouter basename="/Admin">
       <App />
     </BrowserRouter>
     
