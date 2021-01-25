@@ -1007,9 +1007,9 @@ export default class Setting extends Component {
                             </Col>
                         </Col>
                         <Col md={15} xl={15} id="col-level1">
-                            <Col md={24} xl={24} id="header-collevel">ประเภทรายการสินค้า</Col>
+                            <Col md={24} xl={24} id="header-collevel">หมวดหมู่สินค้า</Col>
                             <Col md={24} xl={24}>
-                                <Button id="button-addcatalog" onClick={this.showModalAddCatalog}>เพิ่มประเภทรายการสินค้า</Button>
+                                <Button id="button-addcatalog" onClick={this.showModalAddCatalog}>เพิ่มหมวดหมู่สินค้า</Button>
                             </Col>
                             <Col md={24} xl={24}>
                                 <Table
@@ -1037,7 +1037,7 @@ export default class Setting extends Component {
                         </Col>
                     </Row>
                     <Row id="change-imagehome">
-                        <Col md={24} xl={24}>ตั้งค่ารูปภาพหน้า Home</Col>
+                        <Col md={24} xl={24}>ตั้งค่ารูปภาพหน้าแรก</Col>
                         <Col md={24} xl={24}>
                             <Table
                                 columns={this.imghome}
@@ -1048,7 +1048,7 @@ export default class Setting extends Component {
                         </Col>
                     </Row>
                     <Row id="change-imagehome">
-                        <Col md={24} xl={24}>ตั้งค่ารูปภาพหน้า Product</Col>
+                        <Col md={24} xl={24}>ตั้งค่ารูปภาพหน้าสินค้า</Col>
                         <Col md={24} xl={24}>
                             <Button id="button-addcatalog" onClick={this.showModalAddImgProduct}>เพิ่มรูปภาพหน้า Product</Button>
                         </Col>
@@ -1100,7 +1100,7 @@ export default class Setting extends Component {
                     </Modal>
 
                     <Modal
-                        title="ประเภทสินค้า"
+                        title="เพิ่มหมวดหมู่สินค้า"
                         visible={this.state.isModalAddCatalogVisible}
                         onOk={this.handleSaveCatalog}
                         onCancel={this.handleAddCatalogCancel}
@@ -1109,7 +1109,7 @@ export default class Setting extends Component {
                             <Col md={24} xl={24} id="col-marginlevel">
                                 <Row>
                                     <Col md={6} xl={6}></Col>
-                                    <Col md={6} xl={6}>ชื่อประเภทสินค้า</Col>
+                                    <Col md={6} xl={6}>ชื่อหมวดหมู่สินค้า</Col>
                                     <Col md={6} xl={6}><Input id="input-level" name="catName" value={this.state.catName} onChange={this.onChangeFildCatalog} /></Col>
                                 </Row>
                             </Col>
@@ -1279,7 +1279,7 @@ export default class Setting extends Component {
                     </Modal>
 
                     <Modal
-                        title="แก้ไขรูปภาพหน้า Product"
+                        title="แก้ไขรูปภาพ"
                         visible={this.state.isModalVisibleImgProductEdit}
                         onOk={this.handleSaveImgProductEdit}
                         onCancel={this.handleCancelSaveImgProductEdit}
