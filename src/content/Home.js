@@ -63,6 +63,14 @@ export default class Home extends Component {
 
       series: [],
       options: {},
+
+      isModalVisibleITProduct: false,
+      itProduct: '',
+      hit: [],
+
+      isModalVisiblenewProduct: false,
+      newProduct: '',
+      newP:[],
     };
 
     this.interestproduct = [
@@ -318,6 +326,13 @@ export default class Home extends Component {
     this.onChangeAcceptStatus = this.onChangeAcceptStatus.bind(this);
     this.copyCodeToClipboard = this.copyCodeToClipboard.bind(this);
 
+    this.showModalITProduct = this.showModalITProduct.bind(this);
+    this.handleOkITProduct = this.handleOkITProduct.bind(this);
+    this.handleCancelITProduct = this.handleCancelITProduct.bind(this);
+
+    this.showModalnewProduct = this.showModalnewProduct.bind(this);
+    this.handleOknewProduct = this.handleOknewProduct.bind(this);
+    this.handleCancelnewProduct = this.handleCancelnewProduct.bind(this);
   }
 
   copyCodeToClipboard(record) {
@@ -470,6 +485,18 @@ export default class Home extends Component {
   };
 
   async componentDidMount() {
+    var url_new = ip + "/WordShow/find/New";
+    const newP = await (await axios.get(url_new)).data;
+    this.setState({
+      newP: newP,
+    });
+
+    var url_hit = ip + "/WordShow/find/Hit";
+    const hit = await (await axios.get(url_hit)).data;
+    this.setState({
+      hit: hit,
+    });
+
     var url_contact = ip + "/Contact/find/all";
     const contact = await (await axios.get(url_contact)).data;
     this.setState({
@@ -730,6 +757,75 @@ export default class Home extends Component {
     }
   }
 
+onChangeFildITProduct(e) {
+    this.setState({
+        [e.target.name]: e.target.value
+    })
+}
+showModalITProduct() {
+    this.setState({ isModalVisibleITProduct: true, itProduct: this.state.hit[0].wordShow });
+};
+async handleOkITProduct() {
+    const data = {
+      wordShow: this.state.itProduct,
+    };
+
+    var url_update_hit = ip + "/WordShow/update/Hit";
+    const updatehit = await (await axios.put(url_update_hit, data)).data;
+
+    if (updatehit) {
+        swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
+            this.setState({
+              isModalVisibleITProduct: false,
+            });
+        });
+
+        var url_hit = ip + "/WordShow/find/Hit";
+        const hit = await (await axios.get(url_hit)).data;
+        this.setState({
+            hit: hit,
+            memberStatus: false
+        });
+    } else {
+
+    }
+};
+handleCancelITProduct() {
+    this.setState({ isModalVisibleITProduct: false })
+}
+
+
+showModalnewProduct() {
+  this.setState({ isModalVisiblenewProduct: true, newProduct: this.state.newP[0]?.wordShow });
+};
+async handleOknewProduct() {
+  const data = {
+    wordShow: this.state.newProduct,
+  };
+
+  var url_update_new = ip + "/WordShow/update/New";
+  const updatenew = await (await axios.put(url_update_new, data)).data;
+
+  if (updatenew) {
+      swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
+          this.setState({
+            isModalVisiblenewProduct: false,
+          });
+      });
+      var url_new = ip + "/WordShow/find/New";
+      const newP = await (await axios.get(url_new)).data;
+        this.setState({
+            newP: newP,
+            memberStatus: false
+        });
+  } else {
+
+  }
+};
+handleCancelnewProduct() {
+  this.setState({ isModalVisiblenewProduct: false })
+}
+
   render() {
     return (
       <Container fluid>
@@ -765,7 +861,12 @@ export default class Home extends Component {
 
           <Row id="interest-product">
             <Col md={24} xl={24}>
-              <Col xs={24} md={24} xl={24} id="interestedproduct">สินค้าใหม่</Col>
+              <Row>
+                <Col xs={4} md={4} xl={4} id="interestedproduct" >{this.state.newP[0]?.wordShow}</Col>
+                <Col xs={12} md={12} xl={12} id="interestedproduct">
+                    <Button id="btnadd-popularproduct"  onClick={() => this.showModalnewProduct()}>แก้ไข</Button>
+                </Col>
+              </Row>
               <Col xs={24} md={24} xl={24} id="input-search-product">
                 <AutoComplete
                   style={{ width: "20%" }}
@@ -789,7 +890,12 @@ export default class Home extends Component {
 
           <Row id="interest-product">
             <Col md={24} xl={24}>
-              <Col xs={24} md={24} xl={24} id="interestedproduct">สินค้าขายดี</Col>
+              <Row>
+                <Col xs={6} md={6} xl={6} id="interestedproduct">{this.state.hit[0]?.wordShow}</Col>
+                <Col xs={12} md={12} xl={12} id="interestedproduct">
+                      <Button id="btnadd-popularproduct" onClick={() => this.showModalITProduct()}>แก้ไข</Button>
+                  </Col>
+              </Row>
               <Col xs={24} md={24} xl={24} id="input-search-product">
                 <AutoComplete
                   style={{ width: "20%" }}
@@ -895,6 +1001,39 @@ export default class Home extends Component {
                   </Row>
                 </Col>
               </Row>
+            </Form>
+          </Modal>
+
+          <Modal
+            title="แก้ไขหัวข้อ"
+            visible={this.state.isModalVisibleITProduct}
+            onOk={this.handleOkITProduct}
+            onCancel={this.handleCancelITProduct}
+            width={600}>
+            <Form>
+              <Col md={24} xl={24} id="col-marginlevel">
+                <Row>
+                  <Col md={6} xl={6}></Col>
+                  <Col md={4} xl={4}>หัวข้อ</Col>
+                  <Col md={6} xl={6}><Input id="input-level" name="itProduct" value={this.state.itProduct} onChange={this.onChangeFildProduct} /></Col>
+                </Row>
+              </Col>
+            </Form>
+          </Modal>
+          <Modal
+            title="แก้ไขหัวข้อ"
+            visible={this.state.isModalVisiblenewProduct}
+            onOk={this.handleOknewProduct}
+            onCancel={this.handleCancelnewProduct}
+            width={600}>
+            <Form>
+              <Col md={24} xl={24} id="col-marginlevel">
+                <Row>
+                  <Col md={6} xl={6}></Col>
+                  <Col md={4} xl={4}>หัวข้อ</Col>
+                  <Col md={6} xl={6}><Input id="input-level" name="newProduct" value={this.state.newProduct} onChange={this.onChangeFildProduct} /></Col>
+                </Row>
+              </Col>
             </Form>
           </Modal>
         </Spin>
