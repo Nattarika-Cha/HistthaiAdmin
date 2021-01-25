@@ -175,3 +175,10 @@
     font-weight: 500;
     font-size: large;
 }
+
+#img-size{
+    color: #DA213D;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+}

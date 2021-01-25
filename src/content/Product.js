@@ -1620,6 +1620,7 @@ export default class Product extends Component {
                             </Row>
 
                             <Row id="header-img">รูปภาพหลัก</Row>
+                            <Row id="img-size">*รูปภาพขนาด 350px * 350px</Row>
                             <Row id="add-img">
                                 <Upload
                                     action={ip + "/UserProfile/UploadImg"}
@@ -1640,6 +1641,7 @@ export default class Product extends Component {
                                 </Modal>
                             </Row>
                             <Row id="header-img">รูปภาพรอง</Row>
+                            <Row id="img-size">*รูปภาพขนาด 350px * 350px</Row>
                             <Row id="add-img">
                                 <Upload
                                     action={ip + "/UserProfile/UploadImg"}
@@ -1823,6 +1825,7 @@ export default class Product extends Component {
                             </Row>
 
                             <Row id="header-img">รูปภาพหลัก</Row>
+                            <Row id="img-size">*รูปภาพขนาด 350px * 350px</Row>
                             <Row id="add-img">
                                 <Upload
                                     action={ip + "/UserProfile/UploadImg"}
@@ -1843,6 +1846,7 @@ export default class Product extends Component {
                                 </Modal>
                             </Row>
                             <Row id="header-img">รูปภาพรอง</Row>
+                            <Row id="img-size">*รูปภาพขนาด 350px * 350px</Row>
                             <Row id="add-img">
                                 <Upload
                                     action={ip + "/UserProfile/UploadImg"}
