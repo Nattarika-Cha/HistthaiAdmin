@@ -38,6 +38,7 @@ export default class Index extends Component {
     }
 
     render() {
+        console.log(this.state.user, " user")
         return (
             <Switch>
                 {
@@ -45,7 +46,9 @@ export default class Index extends Component {
                         (this.state.token !== undefined) ?
                             <>
                                 <Route exact path="/Admin/Home" component={Home} />
-                                <Route exact path="/Admin/Product" component={Product} />
+                                {
+                                    (this.state.user?.userRoleId === 1) ? <Route exact path="/Admin/Product" component={Product} /> : <></>
+                                }            
                                 <Route exact path="/Admin/User" component={User} />
                                 <Route exact path="/Admin/Setting" component={Setting} />
                                 <Route exact path="/Admin/Logout" component={Logout} />

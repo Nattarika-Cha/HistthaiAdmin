@@ -72,7 +72,8 @@ export default class Login extends Component {
                 username: data_login.user,
                 name: data_login.name,
                 img: data_login.img,
-                levelId: data_login.levelId
+                levelId: data_login.levelId,
+                userRoleId: data_login.userRoleId
             }
             
             cookies.set('user', JSON.stringify(user_data), { path: '/Admin/' });
