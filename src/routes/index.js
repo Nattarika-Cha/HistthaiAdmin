@@ -38,7 +38,6 @@ export default class Index extends Component {
     }
 
     render() {
-        console.log(this.state.user.userRoleId , " user")
         return (
             <Switch>
                 {

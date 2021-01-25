@@ -36,7 +36,6 @@ export default class MenuAdmin extends Component {
     }
 
     render() {
-        console.log(this.state.user.userRoleId , " user")
         return (
             <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
                 <Menu.Item key="1" icon={<BsFillGrid1X2Fill />}><NavLink to="/Admin/Home">หน้าหลัก</NavLink></Menu.Item>
