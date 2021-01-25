@@ -5,10 +5,11 @@ import '../css/Login.css';
 import axios from 'axios';
 import swal from 'sweetalert';
 import Cookies from 'universal-cookie';
+import { config } from '../config/config';
 
 const cookies = new Cookies();
 
-var ip = "https://www.hitsthai.com/API";
+var ip = config.ipServer;
 
 axios.interceptors.request.use(
     config => {

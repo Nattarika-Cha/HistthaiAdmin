@@ -8,8 +8,9 @@ import swal from 'sweetalert';
 import Highlighter from 'react-highlight-words';
 import moment from 'moment';
 import imgm from '../img/photocomingsoon.svg';
+import { config } from '../config/config';
 
-var ip = "https://www.hitsthai.com/API";
+var ip = config.ipServer;
 
 const { Option } = Select;
 
@@ -147,7 +148,8 @@ export default class Setting extends Component {
                 key: 'x',
                 render: (record) =>
                     <>
-                        {(record.pointState === "1") ? "+ " + record.point : "- " + record.point}
+                        {/* {(record.pointState === "1") ? "+ " + record.point : "- " + record.point} */}
+                        {record.point}
                     </>
             },
             {
@@ -1001,7 +1003,8 @@ export default class Setting extends Component {
                                     columns={this.member}
                                     dataSource={this.state.member}
                                     loading={this.state.memberStatus}
-                                    pagination={false} />
+                                    pagination={false} 
+                                    showHeader={false}/>
                             </Col>
                             <Col id="col-editlevel" md={24} xl={24}>
                                 <Button id="edit-level" onClick={() => this.showModal()}>แก้ไข</Button>

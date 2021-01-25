@@ -11,13 +11,13 @@ import { DeleteTwoTone, EditTwoTone, CopyTwoTone } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
 
-// import { config } from '../config/config';
+import { config } from '../config/config';
 
 const { Option } = Select;
 const { TextArea } = Input;
 
 var ip_web = "https://www.hitsthai.com";
-var ip = "https://www.hitsthai.com/API";
+var ip = config.ipServer;
 // var ip_img_profile = "https://www.hitsthai.com/API/profile/";
 
 function onChange(pagination, filters, sorter, extra) {
@@ -227,7 +227,7 @@ export default class Home extends Component {
         dataIndex: 'numCall',
         key: 'numCall',
         width: 160,
-        defaultSortOrder: 'descend',
+        // defaultSortOrder: 'descend',
         sorter: {
           compare: (a, b) => a.numCall - b.numCall,
         },
@@ -863,7 +863,7 @@ handleCancelnewProduct() {
           <Row id="interest-product">
             <Col md={24} xl={24}>
               <Row>
-                <Col xs={4} md={4} xl={4} id="interestedproduct" >{this.state.newP[0]?.wordShow}</Col>
+                <Col xs={5} md={5} xl={5} id="interestedproduct" >{this.state.newP[0]?.wordShow}</Col>
                 <Col xs={12} md={12} xl={12} id="interestedproduct">
                     <Button id="btnadd-popularproduct"  onClick={() => this.showModalnewProduct()}>แก้ไข</Button>
                 </Col>
@@ -892,7 +892,7 @@ handleCancelnewProduct() {
           <Row id="interest-product">
             <Col md={24} xl={24}>
               <Row>
-                <Col xs={6} md={6} xl={6} id="interestedproduct">{this.state.hit[0]?.wordShow}</Col>
+                <Col xs={5} md={5} xl={5} id="interestedproduct">{this.state.hit[0]?.wordShow}</Col>
                 <Col xs={12} md={12} xl={12} id="interestedproduct">
                       <Button id="btnadd-popularproduct" onClick={() => this.showModalITProduct()}>แก้ไข</Button>
                   </Col>

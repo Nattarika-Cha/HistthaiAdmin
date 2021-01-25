@@ -11,8 +11,9 @@ import Highlighter from 'react-highlight-words';
 import imgm from '../img/photocomingsoon.svg';
 import readXlsxFile from 'read-excel-file';
 import { JsonToCsv, useJsonToCsv } from 'react-json-csv';
+import { config } from '../config/config';
 
-var ip = "https://www.hitsthai.com/API";
+var ip = config.ipServer;
 var uuid = "";
 var uuidMain = "";
 var uuidSave = "";

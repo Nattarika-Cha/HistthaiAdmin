@@ -9,11 +9,12 @@ import axios from 'axios';
 import swal from 'sweetalert';
 import moment from 'moment';
 import '../css/User.css';
+import { config } from '../config/config';
 
 const { Option } = Select;
 
 // var ip = "https://www.hitsthai.com/API";
-var ip = "http://localhost:5000";
+var ip = config.ipServer;
 var ip_img_profile = "https://www.hitsthai.com/API/profile/";
 // const data = [
 //     {
@@ -236,43 +237,53 @@ export default class User extends Component {
 
     async handleOk() {
         this.setState({ statusButtonEdit: true });
-        const data = {
-            memberId: this.state.memberId,
-            levelId: this.state.levelId,
-            userCode: this.state.userCode,
-        };
+        console.log(this.state.levelId, " this.state.levelId")
+        if (this.state.levelId > 0) {
+            const data = {
+                memberId: this.state.memberId,
+                levelId: this.state.levelId,
+                userCode: this.state.userCode,
+            };
 
-        var url_update_member_level = ip + "/UserProfile/updatememberlevel/" + this.state.userProfileId;
-        const updatememberlevel = await (await axios.put(url_update_member_level, data)).data;
+            var url_update_member_level = ip + "/UserProfile/updatememberlevel/" + this.state.userProfileId;
+            const updatememberlevel = await (await axios.put(url_update_member_level, data)).data;
 
-        if (updatememberlevel !== null) {
+            if (updatememberlevel !== null) {
 
-            if (updatememberlevel[0] > 0) {
-                this.setState({ statusButtonEdit: false, userstatus: true });
-                swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
-                    this.setState({
-                        isModalVisible: false
+                if (updatememberlevel[0] > 0) {
+                    this.setState({ statusButtonEdit: false, userstatus: true });
+                    swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
+                        this.setState({
+                            isModalVisible: false
+                        });
                     });
-                });
 
-                var url_user = ip + "/UserProfile/find/all/admin";
-                const user = await (await axios.get(url_user)).data;
-                this.setState({
-                    user: user,
-                    userstatus: false
-                });
+                    var url_user = ip + "/UserProfile/find/all/admin";
+                    const user = await (await axios.get(url_user)).data;
+                    this.setState({
+                        user: user,
+                        userstatus: false
+                    });
+                } else {
+                    this.setState({ statusButtonEdit: false, userstatus: false, isModalVisible: false });
+                    // swal("Warning!", "บันทึกข้อมูลไม่สำเร็จ", "success").then((value) => {
+                    // });
+                }
             } else {
-                this.setState({ statusButtonEdit: false, userstatus: false, isModalVisible: false });
-                // swal("Warning!", "บันทึกข้อมูลไม่สำเร็จ", "success").then((value) => {
-                // });
+                this.setState({ statusButtonEdit: false });
+                swal("Warning!", "รหัสสมาชิกซ้ำ", "warning").then((value) => {
+                    // this.setState({
+                    //     isModalVisible: false
+                    // });
+                });
             }
-        } else {
+        }else {
             this.setState({ statusButtonEdit: false });
-            swal("Warning!", "รหัสสมาชิกซ้ำ", "warning").then((value) => {
-                // this.setState({
-                //     isModalVisible: false
-                // });
-            });
+                swal("Warning!", "กรุณาเลือก Level สมาชิก", "warning").then((value) => {
+                    // this.setState({
+                    //     isModalVisible: false
+                    // });
+                });
         }
     };
 
@@ -297,8 +308,10 @@ export default class User extends Component {
     async handleChangeMemberIdEdit(value) {
         var url_level = ip + "/Level/find/memberId/" + value.value;
         const level = await (await axios.get(url_level)).data;
+        console.log(level, " level");
         this.setState({
             memberId: value.value,
+            levelId: 0,
             level: level
         });
     }
