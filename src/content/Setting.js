@@ -1042,6 +1042,7 @@ export default class Setting extends Component {
                     </Row>
                     <Row id="change-imagehome">
                         <Col md={24} xl={24}>ตั้งค่ารูปภาพหน้าแรก</Col>
+                        <Col md={24} xl={24} id="img-sizehome">***รูปภาพขนาด 752px * 235px</Col>
                         <Col md={24} xl={24}>
                             <Table
                                 columns={this.imghome}
@@ -1053,6 +1054,7 @@ export default class Setting extends Component {
                     </Row>
                     <Row id="change-imagehome">
                         <Col md={24} xl={24}>ตั้งค่ารูปภาพหน้าสินค้า</Col>
+                        <Col md={24} xl={24} id="img-sizehome">***รูปภาพขนาด 1423px * 450px</Col>
                         <Col md={24} xl={24}>
                             <Button id="button-addcatalog" onClick={this.showModalAddImgProduct}>เพิ่มรูปภาพหน้า Product</Button>
                         </Col>
