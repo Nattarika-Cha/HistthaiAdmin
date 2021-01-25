@@ -111,3 +111,8 @@
     border-radius: 4px;
     box-shadow: 0.5px 0.5px 0.5px 0.5px rgba(153, 151, 151, 0.2);
 }
+
+#img-sizehome{
+    color: #DA213D;
+    font-size: 14px;
+}
