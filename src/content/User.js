@@ -12,7 +12,8 @@ import '../css/User.css';
 
 const { Option } = Select;
 
-var ip = "https://www.hitsthai.com/API";
+// var ip = "https://www.hitsthai.com/API";
+var ip = "http://localhost:5000";
 var ip_img_profile = "https://www.hitsthai.com/API/profile/";
 // const data = [
 //     {
@@ -105,9 +106,9 @@ export default class User extends Component {
                     ellipsis: true,
                     width: 120,
                     render: render =>
-                    <>
-                        <div>{moment(render).format('L')}</div>
-                    </>
+                        <>
+                            <div>{moment(render).format('L')}</div>
+                        </>
                 },
                 {
                     title: '',
@@ -244,22 +245,34 @@ export default class User extends Component {
         var url_update_member_level = ip + "/UserProfile/updatememberlevel/" + this.state.userProfileId;
         const updatememberlevel = await (await axios.put(url_update_member_level, data)).data;
 
-        if (updatememberlevel[0] > 0) {
-            this.setState({ statusButtonEdit: false, userstatus: true });
-            swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
-                this.setState({
-                    isModalVisible: false
+        if (updatememberlevel !== null) {
+
+            if (updatememberlevel[0] > 0) {
+                this.setState({ statusButtonEdit: false, userstatus: true });
+                swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
+                    this.setState({
+                        isModalVisible: false
+                    });
                 });
-            });
 
-            var url_user = ip + "/UserProfile/find/all/admin";
-            const user = await (await axios.get(url_user)).data;
-            this.setState({
-                user: user,
-                userstatus: false
-            });
+                var url_user = ip + "/UserProfile/find/all/admin";
+                const user = await (await axios.get(url_user)).data;
+                this.setState({
+                    user: user,
+                    userstatus: false
+                });
+            } else {
+                this.setState({ statusButtonEdit: false, userstatus: false, isModalVisible: false });
+                // swal("Warning!", "บันทึกข้อมูลไม่สำเร็จ", "success").then((value) => {
+                // });
+            }
         } else {
-
+            this.setState({ statusButtonEdit: false });
+            swal("Warning!", "รหัสสมาชิกซ้ำ", "warning").then((value) => {
+                // this.setState({
+                //     isModalVisible: false
+                // });
+            });
         }
     };
 
@@ -368,9 +381,9 @@ export default class User extends Component {
                     ellipsis: true,
                     width: 120,
                     render: render =>
-                    <>
-                        <div>{moment(render).format('L')}</div>
-                    </>
+                        <>
+                            <div>{moment(render).format('L')}</div>
+                        </>
                 },
                 {
                     title: '',

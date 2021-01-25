@@ -11,7 +11,7 @@ import { DeleteTwoTone, EditTwoTone, CopyTwoTone } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
 
-// import ipconfig from '../config/ipconfig';
+// import { config } from '../config/config';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -612,7 +612,7 @@ export default class Home extends Component {
 
       var url_create_prouct_new = ip + "/ProductShow/create/";
       const createproductnew = await (await axios.post(url_create_prouct_new, data)).data;
-      if(createproductnew) {
+      if (createproductnew) {
 
       }
 
@@ -640,8 +640,8 @@ export default class Home extends Component {
 
       var url_create_prouct_hit = ip + "/ProductShow/create/";
       const createproducthit = await (await axios.post(url_create_prouct_hit, data)).data;
-      if(createproducthit) {
-        
+      if (createproducthit) {
+
       }
 
       var url_product_hit = ip + "/ProductShow/find/hit";
@@ -731,6 +731,7 @@ export default class Home extends Component {
   }
 
   render() {
+    // console.log(config.ipServer, " config")
     return (
       <Container fluid>
         <Spin spinning={this.state.statusButtonEdit} size="large">
