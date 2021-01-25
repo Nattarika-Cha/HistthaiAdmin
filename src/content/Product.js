@@ -480,7 +480,7 @@ export default class Product extends Component {
 
     async handEditProduct() {
 
-        if ((this.state.ImgMainEdit.length !== 0) && (this.state.ImgMainEdit[0]?.flag !== "Removed")) {
+        // if ((this.state.ImgMainEdit.length !== 0) && (this.state.ImgMainEdit[0]?.flag !== "Removed")) {
             this.setState({ statusButtonEdit: true });
             var dataSave = {
                 productId: this.state.productId,
@@ -580,15 +580,15 @@ export default class Product extends Component {
                 swal("Warning!", "บันทึกข้อมูลไม่สำเร็จ", "warning").then((value) => {
                 });
             }
-        } else {
-            swal("Warning!", "กรุณาเลือกรูปภาพหลัก", "warning").then((value) => {
-            });
-        }
+        // } else {
+        //     swal("Warning!", "กรุณาเลือกรูปภาพหลัก", "warning").then((value) => {
+        //     });
+        // }
     };
 
     async handleSaveProduct() {
 
-        if ((this.state.ImgMainSave.length !== 0) && (this.state.ImgMainSave[0]?.flag !== "Removed")) {
+        // if ((this.state.ImgMainSave.length !== 0) && (this.state.ImgMainSave[0]?.flag !== "Removed")) {
             this.setState({ statusButtonEdit: true });
             var dataSave = {
                 barCode: this.state.barCodeSave,
@@ -684,10 +684,10 @@ export default class Product extends Component {
                 swal("Warning!", "บันทึกข้อมูลไม่สำเร็จ", "warning").then((value) => {
                 });
             }
-        } else {
-            swal("Warning!", "กรุณาเลือกรูปภาพหลัก", "warning").then((value) => {
-            });
-        }
+        // } else {
+        //     swal("Warning!", "กรุณาเลือกรูปภาพหลัก", "warning").then((value) => {
+        //     });
+        // }
     };
 
     async handleDeleteProduct(record) {
