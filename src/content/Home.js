@@ -7,18 +7,19 @@ import ReactApexChart from "react-apexcharts";
 import axios from 'axios';
 import swal from 'sweetalert';
 import moment from 'moment';
+import Cookies from 'universal-cookie';
 import { DeleteTwoTone, EditTwoTone, CopyTwoTone } from '@ant-design/icons';
 import Highlighter from 'react-highlight-words';
 import { SearchOutlined } from '@ant-design/icons';
 
 import { config } from '../config/config';
 
+const cookies = new Cookies();
 const { Option } = Select;
 const { TextArea } = Input;
 
 var ip_web = "https://www.hitsthai.com";
 var ip = config.ipServer;
-// var ip_img_profile = "https://www.hitsthai.com/API/profile/";
 
 function onChange(pagination, filters, sorter, extra) {
   console.log('params', pagination, filters, sorter, extra);
@@ -70,7 +71,7 @@ export default class Home extends Component {
 
       isModalVisiblenewProduct: false,
       newProduct: '',
-      newP:[],
+      newP: [],
     };
 
     this.interestproduct = [
@@ -335,6 +336,13 @@ export default class Home extends Component {
     this.handleCancelnewProduct = this.handleCancelnewProduct.bind(this);
   }
 
+  componentWillMount() {
+    this.setState({
+      token: cookies.get('token_key', { path: '/Admin/' }),
+      user: cookies.get('user', { path: '/Admin/' })
+    });
+  }
+
   copyCodeToClipboard(record) {
     var el = ip_web + "/FormRegister/" + record.keyRegister;
     navigator.clipboard.writeText(el);
@@ -443,36 +451,34 @@ export default class Home extends Component {
     };
 
     var url_update_contact = ip + "/Contact/update/" + this.state.productContact?.contactId;
-    const updatecontact = await (await axios.put(url_update_contact, data)).data;
-    if (updatecontact[0] > 0) {
-      this.setState({ statusButtonEdit: false, contactstatus: true });
-      swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
-        // const contact = [...this.state.contact];
-        // contact.forEach((contact, index) => {
-        //   if (contact.contactId === this.state.productContact?.contactId) {
-        //     contact.acceptStatus = this.state.acceptStatus;
-        //     contact.numCall = this.state.numCall;
-        //     contact.remark = this.state.remark;
-        //   }
-        // });
-        // this.setState({
-        //   contact: contact,
-        //   isModalVisible: false
-        // });
-      });
-      var url_contact = ip + "/Contact/find/all";
-      const contact = await (await axios.get(url_contact)).data;
-      this.setState({
-        contact: contact,
-        contactstatus: false,
-        isModalVisible: false
+    const updatecontact = await (await axios.put(url_update_contact, data, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+    if ((updatecontact?.statusCode === 500) || (updatecontact?.statusCode === 400)) {
+      swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+        this.setState({
+          token: cookies.remove('token_key', { path: '/Admin/' }),
+          user: cookies.remove('user', { path: '/Admin/' })
+        });
+        window.location.replace('/Admin/Login', false);
       });
     } else {
-      this.setState({ statusButtonEdit: false });
-      swal("Warning!", "บันทึกข้อมูลไม่สำเร็จ", "warning").then((value) => {
-      });
-    }
-  };
+      if (updatecontact[0] > 0) {
+        this.setState({ statusButtonEdit: false, contactstatus: true });
+        swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
+        });
+        var url_contact = ip + "/Contact/find/all";
+        const contact = await (await axios.get(url_contact)).data;
+        this.setState({
+          contact: contact,
+          contactstatus: false,
+          isModalVisible: false
+        });
+      } else {
+        this.setState({ statusButtonEdit: false });
+        swal("Warning!", "บันทึกข้อมูลไม่สำเร็จ", "warning").then((value) => {
+        });
+      }
+    };
+  }
 
   handleCancel() {
     this.setState({
@@ -485,83 +491,151 @@ export default class Home extends Component {
   };
 
   async componentDidMount() {
-    var url_new = ip + "/WordShow/find/New";
-    const newP = await (await axios.get(url_new)).data;
-    this.setState({
-      newP: newP,
-    });
+    var url_new = ip + "/WordShow/find/Admin/New";
+    const newP = await (await axios.get(url_new, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+    if ((newP?.statusCode === 500) || (newP?.statusCode === 400)) {
+      swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+        this.setState({
+          token: cookies.remove('token_key', { path: '/Admin/' }),
+          user: cookies.remove('user', { path: '/Admin/' })
+        });
+        window.location.replace('/Admin/Login', false);
+      });
+    } else {
+      this.setState({
+        newP: newP,
+      });
+    }
 
-    var url_hit = ip + "/WordShow/find/Hit";
-    const hit = await (await axios.get(url_hit)).data;
-    this.setState({
-      hit: hit,
-    });
+    var url_hit = ip + "/WordShow/find/Admin/Hit";
+    const hit = await (await axios.get(url_hit, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+    if ((hit?.statusCode === 500) || (hit?.statusCode === 400)) {
+      swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+        this.setState({
+          token: cookies.remove('token_key', { path: '/Admin/' }),
+          user: cookies.remove('user', { path: '/Admin/' })
+        });
+        window.location.replace('/Admin/Login', false);
+      });
+    } else {
+      this.setState({
+        hit: hit,
+      });
+    }
 
     var url_contact = ip + "/Contact/find/all";
-    const contact = await (await axios.get(url_contact)).data;
-    this.setState({
-      contact: contact,
-      contactstatus: false
-    });
+    const contact = await (await axios.get(url_contact, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+    if ((contact?.statusCode === 500) || (contact?.statusCode === 400)) {
+      swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+        this.setState({
+          token: cookies.remove('token_key', { path: '/Admin/' }),
+          user: cookies.remove('user', { path: '/Admin/' })
+        });
+        window.location.replace('/Admin/Login', false);
+      });
+    } else {
+      this.setState({
+        contact: contact,
+        contactstatus: false
+      });
+    }
 
     var url_product_hit = ip + "/ProductShow/find/hit";
-    const producthit = await (await axios.get(url_product_hit)).data;
-    this.setState({
-      producthit: producthit,
-      producthitstatus: false,
-      searchhitstatus: (producthit.length >= 6) ? true : false
-    });
+    const producthit = await (await axios.get(url_product_hit, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+    if ((producthit?.statusCode === 500) || (producthit?.statusCode === 400)) {
+      swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+        this.setState({
+          token: cookies.remove('token_key', { path: '/Admin/' }),
+          user: cookies.remove('user', { path: '/Admin/' })
+        });
+        window.location.replace('/Admin/Login', false);
+      });
+    } else {
+      this.setState({
+        producthit: producthit,
+        producthitstatus: false,
+        searchhitstatus: (producthit.length >= 6) ? true : false
+      });
+    }
 
     var url_product_new = ip + "/ProductShow/find/new";
-    const productnew = await (await axios.get(url_product_new)).data;
-    this.setState({
-      productnew: productnew,
-      productnewstatus: false,
-      searchnewstatus: (productnew.length >= 6) ? true : false
-    });
+    const productnew = await (await axios.get(url_product_new, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+    if ((productnew?.statusCode === 500) || (productnew?.statusCode === 400)) {
+      swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+        this.setState({
+          token: cookies.remove('token_key', { path: '/Admin/' }),
+          user: cookies.remove('user', { path: '/Admin/' })
+        });
+        window.location.replace('/Admin/Login', false);
+      });
+    } else {
+      this.setState({
+        productnew: productnew,
+        productnewstatus: false,
+        searchnewstatus: (productnew.length >= 6) ? true : false
+      });
+    }
 
     var url_Statistic_User = ip + "/StatisticsUser/find/all";
-    const memberUser = await (await axios.get(url_Statistic_User)).data;
-
-    this.setState({
-      memberUser: memberUser?.memberUser,
-      endUser: memberUser?.endUser,
-      StatisticUserstatus: false,
-    });
+    const memberUser = await (await axios.get(url_Statistic_User, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+    if ((memberUser?.statusCode === 500) || (memberUser?.statusCode === 400)) {
+      swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+        this.setState({
+          token: cookies.remove('token_key', { path: '/Admin/' }),
+          user: cookies.remove('user', { path: '/Admin/' })
+        });
+        window.location.replace('/Admin/Login', false);
+      });
+    } else {
+      this.setState({
+        memberUser: memberUser?.memberUser,
+        endUser: memberUser?.endUser,
+        StatisticUserstatus: false,
+      });
+    }
 
     var url_Graph = ip + "/Product/find/view";
-    const graph = await (await axios.get(url_Graph)).data;
+    const graph = await (await axios.get(url_Graph, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+    if ((graph?.statusCode === 500) || (graph?.statusCode === 400)) {
+      swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+        this.setState({
+          token: cookies.remove('token_key', { path: '/Admin/' }),
+          user: cookies.remove('user', { path: '/Admin/' })
+        });
+        window.location.replace('/Admin/Login', false);
+      });
+    } else {
+      var data = [];
+      var label = [];
 
-    var data = [];
-    var label = [];
-
-    await graph.forEach(async (Graph, index) => {
-      data.push(Graph.view);
-      label.push(Graph.name);
-    });
-    this.setState({
-      series: [{ data }],
-      options: {
-        chart: {
-          type: 'bar',
-          height: 350
+      await graph.forEach(async (Graph, index) => {
+        data.push(Graph.view);
+        label.push(Graph.name);
+      });
+      this.setState({
+        series: [{ data }],
+        options: {
+          chart: {
+            type: 'bar',
+            height: 350
+          },
+          title: {
+            text: 'สถิติการเข้าชม' + moment().format('LL')
+          },
+          plotOptions: {
+            bar: {
+              horizontal: true,
+            }
+          },
+          dataLabels: {
+            enabled: false
+          },
+          xaxis: {
+            categories: label,
+          },
         },
-        title: {
-          text: 'สถิติการเข้าชม' + moment().format('LL')
-        },
-        plotOptions: {
-          bar: {
-            horizontal: true,
-          }
-        },
-        dataLabels: {
-          enabled: false
-        },
-        xaxis: {
-          categories: label,
-        },
-      },
-    });
+      });
+    }
   }
 
   async onSearchFildNew(value) {
@@ -569,7 +643,7 @@ export default class Home extends Component {
       const dataSearch = {
         search: value
       }
-
+      // Not Authorization ฺBecause Send More 
       var url_wordsearch_new = ip + "/Product/find/wordsearchproductshow/";
       const wordsearchnew = await (await axios.post(url_wordsearch_new, dataSearch)).data;
       this.setState({
@@ -587,7 +661,7 @@ export default class Home extends Component {
       const dataSearch = {
         search: value
       }
-
+      // Not Authorization ฺBecause Send More
       var url_wordsearch_hit = ip + "/Product/find/wordsearchproductshow/";
       const wordsearchhit = await (await axios.post(url_wordsearch_hit, dataSearch)).data;
       this.setState({
@@ -638,17 +712,37 @@ export default class Home extends Component {
       }
 
       var url_create_prouct_new = ip + "/ProductShow/create/";
-      const createproductnew = await (await axios.post(url_create_prouct_new, data)).data;
-      if (createproductnew) {
+      const createproductnew = await (await axios.post(url_create_prouct_new, data, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+      if ((createproductnew?.statusCode === 500) || (createproductnew?.statusCode === 400)) {
+        swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+          this.setState({
+            token: cookies.remove('token_key', { path: '/Admin/' }),
+            user: cookies.remove('user', { path: '/Admin/' })
+          });
+          window.location.replace('/Admin/Login', false);
+        });
+      } else {
+        if (createproductnew) {
 
+        }
       }
 
       var url_product_new = ip + "/ProductShow/find/new";
-      const productnew = await (await axios.get(url_product_new)).data;
-      this.setState({
-        productnew: productnew,
-        searchnewstatus: (productnew.length >= 6) ? true : false
-      });
+      const productnew = await (await axios.get(url_product_new, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+      if ((productnew?.statusCode === 500) || (productnew?.statusCode === 400)) {
+        swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+          this.setState({
+            token: cookies.remove('token_key', { path: '/Admin/' }),
+            user: cookies.remove('user', { path: '/Admin/' })
+          });
+          window.location.replace('/Admin/Login', false);
+        });
+      } else {
+        this.setState({
+          productnew: productnew,
+          searchnewstatus: (productnew.length >= 6) ? true : false
+        });
+      }
     } else {
       swal("Warning!", "กรุณาเลือกสินค้า", "warning").then((value) => {
       });
@@ -666,21 +760,39 @@ export default class Home extends Component {
       }
 
       var url_create_prouct_hit = ip + "/ProductShow/create/";
-      const createproducthit = await (await axios.post(url_create_prouct_hit, data)).data;
-      if (createproducthit) {
-
+      const createproducthit = await (await axios.post(url_create_prouct_hit, data, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+      if ((createproducthit?.statusCode === 500) || (createproducthit?.statusCode === 400)) {
+        swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+          this.setState({
+            token: cookies.remove('token_key', { path: '/Admin/' }),
+            user: cookies.remove('user', { path: '/Admin/' })
+          });
+          window.location.replace('/Admin/Login', false);
+        });
+      } else {
+        if (createproducthit) {
+        }
       }
 
       var url_product_hit = ip + "/ProductShow/find/hit";
-      const producthit = await (await axios.get(url_product_hit)).data;
-      this.setState({
-        producthit: producthit,
-        searchhitstatus: (producthit.length >= 6) ? true : false
-      });
+      const producthit = await (await axios.get(url_product_hit, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+      if ((producthit?.statusCode === 500) || (producthit?.statusCode === 400)) {
+        swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+          this.setState({
+            token: cookies.remove('token_key', { path: '/Admin/' }),
+            user: cookies.remove('user', { path: '/Admin/' })
+          });
+          window.location.replace('/Admin/Login', false);
+        });
+      } else {
+        this.setState({
+          producthit: producthit,
+          searchhitstatus: (producthit.length >= 6) ? true : false
+        });
+      }
     } else {
       swal("Warning!", "กรุณาเลือกสินค้า", "warning").then((value) => {
       });
-
     }
   }
 
@@ -690,21 +802,37 @@ export default class Home extends Component {
     };
 
     var url_update_product_new = ip + "/ProductShow/update/" + productId + "/New";
-    const updateproductnew = await (await axios.put(url_update_product_new, data)).data;
-    if (updateproductnew[0] > 0) {
-      // const productnew = [...this.state.productnew];
-      // this.setState({
-      //   productnew: productnew.filter((item) => item.productId !== productId),
-      //   searchnewstatus: false
-      // });
-      var url_product_new = ip + "/ProductShow/find/new";
-      const productnew = await (await axios.get(url_product_new)).data;
-      this.setState({
-        productnew: productnew,
-        searchnewstatus: (productnew.length >= 6) ? true : false
+    const updateproductnew = await (await axios.put(url_update_product_new, data, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+    if ((updateproductnew?.statusCode === 500) || (updateproductnew?.statusCode === 400)) {
+      swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+        this.setState({
+          token: cookies.remove('token_key', { path: '/Admin/' }),
+          user: cookies.remove('user', { path: '/Admin/' })
+        });
+        window.location.replace('/Admin/Login', false);
       });
     } else {
-
+      if (updateproductnew[0] > 0) {
+        var url_product_new = ip + "/ProductShow/find/new";
+        const productnew = await (await axios.get(url_product_new, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+        if ((productnew?.statusCode === 500) || (productnew?.statusCode === 400)) {
+          swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+            this.setState({
+              token: cookies.remove('token_key', { path: '/Admin/' }),
+              user: cookies.remove('user', { path: '/Admin/' })
+            });
+            window.location.replace('/Admin/Login', false);
+          });
+        } else {
+          this.setState({
+            productnew: productnew,
+            searchnewstatus: (productnew.length >= 6) ? true : false
+          });
+        }
+      } else {
+        swal("Error!", "เกิดข้อผิดพลาดในการลบข้อมูล \n กรุณาลองใหม่อีกครั้ง", "error").then((value) => {
+        });
+      }
     }
   }
 
@@ -714,21 +842,37 @@ export default class Home extends Component {
     };
 
     var url_update_product_Hit = ip + "/ProductShow/update/" + productId + "/Hit";
-    const updateproducthit = await (await axios.put(url_update_product_Hit, data)).data;
-    if (updateproducthit[0] > 0) {
-      // const producthit = [...this.state.producthit];
-      // this.setState({
-      //   producthit: producthit.filter((item) => item.productId !== productId),
-      //   searchhitstatus: false
-      // });
-      var url_product_hit = ip + "/ProductShow/find/hit";
-      const producthit = await (await axios.get(url_product_hit)).data;
-      this.setState({
-        producthit: producthit,
-        searchhitstatus: (producthit.length >= 6) ? true : false
+    const updateproducthit = await (await axios.put(url_update_product_Hit, data, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+    if ((updateproducthit?.statusCode === 500) || (updateproducthit?.statusCode === 400)) {
+      swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+        this.setState({
+          token: cookies.remove('token_key', { path: '/Admin/' }),
+          user: cookies.remove('user', { path: '/Admin/' })
+        });
+        window.location.replace('/Admin/Login', false);
       });
     } else {
-
+      if (updateproducthit[0] > 0) {
+        var url_product_hit = ip + "/ProductShow/find/hit";
+        const producthit = await (await axios.get(url_product_hit, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+        if ((producthit?.statusCode === 500) || (producthit?.statusCode === 400)) {
+          swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+            this.setState({
+              token: cookies.remove('token_key', { path: '/Admin/' }),
+              user: cookies.remove('user', { path: '/Admin/' })
+            });
+            window.location.replace('/Admin/Login', false);
+          });
+        } else {
+          this.setState({
+            producthit: producthit,
+            searchhitstatus: (producthit.length >= 6) ? true : false
+          });
+        }
+      } else {
+        swal("Error!", "เกิดข้อผิดพลาดในการลบข้อมูล \n กรุณาลองใหม่อีกครั้ง", "error").then((value) => {
+        });
+      }
     }
   }
 
@@ -738,96 +882,154 @@ export default class Home extends Component {
     };
 
     var url_update_product_Contact = ip + "/Contact/updateStatus/" + contactId;
-    const updateproductcontact = await (await axios.put(url_update_product_Contact, data)).data;
-    if (updateproductcontact[0] > 0) {
-      // const contact = [...this.state.contact];
-      // this.setState({
-      //   contact: contact.filter((item) => item.contactId !== contactId),
-      //   contactstatus: false
-      // });
-      var url_contact = ip + "/Contact/find/all";
-      const contact = await (await axios.get(url_contact)).data;
-      this.setState({
-        contact: contact,
-        contactstatus: false
+    const updateproductcontact = await (await axios.put(url_update_product_Contact, data, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+    if ((updateproductcontact?.statusCode === 500) || (updateproductcontact?.statusCode === 400)) {
+      swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+        this.setState({
+          token: cookies.remove('token_key', { path: '/Admin/' }),
+          user: cookies.remove('user', { path: '/Admin/' })
+        });
+        window.location.replace('/Admin/Login', false);
       });
-
     } else {
-
+      if (updateproductcontact[0] > 0) {
+        var url_contact = ip + "/Contact/find/all";
+        const contact = await (await axios.get(url_contact, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+        if ((contact?.statusCode === 500) || (contact?.statusCode === 400)) {
+          swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+            this.setState({
+              token: cookies.remove('token_key', { path: '/Admin/' }),
+              user: cookies.remove('user', { path: '/Admin/' })
+            });
+            window.location.replace('/Admin/Login', false);
+          });
+        } else {
+          this.setState({
+            contact: contact,
+            contactstatus: false
+          });
+        }
+      } else {
+        swal("Error!", "เกิดข้อผิดพลาดในการลบข้อมูล \n กรุณาลองใหม่อีกครั้ง", "error").then((value) => {
+        });
+      }
     }
   }
 
-onChangeFildITProduct(e) {
+  onChangeFildITProduct(e) {
     this.setState({
-        [e.target.name]: e.target.value
+      [e.target.name]: e.target.value
     })
-}
-showModalITProduct() {
+  }
+
+  showModalITProduct() {
     this.setState({ isModalVisibleITProduct: true, itProduct: this.state.hit[0].wordShow });
-};
-async handleOkITProduct() {
+  };
+
+  async handleOkITProduct() {
     const data = {
       wordShow: this.state.itProduct,
     };
 
     var url_update_hit = ip + "/WordShow/update/Hit";
-    const updatehit = await (await axios.put(url_update_hit, data)).data;
-
-    if (updatehit) {
+    const updatehit = await (await axios.put(url_update_hit, data, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+    if ((updatehit?.statusCode === 500) || (updatehit?.statusCode === 400)) {
+      swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+        this.setState({
+          token: cookies.remove('token_key', { path: '/Admin/' }),
+          user: cookies.remove('user', { path: '/Admin/' })
+        });
+        window.location.replace('/Admin/Login', false);
+      });
+    } else {
+      if (updatehit) {
         swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
-            this.setState({
-              isModalVisibleITProduct: false,
-            });
+          this.setState({
+            isModalVisibleITProduct: false,
+          });
         });
 
-        var url_hit = ip + "/WordShow/find/Hit";
-        const hit = await (await axios.get(url_hit)).data;
-        this.setState({
+        var url_hit = ip + "/WordShow/find/Admin/Hit";
+        const hit = await (await axios.get(url_hit, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+        if ((hit?.statusCode === 500) || (hit?.statusCode === 400)) {
+          swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+            this.setState({
+              token: cookies.remove('token_key', { path: '/Admin/' }),
+              user: cookies.remove('user', { path: '/Admin/' })
+            });
+            window.location.replace('/Admin/Login', false);
+          });
+        } else {
+          this.setState({
             hit: hit,
             memberStatus: false
+          });
+        }
+      } else {
+        swal("Error!", "เกิดข้อผิดพลาดในการแก้ไขข้อมูล \n กรุณาลองใหม่อีกครั้ง", "error").then((value) => {
         });
-    } else {
-
+      }
     }
-};
-handleCancelITProduct() {
-    this.setState({ isModalVisibleITProduct: false })
-}
-
-
-showModalnewProduct() {
-  this.setState({ isModalVisiblenewProduct: true, newProduct: this.state.newP[0]?.wordShow });
-};
-async handleOknewProduct() {
-  const data = {
-    wordShow: this.state.newProduct,
   };
 
-  var url_update_new = ip + "/WordShow/update/New";
-  const updatenew = await (await axios.put(url_update_new, data)).data;
+  handleCancelITProduct() {
+    this.setState({ isModalVisibleITProduct: false })
+  }
 
-  if (updatenew) {
-      swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
+  showModalnewProduct() {
+    this.setState({ isModalVisiblenewProduct: true, newProduct: this.state.newP[0]?.wordShow });
+  };
+
+  async handleOknewProduct() {
+    const data = {
+      wordShow: this.state.newProduct,
+    };
+
+    var url_update_new = ip + "/WordShow/update/New";
+    const updatenew = await (await axios.put(url_update_new, data, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+    if ((updatenew?.statusCode === 500) || (updatenew?.statusCode === 400)) {
+      swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+        this.setState({
+          token: cookies.remove('token_key', { path: '/Admin/' }),
+          user: cookies.remove('user', { path: '/Admin/' })
+        });
+        window.location.replace('/Admin/Login', false);
+      });
+    } else {
+      if (updatenew) {
+        swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
           this.setState({
             isModalVisiblenewProduct: false,
           });
-      });
-      var url_new = ip + "/WordShow/find/New";
-      const newP = await (await axios.get(url_new)).data;
-        this.setState({
+        });
+        var url_new = ip + "/WordShow/find/Admin/New";
+        const newP = await (await axios.get(url_new, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+        if ((newP?.statusCode === 500) || (newP?.statusCode === 400)) {
+          swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+            this.setState({
+              token: cookies.remove('token_key', { path: '/Admin/' }),
+              user: cookies.remove('user', { path: '/Admin/' })
+            });
+            window.location.replace('/Admin/Login', false);
+          });
+        } else {
+          this.setState({
             newP: newP,
             memberStatus: false
+          });
+        }
+      } else {
+        swal("Error!", "เกิดข้อผิดพลาดในการแก้ไขข้อมูล \n กรุณาลองใหม่อีกครั้ง", "error").then((value) => {
         });
-  } else {
-
+      }
+    }
+  };
+  
+  handleCancelnewProduct() {
+    this.setState({ isModalVisiblenewProduct: false })
   }
-};
-handleCancelnewProduct() {
-  this.setState({ isModalVisiblenewProduct: false })
-}
 
   render() {
-    // console.log(config.ipServer, " config")
     return (
       <Container fluid>
         <Spin spinning={this.state.statusButtonEdit} size="large">
@@ -865,7 +1067,7 @@ handleCancelnewProduct() {
               <Row>
                 <Col xs={5} md={5} xl={5} id="interestedproduct" >{this.state.newP[0]?.wordShow}</Col>
                 <Col xs={12} md={12} xl={12} id="interestedproduct">
-                    <Button id="btnadd-popularproduct"  onClick={() => this.showModalnewProduct()}>แก้ไข</Button>
+                  <Button id="btnadd-popularproduct" onClick={() => this.showModalnewProduct()}>แก้ไข</Button>
                 </Col>
               </Row>
               <Col xs={24} md={24} xl={24} id="input-search-product">
@@ -894,8 +1096,8 @@ handleCancelnewProduct() {
               <Row>
                 <Col xs={5} md={5} xl={5} id="interestedproduct">{this.state.hit[0]?.wordShow}</Col>
                 <Col xs={12} md={12} xl={12} id="interestedproduct">
-                      <Button id="btnadd-popularproduct" onClick={() => this.showModalITProduct()}>แก้ไข</Button>
-                  </Col>
+                  <Button id="btnadd-popularproduct" onClick={() => this.showModalITProduct()}>แก้ไข</Button>
+                </Col>
               </Row>
               <Col xs={24} md={24} xl={24} id="input-search-product">
                 <AutoComplete

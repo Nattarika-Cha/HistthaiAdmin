@@ -42,9 +42,6 @@ export default class App extends Component {
       statusUser: true
     });
   }
-  // state = {
-  //   collapsed: false,
-  // };
 
   toggle = () => {
     this.setState({

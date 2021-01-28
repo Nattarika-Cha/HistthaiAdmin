@@ -9,9 +9,11 @@ import axios from 'axios';
 import swal from 'sweetalert';
 import moment from 'moment';
 import '../css/User.css';
+import Cookies from 'universal-cookie';
 import { config } from '../config/config';
 
 const { Option } = Select;
+const cookies = new Cookies();
 
 // var ip = "https://www.hitsthai.com/API";
 var ip = config.ipServer;
@@ -29,11 +31,12 @@ var ip_img_profile = "https://www.hitsthai.com/API/profile/";
 //     },
 // ];
 
-export default class User extends Component {
+export default class UserProfile extends Component {
     constructor(props) {
         super(props);
         this.state = {
             token: "",
+            userLogin: [],
             user: [],
             isModalVisible: false,
             userstatus: false,
@@ -208,25 +211,41 @@ export default class User extends Component {
         this.setState({ searchText: '' });
     };
 
+    componentWillMount() {
+        this.setState({
+            token: cookies.get('token_key', { path: '/Admin/' }),
+            userLogin: cookies.get('user', { path: '/Admin/' })
+        });
+    }
 
     async showModal(record) {
         var url_level = ip + "/Level/find/memberId/" + record.memberId;
-        const level = await (await axios.get(url_level)).data;
-        this.setState({
-            isModalVisible: true,
-            userProfileId: record.userProfileId,
-            memberId: record.memberId,
-            levelId: record.levelId,
-            userCode: record.userCode,
-            name: record.name,
-            line: record.line,
-            email: record.email,
-            phone: record.phone,
-            address: record.address,
-            createDate: record.createDate,
-            img: ip_img_profile + record.img,
-            level: level
-        });
+        const level = await (await axios.get(url_level, { headers: { "token": this.state.token, "key": this.state.userLogin?.username } })).data;
+        if ((level?.statusCode === 500) || (level?.statusCode === 400)) {
+            swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+                this.setState({
+                    token: cookies.remove('token_key', { path: '/Admin/' }),
+                    user: cookies.remove('user', { path: '/Admin/' })
+                });
+                window.location.replace('/Admin/Login', false);
+            });
+        } else {
+            this.setState({
+                isModalVisible: true,
+                userProfileId: record.userProfileId,
+                memberId: record.memberId,
+                levelId: record.levelId,
+                userCode: record.userCode,
+                name: record.name,
+                line: record.line,
+                email: record.email,
+                phone: record.phone,
+                address: record.address,
+                createDate: record.createDate,
+                img: ip_img_profile + record.img,
+                level: level
+            });
+        }
     };
 
     onChangeFilduserCode(e) {
@@ -237,7 +256,6 @@ export default class User extends Component {
 
     async handleOk() {
         this.setState({ statusButtonEdit: true });
-        console.log(this.state.levelId, " this.state.levelId")
         if (this.state.levelId > 0) {
             const data = {
                 memberId: this.state.memberId,
@@ -246,44 +264,63 @@ export default class User extends Component {
             };
 
             var url_update_member_level = ip + "/UserProfile/updatememberlevel/" + this.state.userProfileId;
-            const updatememberlevel = await (await axios.put(url_update_member_level, data)).data;
-
-            if (updatememberlevel !== null) {
-
-                if (updatememberlevel[0] > 0) {
-                    this.setState({ statusButtonEdit: false, userstatus: true });
-                    swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
-                        this.setState({
-                            isModalVisible: false
-                        });
-                    });
-
-                    var url_user = ip + "/UserProfile/find/all/admin";
-                    const user = await (await axios.get(url_user)).data;
+            const updatememberlevel = await (await axios.put(url_update_member_level, data, { headers: { "token": this.state.token, "key": this.state.userLogin?.username } })).data;
+            if ((updatememberlevel?.statusCode === 500) || (updatememberlevel?.statusCode === 400)) {
+                swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
                     this.setState({
-                        user: user,
-                        userstatus: false
+                        token: cookies.remove('token_key', { path: '/Admin/' }),
+                        user: cookies.remove('user', { path: '/Admin/' })
                     });
-                } else {
-                    this.setState({ statusButtonEdit: false, userstatus: false, isModalVisible: false });
-                    // swal("Warning!", "บันทึกข้อมูลไม่สำเร็จ", "success").then((value) => {
-                    // });
-                }
+                    window.location.replace('/Admin/Login', false);
+                });
             } else {
-                this.setState({ statusButtonEdit: false });
-                swal("Warning!", "รหัสสมาชิกซ้ำ", "warning").then((value) => {
-                    // this.setState({
-                    //     isModalVisible: false
-                    // });
-                });
+                if (updatememberlevel !== null) {
+
+                    if (updatememberlevel[0] > 0) {
+                        this.setState({ statusButtonEdit: false, userstatus: true });
+                        swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
+                            this.setState({
+                                isModalVisible: false
+                            });
+                        });
+
+                        var url_user = ip + "/UserProfile/find/all/admin";
+                        const user = await (await axios.get(url_user, { headers: { "token": this.state.token, "key": this.state.userLogin?.username } })).data;
+                        if ((user?.statusCode === 500) || (user?.statusCode === 400)) {
+                            swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+                                this.setState({
+                                    token: cookies.remove('token_key', { path: '/Admin/' }),
+                                    user: cookies.remove('user', { path: '/Admin/' })
+                                });
+                                window.location.replace('/Admin/Login', false);
+                            });
+                        } else {
+                            this.setState({
+                                user: user,
+                                userstatus: false
+                            });
+                        }
+                    } else {
+                        this.setState({ statusButtonEdit: false, userstatus: false, isModalVisible: false });
+                        // swal("Warning!", "บันทึกข้อมูลไม่สำเร็จ", "success").then((value) => {
+                        // });
+                    }
+                } else {
+                    this.setState({ statusButtonEdit: false });
+                    swal("Warning!", "รหัสสมาชิกซ้ำ", "warning").then((value) => {
+                        // this.setState({
+                        //     isModalVisible: false
+                        // });
+                    });
+                }
             }
-        }else {
+        } else {
             this.setState({ statusButtonEdit: false });
-                swal("Warning!", "กรุณาเลือก Level สมาชิก", "warning").then((value) => {
-                    // this.setState({
-                    //     isModalVisible: false
-                    // });
-                });
+            swal("Warning!", "กรุณาเลือก Level สมาชิก", "warning").then((value) => {
+                // this.setState({
+                //     isModalVisible: false
+                // });
+            });
         }
     };
 
@@ -307,13 +344,22 @@ export default class User extends Component {
 
     async handleChangeMemberIdEdit(value) {
         var url_level = ip + "/Level/find/memberId/" + value.value;
-        const level = await (await axios.get(url_level)).data;
-        console.log(level, " level");
-        this.setState({
-            memberId: value.value,
-            levelId: 0,
-            level: level
-        });
+        const level = await (await axios.get(url_level, { headers: { "token": this.state.token, "key": this.state.userLogin?.username } })).data;
+        if ((level?.statusCode === 500) || (level?.statusCode === 400)) {
+            swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+                this.setState({
+                    token: cookies.remove('token_key', { path: '/Admin/' }),
+                    user: cookies.remove('user', { path: '/Admin/' })
+                });
+                window.location.replace('/Admin/Login', false);
+            });
+        } else {
+            this.setState({
+                memberId: value.value,
+                levelId: 0,
+                level: level
+            });
+        }
     }
 
     handleChangeLevelIdEdit(value) {
@@ -324,102 +370,122 @@ export default class User extends Component {
 
     async componentDidMount() {
         var url_user = ip + "/UserProfile/find/all/admin";
-        const user = await (await axios.get(url_user)).data;
-        this.setState({
-            user: user,
-            userstatus: false
-        });
+        const user = await (await axios.get(url_user, { headers: { "token": this.state.token, "key": this.state.userLogin?.username } })).data;
+        if ((user?.statusCode === 500) || (user?.statusCode === 400)) {
+            swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+                this.setState({
+                    token: cookies.remove('token_key', { path: '/Admin/' }),
+                    user: cookies.remove('user', { path: '/Admin/' })
+                });
+                window.location.replace('/Admin/Login', false);
+            });
+        } else {
+            this.setState({
+                user: user,
+                userstatus: false
+            });
+        }
 
         var url_member = ip + "/Member/find/all";
-        const member = await (await axios.get(url_member)).data;
-        this.setState({
-            member: member
-        });
+        const member = await (await axios.get(url_member, { headers: { "token": this.state.token, "key": this.state.userLogin?.username } })).data;
+        if ((member?.statusCode === 500) || (member?.statusCode === 400)) {
+            swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+                this.setState({
+                    token: cookies.remove('token_key', { path: '/Admin/' }),
+                    user: cookies.remove('user', { path: '/Admin/' })
+                });
+                window.location.replace('/Admin/Login', false);
+            });
+        } else {
+            this.setState({
+                member: member
+            });
 
-        var memberFilter = [];
-        await member.forEach(async (member, index) => {
-            var filter = { text: member.memberName, value: member.memberName }
-            memberFilter.push(filter);
-        });
+            var memberFilter = [];
+            await member.forEach(async (member, index) => {
+                var filter = { text: member.memberName, value: member.memberName }
+                memberFilter.push(filter);
+            });
 
 
-        this.setState({
-            usertable: [
-                {
-                    title: 'ประเภทสมาชิก',
-                    dataIndex: 'memberName',
-                    key: 'memberName',
-                    width: 120,
-                    filters: memberFilter,
-                    onFilter: (value, record) => record.memberName.indexOf(value) === 0,
-                },
-                {
-                    title: 'รหัสสมาชิก',
-                    dataIndex: 'userCode',
-                    key: 'userCode',
-                    width: 120,
-                    ...this.getColumnSearchProps('userCode'),
-                },
-                {
-                    title: 'ชื่อสมาชิก',
-                    dataIndex: 'name',
-                    key: 'name',
-                    width: 120,
-                    ...this.getColumnSearchProps('name'),
-                },
-                {
-                    title: 'อีเมลล์',
-                    dataIndex: 'email',
-                    key: 'email',
-                    width: 150,
-                },
-                {
-                    title: 'เบอร์โทร',
-                    dataIndex: 'phone',
-                    key: 'phone',
-                    width: 120,
-                    ...this.getColumnSearchProps('phone'),
-                },
-                {
-                    title: 'ที่อยู่',
-                    dataIndex: 'address',
-                    key: 'address',
-                    ellipsis: true,
-                    width: 200,
-                },
-                {
-                    title: 'วันที่',
-                    dataIndex: 'createDate',
-                    key: 'createDate',
-                    ellipsis: true,
-                    width: 120,
-                    render: render =>
-                        <>
-                            <div>{moment(render).format('L')}</div>
-                        </>
-                },
-                {
-                    title: '',
-                    dataIndex: '',
-                    key: 'x',
-                    width: 60,
-                    render: (record) =>
-                        <>
-                            <div type="primary" onClick={() => this.showModal(record)}><EditTwoTone style={{ fontSize: '20px' }} twoToneColor="#63549B" /></div>
-                        </>,
-                },
-                {
-                    title: '',
-                    dataIndex: '',
-                    key: 'x',
-                    width: 50,
-                    render: (record) =>
-                        <Popconfirm title="คุณแน่ใจว่าจะลบรายการ？" okText="ลบ" cancelText="ยกเลิก" onConfirm={() => this.handleDeleteUser(record.userProfileId)}>
-                            <div><DeleteTwoTone style={{ fontSize: '20px' }} twoToneColor="#DA213D" /></div>
-                        </Popconfirm>,
-                },
-            ]
-        });
+            this.setState({
+                usertable: [
+                    {
+                        title: 'ประเภทสมาชิก',
+                        dataIndex: 'memberName',
+                        key: 'memberName',
+                        width: 120,
+                        filters: memberFilter,
+                        onFilter: (value, record) => record.memberName.indexOf(value) === 0,
+                    },
+                    {
+                        title: 'รหัสสมาชิก',
+                        dataIndex: 'userCode',
+                        key: 'userCode',
+                        width: 120,
+                        ...this.getColumnSearchProps('userCode'),
+                    },
+                    {
+                        title: 'ชื่อสมาชิก',
+                        dataIndex: 'name',
+                        key: 'name',
+                        width: 120,
+                        ...this.getColumnSearchProps('name'),
+                    },
+                    {
+                        title: 'อีเมลล์',
+                        dataIndex: 'email',
+                        key: 'email',
+                        width: 150,
+                    },
+                    {
+                        title: 'เบอร์โทร',
+                        dataIndex: 'phone',
+                        key: 'phone',
+                        width: 120,
+                        ...this.getColumnSearchProps('phone'),
+                    },
+                    {
+                        title: 'ที่อยู่',
+                        dataIndex: 'address',
+                        key: 'address',
+                        ellipsis: true,
+                        width: 200,
+                    },
+                    {
+                        title: 'วันที่',
+                        dataIndex: 'createDate',
+                        key: 'createDate',
+                        ellipsis: true,
+                        width: 120,
+                        render: render =>
+                            <>
+                                <div>{moment(render).format('L')}</div>
+                            </>
+                    },
+                    {
+                        title: '',
+                        dataIndex: '',
+                        key: 'x',
+                        width: 60,
+                        render: (record) =>
+                            <>
+                                <div type="primary" onClick={() => this.showModal(record)}><EditTwoTone style={{ fontSize: '20px' }} twoToneColor="#63549B" /></div>
+                            </>,
+                    },
+                    {
+                        title: '',
+                        dataIndex: '',
+                        key: 'x',
+                        width: 50,
+                        render: (record) =>
+                            <Popconfirm title="คุณแน่ใจว่าจะลบรายการ？" okText="ลบ" cancelText="ยกเลิก" onConfirm={() => this.handleDeleteUser(record.userProfileId)}>
+                                <div><DeleteTwoTone style={{ fontSize: '20px' }} twoToneColor="#DA213D" /></div>
+                            </Popconfirm>,
+                    },
+                ]
+            });
+        }
     }
 
     async handleDeleteUser(userProfileId) {
@@ -429,18 +495,39 @@ export default class User extends Component {
         };
 
         var url_delete_user = ip + "/UserProfile/update/delete/" + userProfileId;
-        const deleteuser = await (await axios.put(url_delete_user, data)).data;
-        if (deleteuser[0] > 0) {
-            this.setState({ statusButtonEdit: false, userstatus: true });
-
-            var url_user = ip + "/UserProfile/find/all/admin";
-            const user = await (await axios.get(url_user)).data;
-            this.setState({
-                user: user,
-                userstatus: false
+        const deleteuser = await (await axios.put(url_delete_user, data, { headers: { "token": this.state.token, "key": this.state.userLogin?.username } })).data;
+        if ((deleteuser?.statusCode === 500) || (deleteuser?.statusCode === 400)) {
+            swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+                this.setState({
+                    token: cookies.remove('token_key', { path: '/Admin/' }),
+                    user: cookies.remove('user', { path: '/Admin/' })
+                });
+                window.location.replace('/Admin/Login', false);
             });
         } else {
+            if (deleteuser[0] > 0) {
+                this.setState({ statusButtonEdit: false, userstatus: true });
 
+                var url_user = ip + "/UserProfile/find/all/admin";
+                const user = await (await axios.get(url_user, { headers: { "token": this.state.token, "key": this.state.userLogin?.username } })).data;
+                if ((user?.statusCode === 500) || (user?.statusCode === 400)) {
+                    swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+                        this.setState({
+                            token: cookies.remove('token_key', { path: '/Admin/' }),
+                            user: cookies.remove('user', { path: '/Admin/' })
+                        });
+                        window.location.replace('/Admin/Login', false);
+                    });
+                } else {
+                    this.setState({
+                        user: user,
+                        userstatus: false
+                    });
+                }
+            } else {
+                swal("Error!", "เกิดข้อผิดพลาดในการลบข้อมูล \n กรุณาลองใหม่อีกครั้ง", "error").then((value) => {
+                });
+            }
         }
     }
 

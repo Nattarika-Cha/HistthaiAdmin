@@ -12,7 +12,9 @@ import imgm from '../img/photocomingsoon.svg';
 import readXlsxFile from 'read-excel-file';
 import { JsonToCsv, useJsonToCsv } from 'react-json-csv';
 import { config } from '../config/config';
+import Cookies from 'universal-cookie';
 
+const cookies = new Cookies();
 var ip = config.ipServer;
 var uuid = "";
 var uuidMain = "";
@@ -223,14 +225,14 @@ export default class Product extends Component {
                     dataIndex: 'catName',
                     key: 'catName',
                     filters: [
-                        {
-                            text: 'อุปกรณ์เครื่องมือช่าง',
-                            value: 'อุปกรณ์เครื่องมือช่าง',
-                        },
-                        {
-                            text: 'แผ่นสแตนเลส',
-                            value: 'แผ่นสแตนเลส',
-                        },
+                        // {
+                        //     text: 'อุปกรณ์เครื่องมือช่าง',
+                        //     value: 'อุปกรณ์เครื่องมือช่าง',
+                        // },
+                        // {
+                        //     text: 'แผ่นสแตนเลส',
+                        //     value: 'แผ่นสแตนเลส',
+                        // },
                     ],
                     onFilter: (value, record) => record.catName.indexOf(value) === 0,
                 },
@@ -352,6 +354,13 @@ export default class Product extends Component {
         this.onImportFile = this.onImportFile.bind(this);
     }
 
+    componentWillMount() {
+        this.setState({
+            token: cookies.get('token_key', { path: '/Admin/' }),
+            user: cookies.get('user', { path: '/Admin/' })
+        });
+    }
+
     onChangeFildProduct(e) {
         this.setState({
             [e.target.name]: e.target.value
@@ -360,94 +369,73 @@ export default class Product extends Component {
 
     async showModal(record) {
         var url_img_main = ip + "/ProductImg/ImgProduct/main/" + record.codeId;
-        const img_main = await (await axios.get(url_img_main)).data;
-        this.setState({
-            fileListMainEdit: img_main,
-            ImgMainEdit: img_main,
-        });
+        const img_main = await (await axios.get(url_img_main, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+        if ((img_main?.statusCode === 500) || (img_main?.statusCode === 400)) {
+            swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+                this.setState({
+                    token: cookies.remove('token_key', { path: '/Admin/' }),
+                    user: cookies.remove('user', { path: '/Admin/' })
+                });
+                window.location.replace('/Admin/Login', false);
+            });
+        } else {
+            this.setState({
+                fileListMainEdit: img_main,
+                ImgMainEdit: img_main,
+            });
+        }
 
         var url_img_detail = ip + "/ProductImg/ImgProduct/detail/" + record.codeId;
-        const img_detail = await (await axios.get(url_img_detail)).data;
-        this.setState({
-            fileListDetailEdit: img_detail,
-            ImgDetailEdit: img_detail,
-            isModalVisible: true,
-            productEdit: record,
-            productId: record.productId,
-            codeId: record.codeId,
-            priceProductId: record.priceProductId,
-            barCode: record.barCode,
-            productCode: record.productCode,
-            unit: record.unit,
-            brand: record.brand,
-            name: record.name,
-            size: record.size,
-            flagProduct: record.flagProduct,
-            color: record.color,
-            catId: record.catId,
-            direction: record.direction,
-            caution: record.caution,
-            keepespreserve: record.keepespreserve,
-            firstaidprocedure: record.firstaidprocedure,
-            detail: record.detail,
-            level1: record.level1,
-            level2: record.level2,
-            level3: record.level3,
-            level4: record.level4,
-            level5: record.level5,
-            level6: record.level6,
-            level7: record.level7,
-            level8: record.level8,
-            level9: record.level9,
-            level10: record.level10,
-            level11: record.level11,
-            level12: record.level12,
-            level13: record.level13,
-            level14: record.level14,
-            level15: record.level15,
-            enduser: record.enduser,
-        });
-
-
-
-
-        // this.setState({
-        //     isModalVisible: true,
-        //     productEdit: record,
-        //     productId: record.productId,
-        //     codeId: record.codeId,
-        //     priceProductId: record.priceProductId,
-        //     barCode: record.barCode,
-        //     productCode: record.productCode,
-        //     unit: record.unit,
-        //     brand: record.brand,
-        //     name: record.name,
-        //     size: record.size,
-        //     flagProduct: record.flagProduct,
-        //     color: record.color,
-        //     catId: record.catId,
-        //     direction: record.direction,
-        //     caution: record.caution,
-        //     keepespreserve: record.keepespreserve,
-        //     firstaidprocedure: record.firstaidprocedure,
-        //     detail: record.detail,
-        //     level1: record.level1,
-        //     level2: record.level2,
-        //     level3: record.level3,
-        //     level4: record.level4,
-        //     level5: record.level5,
-        //     level6: record.level6,
-        //     level7: record.level7,
-        //     level8: record.level8,
-        //     level9: record.level9,
-        //     level10: record.level10,
-        //     level11: record.level11,
-        //     level12: record.level12,
-        //     level13: record.level13,
-        //     level14: record.level14,
-        //     level15: record.level15,
-        //     enduser: record.enduser,
-        // });
+        const img_detail = await (await axios.get(url_img_detail, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+        if ((img_detail?.statusCode === 500) || (img_detail?.statusCode === 400)) {
+            swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+                this.setState({
+                    token: cookies.remove('token_key', { path: '/Admin/' }),
+                    user: cookies.remove('user', { path: '/Admin/' })
+                });
+                window.location.replace('/Admin/Login', false);
+            });
+        } else {
+            this.setState({
+                fileListDetailEdit: img_detail,
+                ImgDetailEdit: img_detail,
+                isModalVisible: true,
+                productEdit: record,
+                productId: record.productId,
+                codeId: record.codeId,
+                priceProductId: record.priceProductId,
+                barCode: record.barCode,
+                productCode: record.productCode,
+                unit: record.unit,
+                brand: record.brand,
+                name: record.name,
+                size: record.size,
+                flagProduct: record.flagProduct,
+                color: record.color,
+                catId: record.catId,
+                direction: record.direction,
+                caution: record.caution,
+                keepespreserve: record.keepespreserve,
+                firstaidprocedure: record.firstaidprocedure,
+                detail: record.detail,
+                level1: record.level1,
+                level2: record.level2,
+                level3: record.level3,
+                level4: record.level4,
+                level5: record.level5,
+                level6: record.level6,
+                level7: record.level7,
+                level8: record.level8,
+                level9: record.level9,
+                level10: record.level10,
+                level11: record.level11,
+                level12: record.level12,
+                level13: record.level13,
+                level14: record.level14,
+                level15: record.level15,
+                enduser: record.enduser,
+            });
+        }
     };
 
     handleChangeFlagProductEdit(value) {
@@ -481,49 +469,57 @@ export default class Product extends Component {
     async handEditProduct() {
 
         // if ((this.state.ImgMainEdit.length !== 0) && (this.state.ImgMainEdit[0]?.flag !== "Removed")) {
-            this.setState({ statusButtonEdit: true });
-            var dataSave = {
-                productId: this.state.productId,
-                // codeId: this.state.codeId,
-                priceProductId: this.state.priceProductId,
-                //priceProductId: "",
-                barCode: this.state.barCode,
-                productCode: this.state.productCode,
-                unit: this.state.unit,
-                brand: this.state.brand,
-                name: this.state.name,
-                size: this.state.size,
-                flagProduct: this.state.flagProduct,
-                color: this.state.color,
-                catId: this.state.catId,
-                direction: this.state.direction,
-                caution: this.state.caution,
-                keepespreserve: this.state.keepespreserve,
-                firstaidprocedure: this.state.firstaidprocedure,
-                detail: this.state.detail,
-                level1: this.state.level1,
-                level2: this.state.level2,
-                level3: this.state.level3,
-                level4: this.state.level4,
-                level5: this.state.level5,
-                level6: this.state.level6,
-                level7: this.state.level7,
-                level8: this.state.level8,
-                level9: this.state.level9,
-                level10: this.state.level10,
-                level11: this.state.level11,
-                level12: this.state.level12,
-                level13: this.state.level13,
-                level14: this.state.level14,
-                level15: this.state.level15,
-                enduser: this.state.enduser,
-                imgMainEdit: this.state.ImgMainEdit,
-                imgDetailEdit: this.state.ImgDetailEdit
-            }
+        this.setState({ statusButtonEdit: true });
+        var dataSave = {
+            productId: this.state.productId,
+            // codeId: this.state.codeId,
+            priceProductId: this.state.priceProductId,
+            //priceProductId: "",
+            barCode: this.state.barCode,
+            productCode: this.state.productCode,
+            unit: this.state.unit,
+            brand: this.state.brand,
+            name: this.state.name,
+            size: this.state.size,
+            flagProduct: this.state.flagProduct,
+            color: this.state.color,
+            catId: this.state.catId,
+            direction: this.state.direction,
+            caution: this.state.caution,
+            keepespreserve: this.state.keepespreserve,
+            firstaidprocedure: this.state.firstaidprocedure,
+            detail: this.state.detail,
+            level1: this.state.level1,
+            level2: this.state.level2,
+            level3: this.state.level3,
+            level4: this.state.level4,
+            level5: this.state.level5,
+            level6: this.state.level6,
+            level7: this.state.level7,
+            level8: this.state.level8,
+            level9: this.state.level9,
+            level10: this.state.level10,
+            level11: this.state.level11,
+            level12: this.state.level12,
+            level13: this.state.level13,
+            level14: this.state.level14,
+            level15: this.state.level15,
+            enduser: this.state.enduser,
+            imgMainEdit: this.state.ImgMainEdit,
+            imgDetailEdit: this.state.ImgDetailEdit
+        }
 
-            var url_update_product_price = ip + "/Product/update/product/admin/" + this.state.codeId;
-            const updateproductprice = await (await axios.put(url_update_product_price, dataSave)).data;
-
+        var url_update_product_price = ip + "/Product/update/product/admin/" + this.state.codeId;
+        const updateproductprice = await (await axios.put(url_update_product_price, dataSave, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+        if ((updateproductprice?.statusCode === 500) || (updateproductprice?.statusCode === 400)) {
+            swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+                this.setState({
+                    token: cookies.remove('token_key', { path: '/Admin/' }),
+                    user: cookies.remove('user', { path: '/Admin/' })
+                });
+                window.location.replace('/Admin/Login', false);
+            });
+        } else {
             if (updateproductprice) {
                 this.setState({ statusButtonEdit: false, productstatus: true });
                 swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
@@ -570,16 +566,27 @@ export default class Product extends Component {
                     });
                 });
                 var url_product = ip + "/Product/find/all/admin";
-                const product = await (await axios.get(url_product)).data;
-                this.setState({
-                    product: product,
-                    productstatus: false
-                });
+                const product = await (await axios.get(url_product, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+                if ((product?.statusCode === 500) || (product?.statusCode === 400)) {
+                    swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+                        this.setState({
+                            token: cookies.remove('token_key', { path: '/Admin/' }),
+                            user: cookies.remove('user', { path: '/Admin/' })
+                        });
+                        window.location.replace('/Admin/Login', false);
+                    });
+                } else {
+                    this.setState({
+                        product: product,
+                        productstatus: false
+                    });
+                }
             } else {
                 this.setState({ statusButtonEdit: false });
                 swal("Warning!", "บันทึกข้อมูลไม่สำเร็จ", "warning").then((value) => {
                 });
             }
+        }
         // } else {
         //     swal("Warning!", "กรุณาเลือกรูปภาพหลัก", "warning").then((value) => {
         //     });
@@ -589,46 +596,55 @@ export default class Product extends Component {
     async handleSaveProduct() {
 
         // if ((this.state.ImgMainSave.length !== 0) && (this.state.ImgMainSave[0]?.flag !== "Removed")) {
-            this.setState({ statusButtonEdit: true });
-            var dataSave = {
-                barCode: this.state.barCodeSave,
-                productCode: this.state.productCodeSave,
-                unit: this.state.unitSave,
-                brand: this.state.brandSave,
-                name: this.state.nameSave,
-                size: this.state.sizeSave,
-                flagProduct: this.state.flagProductSave,
-                color: this.state.colorSave,
-                catId: this.state.catIdSave,
-                direction: this.state.directionSave,
-                caution: this.state.cautionSave,
-                keepespreserve: this.state.keepespreserveSave,
-                firstaidprocedure: this.state.firstaidprocedureSave,
-                productStatus: "A",
-                detail: this.state.detailSave,
-                level1: this.state.level1Save,
-                level2: this.state.level2Save,
-                level3: this.state.level3Save,
-                level4: this.state.level4Save,
-                level5: this.state.level5Save,
-                level6: this.state.level6Save,
-                level7: this.state.level7Save,
-                level8: this.state.level8Save,
-                level9: this.state.level9Save,
-                level10: this.state.level10Save,
-                level11: this.state.level11Save,
-                level12: this.state.level12Save,
-                level13: this.state.level13Save,
-                level14: this.state.level14Save,
-                level15: this.state.level15Save,
-                enduser: this.state.enduserSave,
-                priceProduceStatus: "A",
-                imgMainSave: this.state.ImgMainSave,
-                imgDetailSave: this.state.ImgDetailSave
-            }
+        this.setState({ statusButtonEdit: true });
+        var dataSave = {
+            barCode: this.state.barCodeSave,
+            productCode: this.state.productCodeSave,
+            unit: this.state.unitSave,
+            brand: this.state.brandSave,
+            name: this.state.nameSave,
+            size: this.state.sizeSave,
+            flagProduct: this.state.flagProductSave,
+            color: this.state.colorSave,
+            catId: this.state.catIdSave,
+            direction: this.state.directionSave,
+            caution: this.state.cautionSave,
+            keepespreserve: this.state.keepespreserveSave,
+            firstaidprocedure: this.state.firstaidprocedureSave,
+            productStatus: "A",
+            detail: this.state.detailSave,
+            level1: this.state.level1Save,
+            level2: this.state.level2Save,
+            level3: this.state.level3Save,
+            level4: this.state.level4Save,
+            level5: this.state.level5Save,
+            level6: this.state.level6Save,
+            level7: this.state.level7Save,
+            level8: this.state.level8Save,
+            level9: this.state.level9Save,
+            level10: this.state.level10Save,
+            level11: this.state.level11Save,
+            level12: this.state.level12Save,
+            level13: this.state.level13Save,
+            level14: this.state.level14Save,
+            level15: this.state.level15Save,
+            enduser: this.state.enduserSave,
+            priceProduceStatus: "A",
+            imgMainSave: this.state.ImgMainSave,
+            imgDetailSave: this.state.ImgDetailSave
+        }
 
-            var url_create_product_price = ip + "/Product/create/admin/";
-            const createproductprice = await (await axios.post(url_create_product_price, dataSave)).data;
+        var url_create_product_price = ip + "/Product/create/admin/";
+        const createproductprice = await (await axios.post(url_create_product_price, dataSave, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+        if ((createproductprice?.statusCode === 500) || (createproductprice?.statusCode === 400)) {
+            swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+                this.setState({
+                    token: cookies.remove('token_key', { path: '/Admin/' }),
+                    user: cookies.remove('user', { path: '/Admin/' })
+                });
+                window.location.replace('/Admin/Login', false);
+            });
+        } else {
             if (createproductprice) {
                 this.setState({ statusButtonEdit: false, productstatus: true });
                 swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
@@ -674,16 +690,27 @@ export default class Product extends Component {
                     });
                 });
                 var url_product = ip + "/Product/find/all/admin";
-                const product = await (await axios.get(url_product)).data;
-                this.setState({
-                    product: product,
-                    productstatus: false
-                });
+                const product = await (await axios.get(url_product, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+                if ((product?.statusCode === 500) || (product?.statusCode === 400)) {
+                    swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+                        this.setState({
+                            token: cookies.remove('token_key', { path: '/Admin/' }),
+                            user: cookies.remove('user', { path: '/Admin/' })
+                        });
+                        window.location.replace('/Admin/Login', false);
+                    });
+                } else {
+                    this.setState({
+                        product: product,
+                        productstatus: false
+                    });
+                }
             } else {
                 this.setState({ statusButtonEdit: false });
                 swal("Warning!", "บันทึกข้อมูลไม่สำเร็จ", "warning").then((value) => {
                 });
             }
+        }
         // } else {
         //     swal("Warning!", "กรุณาเลือกรูปภาพหลัก", "warning").then((value) => {
         //     });
@@ -691,23 +718,43 @@ export default class Product extends Component {
     };
 
     async handleDeleteProduct(record) {
-        // this.setState({ statusButtonEdit: true });
         const productId = record.productId;
         const priceProductId = record.priceProductId;
         const codeId = record.codeId;
 
         var url_delete_product = ip + "/Product/delete/" + productId + "/" + priceProductId + "/" + codeId;
-        const deleteproduct = await (await axios.delete(url_delete_product)).data;
-        if (deleteproduct !== null) {
-            this.setState({ statusButtonEdit: false, productstatus: true });
-            var url_product = ip + "/Product/find/all/admin";
-            const product = await (await axios.get(url_product)).data;
-            this.setState({
-                product: product,
-                productstatus: false
+        const deleteproduct = await (await axios.delete(url_delete_product, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+        if ((deleteproduct?.statusCode === 500) || (deleteproduct?.statusCode === 400)) {
+            swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+                this.setState({
+                    token: cookies.remove('token_key', { path: '/Admin/' }),
+                    user: cookies.remove('user', { path: '/Admin/' })
+                });
+                window.location.replace('/Admin/Login', false);
             });
         } else {
-
+            if (deleteproduct !== null) {
+                this.setState({ statusButtonEdit: false, productstatus: true });
+                var url_product = ip + "/Product/find/all/admin";
+                const product = await (await axios.get(url_product, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+                if ((product?.statusCode === 500) || (product?.statusCode === 400)) {
+                    swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+                        this.setState({
+                            token: cookies.remove('token_key', { path: '/Admin/' }),
+                            user: cookies.remove('user', { path: '/Admin/' })
+                        });
+                        window.location.replace('/Admin/Login', false);
+                    });
+                } else {
+                    this.setState({
+                        product: product,
+                        productstatus: false
+                    });
+                }
+            } else {
+                swal("Error!", "เกิดข้อผิดพลาดในการลบข้อมูล \n กรุณาลองใหม่อีกครั้ง", "error").then((value) => {
+                });
+            }
         }
     }
 
@@ -939,7 +986,7 @@ export default class Product extends Component {
         } else if (fileList.file.status === "removed") {
             imgMainSave.splice(0, 1);
         }
-        
+
         this.setState({ fileListMainSave: fileList.fileList });
     };
 
@@ -1011,101 +1058,129 @@ export default class Product extends Component {
             this.setState({ statusButtonEdit: true });
             var url_product = ip + "/Product/find/all/admin";
             var url_import_product = ip + "/Product/create/import/admin/";
-            const importproduct = await (await axios.post(url_import_product, this.state.dataImportFile)).data;
+            const importproduct = await (await axios.post(url_import_product, this.state.dataImportFile, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+            if ((importproduct?.statusCode === 500) || (importproduct?.statusCode === 400)) {
+                swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+                    this.setState({
+                        token: cookies.remove('token_key', { path: '/Admin/' }),
+                        user: cookies.remove('user', { path: '/Admin/' })
+                    });
+                    window.location.replace('/Admin/Login', false);
+                });
+            } else {
+                if (importproduct.length <= 0) {
+                    this.setState({ statusButtonEdit: false, productstatus: true });
+                    swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
+                        this.setState({
+                            dataImportFile: [],
+                            ststusButtomFile: false,
+                            previewImage: '',
+                            previewVisible: false,
+                            previewTitle: '',
+                            fileList: []
+                        });
+                    });
 
-            if (importproduct.length <= 0) {
-                this.setState({ statusButtonEdit: false, productstatus: true });
-                swal("Success!", "บันทึกข้อมูลสำเร็จ", "success").then((value) => {
+                    const product = await (await axios.get(url_product, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+                    if ((product?.statusCode === 500) || (product?.statusCode === 400)) {
+                        swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+                            this.setState({
+                                token: cookies.remove('token_key', { path: '/Admin/' }),
+                                user: cookies.remove('user', { path: '/Admin/' })
+                            });
+                            window.location.replace('/Admin/Login', false);
+                        });
+                    } else {
+                        this.setState({
+                            product: product,
+                            productstatus: false
+                        });
+                    }
+
+                } else {
                     this.setState({
                         dataImportFile: [],
                         ststusButtomFile: false,
+                        statusButtonEdit: false,
                         previewImage: '',
                         previewVisible: false,
+                        productstatus: true,
                         previewTitle: '',
                         fileList: []
                     });
-                });
 
-                const product = await (await axios.get(url_product)).data;
-                this.setState({
-                    product: product,
-                    productstatus: false
-                });
+                    const product = await (await axios.get(url_product, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+                    if ((product?.statusCode === 500) || (product?.statusCode === 400)) {
+                        swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+                            this.setState({
+                                token: cookies.remove('token_key', { path: '/Admin/' }),
+                                user: cookies.remove('user', { path: '/Admin/' })
+                            });
+                            window.location.replace('/Admin/Login', false);
+                        });
+                    } else {
+                        this.setState({
+                            product: product,
+                            productstatus: false
+                        });
+                    }
+                    swal("Warning!", "ข้อมูลบางสินค้าไม่สามารถ Import ข้อมูลได้ กรุณาลองใหม่", "warning").then((value) => {
 
-            } else {
-                this.setState({
-                    dataImportFile: [],
-                    ststusButtomFile: false,
-                    statusButtonEdit: false,
-                    previewImage: '',
-                    previewVisible: false,
-                    productstatus: true,
-                    previewTitle: '',
-                    fileList: []
-                });
+                        const className = 'class-name-for-style',
+                            filename = 'ProductImportError',
+                            fields = {
+                                "barCode": "barCode",
+                                "productCode": "productCode",
+                                "name": "name",
+                                "size": "size",
+                                "color": "color",
+                                "unit": "unit",
+                                "brand": "brand",
+                                "detail": "detail",
+                                "direction": "direction",
+                                "caution": "caution",
+                                "keepespreserve": "keepespreserve",
+                                "firstaidprocedure": "firstaidprocedure",
+                                "flagProduct": "flagProduct",
+                                "catId": "catId",
+                                "enduser": "enduser",
+                                "level1": "level1",
+                                "level2": "level2",
+                                "level3": "level3",
+                                "level4": "level4",
+                                "level5": "level5",
+                                "level6": "level6",
+                                "level7": "level7",
+                                "level8": "level8",
+                                "level9": "level9",
+                                "level10": "level10",
+                                "level11": "level11",
+                                "level12": "level12",
+                                "level13": "level13",
+                                "level14": "level14",
+                                "level15": "level15",
+                            },
+                            style = { padding: "5px" },
+                            data = importproduct,
+                            text = "Convert Json to Excel";
 
-                const product = await (await axios.get(url_product)).data;
-                this.setState({
-                    product: product,
-                    productstatus: false
-                });
-                swal("Warning!", "ข้อมูลบางสินค้าไม่สามารถ Import ข้อมูลได้ กรุณาลองใหม่", "warning").then((value) => {
-                    
-                    const className = 'class-name-for-style',
-                        filename = 'ProductImportError',
-                        fields = {
-                            "barCode": "barCode",
-                            "productCode": "productCode",
-                            "name": "name",
-                            "size": "size",
-                            "color": "color",
-                            "unit": "unit",
-                            "brand": "brand",
-                            "detail": "detail",
-                            "direction": "direction",
-                            "caution": "caution",
-                            "keepespreserve": "keepespreserve",
-                            "firstaidprocedure": "firstaidprocedure",
-                            "flagProduct": "flagProduct",
-                            "catId": "catId",
-                            "enduser": "enduser",
-                            "level1": "level1",
-                            "level2": "level2",
-                            "level3": "level3",
-                            "level4": "level4",
-                            "level5": "level5",
-                            "level6": "level6",
-                            "level7": "level7",
-                            "level8": "level8",
-                            "level9": "level9",
-                            "level10": "level10",
-                            "level11": "level11",
-                            "level12": "level12",
-                            "level13": "level13",
-                            "level14": "level14",
-                            "level15": "level15",
-                        },
-                        style = { padding: "5px" },
-                        data = importproduct,
-                        text = "Convert Json to Excel";
-                    
-                    <JsonToCsv
-                        data={data}
-                        className={className}
-                        filename={filename}
-                        fields={fields}
-                        style={style}
-                        text={text}
-                    />
+                        <JsonToCsv
+                            data={data}
+                            className={className}
+                            filename={filename}
+                            fields={fields}
+                            style={style}
+                            text={text}
+                        />
 
-                    const { saveAsCsv } = useJsonToCsv();
-                    saveAsCsv({ data, fields, filename })
+                        const { saveAsCsv } = useJsonToCsv();
+                        saveAsCsv({ data, fields, filename })
 
-                });
+                    });
+                }
             }
         } else {
             swal("Warning!", "ไม่พบข้อมูลข้อมูลที่จะ Import", "warning").then((value) => {
-
             });
         }
     }
@@ -1151,193 +1226,233 @@ export default class Product extends Component {
         };
 
         var url_update_product_status = ip + "/Product/update/productstatus/" + record?.productId;
-        const updateproductstatus = await (await axios.put(url_update_product_status, data)).data;
-        if (updateproductstatus[0] > 0) {
-            const product = [...this.state.product];
-            product.forEach((product, index) => {
-                if (product.productId === record?.productId) {
-                    product.productStatus = productStatus;
-                }
-            });
-            this.setState({
-                product: product,
-                productstatus: false
+        const updateproductstatus = await (await axios.put(url_update_product_status, data, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+        if ((updateproductstatus?.statusCode === 500) || (updateproductstatus?.statusCode === 400)) {
+            swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+                this.setState({
+                    token: cookies.remove('token_key', { path: '/Admin/' }),
+                    user: cookies.remove('user', { path: '/Admin/' })
+                });
+                window.location.replace('/Admin/Login', false);
             });
         } else {
+            if (updateproductstatus[0] > 0) {
+                const product = [...this.state.product];
+                product.forEach((product, index) => {
+                    if (product.productId === record?.productId) {
+                        product.productStatus = productStatus;
+                    }
+                });
+                this.setState({
+                    product: product,
+                    productstatus: false
+                });
+            } else {
 
+            }
         }
     }
 
     async componentDidMount() {
         var url_product = ip + "/Product/find/all/admin";
-        const product = await (await axios.get(url_product)).data;
-        this.setState({
-            product: product,
-            productstatus: false
-        });
+        const product = await (await axios.get(url_product, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+        if ((product?.statusCode === 500) || (product?.statusCode === 400)) {
+            swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+                this.setState({
+                    token: cookies.remove('token_key', { path: '/Admin/' }),
+                    user: cookies.remove('user', { path: '/Admin/' })
+                });
+                window.location.replace('/Admin/Login', false);
+            });
+        } else {
+            this.setState({
+                product: product,
+                productstatus: false
+            });
+        }
 
-        var url_catalog = ip + "/Catalog/find/all";
-        const catalog = await (await axios.get(url_catalog)).data;
-        this.setState({
-            catalog: catalog
-        });
+        var url_catalog = ip + "/Catalog/find/Admin/all";
+        const catalog = await (await axios.get(url_catalog, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+        if ((catalog?.statusCode === 500) || (catalog?.statusCode === 400)) {
+            swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+                this.setState({
+                    token: cookies.remove('token_key', { path: '/Admin/' }),
+                    user: cookies.remove('user', { path: '/Admin/' })
+                });
+                window.location.replace('/Admin/Login', false);
+            });
+        } else {
+            this.setState({
+                catalog: catalog
+            });
 
-        var catalogFilter = [];
-        await catalog.forEach(async (catalog, index) => {
-            var filter = { text: catalog.catName, value: catalog.catName }
-            catalogFilter.push(filter);
-        });
+            var catalogFilter = [];
+            await catalog.forEach(async (catalog, index) => {
+                var filter = { text: catalog.catName, value: catalog.catName }
+                catalogFilter.push(filter);
+            });
 
-        this.setState({
-            producttable: [
-                {
-                    title: 'รูปภาพ',
-                    dataIndex: 'img',
-                    key: 'img',
-                    render: (record) =>
-                        <>
+            this.setState({
+                producttable: [
+                    {
+                        title: 'รูปภาพ',
+                        dataIndex: 'img',
+                        key: 'img',
+                        render: (record) =>
+                            <>
+                                {
+                                    (record === null) ?
+                                        <Image src={imgm} alt="imgProfile" width={"100%"} />
+                                        :
+                                        <Image src={record} alt="imgProfile" width={"100%"} />
+                                }
+                            </>,
+                        width: 180
+                    },
+                    {
+                        title: 'แสดง',
+                        dataIndex: '',
+                        key: 'x',
+                        render: (record) =>
+                            <Switch
+                                checkedChildren={<CheckOutlined />}
+                                unCheckedChildren={<CloseOutlined />}
+                                size="small"
+                                checked={(record.productStatus === "A") ? true : false}
+                                onChange={() => this.onChangeProduct(record)}
+                            //defaultChecked
+                            />,
+                    },
+                    {
+                        title: 'รหัสโค้ด',
+                        dataIndex: 'barCode',
+                        key: 'barCode',
+                    },
+                    {
+                        title: 'รหัสสินค้า',
+                        dataIndex: 'productCode',
+                        key: 'productCode',
+                        ...this.getColumnSearchProps('productCode'),
+
+                    },
+                    {
+                        title: 'ชื่อสินค้า',
+                        dataIndex: 'name',
+                        key: 'name',
+                        ...this.getColumnSearchProps('name'),
+                    },
+                    {
+                        title: 'หน่วย',
+                        dataIndex: 'unit',
+                        key: 'unit',
+                        filters: [
                             {
-                                (record === null) ?
-                                    <Image src={imgm} alt="imgProfile" width={"100%"} />
-                                    :
-                                    <Image src={record} alt="imgProfile" width={"100%"} />
-                            }
-                        </>,
-                    width: 180
-                },
-                {
-                    title: 'แสดง',
-                    dataIndex: '',
-                    key: 'x',
-                    render: (record) =>
-                        <Switch
-                            checkedChildren={<CheckOutlined />}
-                            unCheckedChildren={<CloseOutlined />}
-                            size="small"
-                            checked={(record.productStatus === "A") ? true : false}
-                            onChange={() => this.onChangeProduct(record)}
-                        //defaultChecked
-                        />,
-                },
-                {
-                    title: 'รหัสโค้ด',
-                    dataIndex: 'barCode',
-                    key: 'barCode',
-                },
-                {
-                    title: 'รหัสสินค้า',
-                    dataIndex: 'productCode',
-                    key: 'productCode',
-                    ...this.getColumnSearchProps('productCode'),
+                                text: 'ใบ',
+                                value: 'ใบ',
+                            },
+                            {
+                                text: 'กล่อง',
+                                value: 'กล่อง',
+                            },
+                            {
+                                text: 'ลัง',
+                                value: 'ลัง',
+                            },
+                            {
+                                text: 'แผ่น',
+                                value: 'แผ่น',
+                            },
+                        ],
+                        onFilter: (value, record) => record.unit.indexOf(value) === 0,
+                    },
+                    {
+                        title: 'หมวดหมู่',
+                        dataIndex: 'catName',
+                        key: 'catName',
+                        filters: catalogFilter,
+                        onFilter: (value, record) => record.catName.indexOf(value) === 0,
+                    },
+                    {
+                        title: 'ขนาด',
+                        dataIndex: 'size',
+                        key: 'size',
+                    },
+                    {
+                        title: 'สี',
+                        dataIndex: 'color',
+                        key: 'color',
+                        ...this.getColumnSearchProps('color'),
+                    },
+                    {
+                        title: 'วันที่',
+                        dataIndex: 'createDate',
+                        key: 'createDate',
+                        ...this.getColumnSearchProps('createDate'),
+                        render: render =>
+                            <>
+                                <div>{moment(render).format('L')}</div>
+                            </>
+                    },
+                    {
+                        title: '',
+                        dataIndex: '',
+                        key: 'x',
+                        width: 45,
+                        render: (record) =>
+                            <>
+                                <div type="primary" onClick={() => this.showModal(record)}><EditTwoTone style={{ fontSize: '20px', cursor: 'pointer' }} twoToneColor="#63549B" /></div>
+                            </>,
+                    },
+                    {
+                        title: '',
+                        dataIndex: '',
+                        key: 'x',
+                        width: 45,
+                        render: (record) =>
+                            <Popconfirm title="คุณแน่ใจว่าจะลบรายการ？" okText="ลบ" cancelText="ยกเลิก" onConfirm={() => this.handleDeleteProduct(record)}>
+                                <div><DeleteTwoTone style={{ fontSize: '20px', cursor: 'pointer' }} twoToneColor="#DA213D" /></div>
+                            </Popconfirm>,
+                    },
+                ]
+            });
+        }
 
-                },
-                {
-                    title: 'ชื่อสินค้า',
-                    dataIndex: 'name',
-                    key: 'name',
-                    ...this.getColumnSearchProps('name'),
-                },
-                {
-                    title: 'หน่วย',
-                    dataIndex: 'unit',
-                    key: 'unit',
-                    filters: [
-                        {
-                            text: 'ใบ',
-                            value: 'ใบ',
-                        },
-                        {
-                            text: 'กล่อง',
-                            value: 'กล่อง',
-                        },
-                        {
-                            text: 'ลัง',
-                            value: 'ลัง',
-                        },
-                        {
-                            text: 'แผ่น',
-                            value: 'แผ่น',
-                        },
-                    ],
-                    onFilter: (value, record) => record.unit.indexOf(value) === 0,
-                },
-                {
-                    title: 'หมวดหมู่',
-                    dataIndex: 'catName',
-                    key: 'catName',
-                    filters: catalogFilter,
-                    onFilter: (value, record) => record.catName.indexOf(value) === 0,
-                },
-                {
-                    title: 'ขนาด',
-                    dataIndex: 'size',
-                    key: 'size',
-                },
-                {
-                    title: 'สี',
-                    dataIndex: 'color',
-                    key: 'color',
-                    ...this.getColumnSearchProps('color'),
-                },
-                {
-                    title: 'วันที่',
-                    dataIndex: 'createDate',
-                    key: 'createDate',
-                    ...this.getColumnSearchProps('createDate'),
-                    render: render =>
-                        <>
-                            <div>{moment(render).format('L')}</div>
-                        </>
-                },
-                {
-                    title: '',
-                    dataIndex: '',
-                    key: 'x',
-                    width: 45,
-                    render: (record) =>
-                        <>
-                            <div type="primary" onClick={() => this.showModal(record)}><EditTwoTone style={{ fontSize: '20px', cursor: 'pointer' }} twoToneColor="#63549B" /></div>
-                        </>,
-                },
-                {
-                    title: '',
-                    dataIndex: '',
-                    key: 'x',
-                    width: 45,
-                    render: (record) =>
-                        <Popconfirm title="คุณแน่ใจว่าจะลบรายการ？" okText="ลบ" cancelText="ยกเลิก" onConfirm={() => this.handleDeleteProduct(record)}>
-                            <div><DeleteTwoTone style={{ fontSize: '20px', cursor: 'pointer' }} twoToneColor="#DA213D" /></div>
-                        </Popconfirm>,
-                },
-            ]
-        });
+        var url_member = ip + "/Member/find/Admin/all";
+        const member = await (await axios.get(url_member, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
+        if ((member?.statusCode === 500) || (member?.statusCode === 400)) {
+            swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+                this.setState({
+                    token: cookies.remove('token_key', { path: '/Admin/' }),
+                    user: cookies.remove('user', { path: '/Admin/' })
+                });
+                window.location.replace('/Admin/Login', false);
+            });
+        } else {
+            this.setState({
+                member: member
+            });
 
-        var url_member = ip + "/Member/find/all";
-        const member = await (await axios.get(url_member)).data;
-        this.setState({
-            member: member
-        });
-
-        this.state.member?.map((member) => {
-            if (member.memberCode === "member1") {
-                this.setState({
-                    member1: member.memberName
-                });
-            } else if (member.memberCode === "member2") {
-                this.setState({
-                    member2: member.memberName
-                });
-            } else if (member.memberCode === "member3") {
-                this.setState({
-                    member3: member.memberName
-                });
-            } else if (member.memberCode === "EndUser") {
-                this.setState({
-                    EndUser: member.memberName
-                });
-            }
-            return 0;
-        });
+            this.state.member?.map((member) => {
+                if (member.memberCode === "member1") {
+                    this.setState({
+                        member1: member.memberName
+                    });
+                } else if (member.memberCode === "member2") {
+                    this.setState({
+                        member2: member.memberName
+                    });
+                } else if (member.memberCode === "member3") {
+                    this.setState({
+                        member3: member.memberName
+                    });
+                } else if (member.memberCode === "EndUser") {
+                    this.setState({
+                        EndUser: member.memberName
+                    });
+                }
+                return 0;
+            });
+        }
     }
 
     getColumnSearchProps = dataIndex => ({
