@@ -523,7 +523,7 @@ export default class Home extends Component {
       });
     }
 
-    var url_contact = ip + "/Contact/find/Admin/all";
+    var url_contact = ip + "/Contact/find/all";
     const contact = await (await axios.get(url_contact, { headers: { "token": this.state.token, "key": this.state.user?.username } })).data;
     if ((contact?.statusCode === 500) || (contact?.statusCode === 400)) {
       swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
@@ -1024,7 +1024,7 @@ export default class Home extends Component {
       }
     }
   };
-
+  
   handleCancelnewProduct() {
     this.setState({ isModalVisiblenewProduct: false })
   }
