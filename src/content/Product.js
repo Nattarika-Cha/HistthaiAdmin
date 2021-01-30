@@ -4,7 +4,7 @@ import { Row, Col, Input, Select, Button, Table, Switch, Modal, Popconfirm, Uplo
 import { Container, Image } from 'react-bootstrap';
 import { CloseOutlined, CheckOutlined, PlusOutlined, EditTwoTone, DeleteTwoTone, SearchOutlined } from '@ant-design/icons'; //PrinterTwoTone
 import '../css/Product.css';
-import moment from 'moment';
+// import moment from 'moment';
 import axios from 'axios';
 import swal from 'sweetalert';
 import Highlighter from 'react-highlight-words';
@@ -252,10 +252,11 @@ export default class Product extends Component {
                     dataIndex: 'createDate',
                     key: 'createDate',
                     ...this.getColumnSearchProps('createDate'),
-                    render: render =>
-                        <>
-                            <div>{moment(render).format('L')}</div>
-                        </>
+                    // render: (createDate) => moment(createDate).format('DD/MM/YYYY')
+                    // render: render =>
+                    //     <>
+                    //         <div>{moment(render).format('L')}</div>
+                    //     </>
                 },
                 {
                     title: '',
@@ -1388,10 +1389,11 @@ export default class Product extends Component {
                         dataIndex: 'createDate',
                         key: 'createDate',
                         ...this.getColumnSearchProps('createDate'),
-                        render: render =>
-                            <>
-                                <div>{moment(render).format('L')}</div>
-                            </>
+                        // render: (createDate) => moment(createDate).format('DD/MM/YYYY')
+                        // render: render =>
+                        //     <>
+                        //         <div>{moment(render).format('L')}</div>
+                        //     </>
                     },
                     {
                         title: '',
@@ -1474,12 +1476,8 @@ export default class Product extends Component {
                         onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
                         size="small"
                         style={{ width: 90 }}
-                    >
-                        Search
-              </Button>
-                    <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
-                        Reset
-              </Button>
+                    >Search</Button>
+                    <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>Reset</Button>
                 </Space>
             </div>
         ),
@@ -1494,6 +1492,7 @@ export default class Product extends Component {
             }
         },
         render: text =>
+            // console.log(dataIndex, " teststststs")
             this.state.searchedColumn === dataIndex ? (
                 <Highlighter
                     highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
@@ -1502,8 +1501,10 @@ export default class Product extends Component {
                     textToHighlight={text ? text.toString() : ''}
                 />
             ) : (
+                    //dataIndex === 'createDate' ? moment(text).format('L') : text
                     text
-                ),
+                )
+        ,
     });
 
     handleSearch = (selectedKeys, confirm, dataIndex) => {
