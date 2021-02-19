@@ -11,6 +11,9 @@ import Cookies from 'universal-cookie';
 import imgm from '../img/photocomingsoon.svg';
 import { config } from '../config/config';
 
+import website from "../documents/Hitthai.pdf"
+import websiteadmin from "../documents/HitthaiAdmin.pdf"
+
 var ip = config.ipServer;
 
 const cookies = new Cookies();
@@ -1260,9 +1263,15 @@ export default class Setting extends Component {
                         <Col md={1} xl={1} id="icon-setting">
                             <SettingOutlined style={{ fontSize: '300%', color: '#DA213D' }} />
                         </Col>
-                        <Col md={5} xl={5} id="page-setting">
-                            ตั้งค่า
-                    </Col>
+                        <Col md={5} xl={5} id="page-setting">ตั้งค่า</Col>
+                    </Row>
+                    <Row id="row-level2">
+                        <a href={website} target="_blank" rel="noopener noreferrer" download="Hitthai.pdf" style={{marginRight: "1%"}}>
+                            <Button id="button-addcatalog">คู่มือใช้งานเว็บไซต์</Button>
+                        </a>
+                        <a href={websiteadmin} target="_blank" rel="noopener noreferrer" download="HitthaiAdmin.pdf">
+                            <Button id="button-addcatalog">คู่มือใช้งานเว็บไซต์ Admin</Button>
+                        </a>
                     </Row>
                     <Row id="row-level">
                         <Col md={8} xl={8} id="col-level">
