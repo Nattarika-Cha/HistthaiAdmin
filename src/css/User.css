@@ -50,3 +50,9 @@
     border-radius: 1mm;
     box-shadow: 1px 1px 1px 1px rgba(153, 151, 151, 0.2);
 }
+
+#reset-pass {
+    display: flex;
+    justify-content: center;
+    margin-top: 2%;
+}

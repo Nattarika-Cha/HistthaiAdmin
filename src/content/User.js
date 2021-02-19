@@ -144,6 +144,7 @@ export default class UserProfile extends Component {
         this.handleChangeLevelIdEdit = this.handleChangeLevelIdEdit.bind(this);
         this.handleDeleteUser = this.handleDeleteUser.bind(this);
         this.onChangeFilduserCode = this.onChangeFilduserCode.bind(this);
+        this.onResetPassword = this.onResetPassword.bind(this);
     }
 
     getColumnSearchProps = dataIndex => ({
@@ -323,6 +324,25 @@ export default class UserProfile extends Component {
             });
         }
     };
+
+    async onResetPassword() {
+        var url_reset_pass = ip + "/UserProfile/ResetPass/" + this.state.userProfileId;
+        const resetpass = await(await axios.post(url_reset_pass, { headers: { "token": this.state.token, "key": this.state.userLogin?.username } })).data;
+        if ((resetpass?.statusCode === 500) || (resetpass?.statusCode === 400)) {
+            swal("Error!", "เกิดข้อผิดพลาดในการเข้าสู่ระบบ \n กรุณาเข้าสู่ระบบใหม่", "error").then((value) => {
+                this.setState({
+                    token: cookies.remove('token_key', { path: '/Admin/' }),
+                    user: cookies.remove('user', { path: '/Admin/' })
+                });
+                window.location.replace('/Admin/Login', false);
+            });
+        } else {
+            if (resetpass !== null) {
+                swal("Success!", "บันทึกข้อมูลสำเร็จ \n รหัสผ่านใหม่ของคุณคือ Hitsthai1234", "success").then((value) => {
+                });
+            }
+        }
+    }
 
     handleCancel() {
         this.setState({
@@ -623,6 +643,9 @@ export default class UserProfile extends Component {
                                     <Col md={6} xl={6}></Col>
                                     <Col md={5} xl={5} id="col-header">วันที่</Col>
                                     <Col>{moment(this.state.createDate).format('L')}</Col>
+                                </Row>
+                                <Row id="row-margin">
+                                    <Col md={24} xl={24} id="reset-pass"><Button id="button-addcatalog" onClick={this.onResetPassword}>ตั้งค่ารหัสผ่านใหม่</Button></Col>
                                 </Row>
                             </Col>
                         </Form>
